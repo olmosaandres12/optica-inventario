@@ -923,261 +923,272 @@
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ybWpsZnBidGpxeXZ0cGRleGVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NjM0MTcsImV4cCI6MjA5MjUzOTQxN30.cg36SF1XXpFbg3hRl2Xl7Tof_OhNJRa9B1BIUcNLpoQ';
 
   // ── Auth guard ────────────────────────────────────────
-  const session = JSON.parse(localStorage.getItem('olvision_user') || 'null');
-  if (!session) { window.location.replace('index.html'); }
+  let session = null;
+  try { session = JSON.parse(localStorage.getItem('olvision_user') || 'null'); } catch(e) {}
+  if (!session) { window.location.replace('index.html'); throw new Error('no session'); }
 
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  // ── Supabase init ─────────────────────────────────────
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  // ── Utils ──────────────────────────────────────────────
+  function esc(s) {
+    const d = document.createElement('div');
+    d.appendChild(document.createTextNode(String(s)));
+    return d.innerHTML;
+  }
+  function timeAgo(date) {
+    const diff = Math.floor((Date.now() - new Date(date)) / 1000);
+    if (diff < 60)   return 'Hace un momento';
+    if (diff < 3600) return `Hace ${Math.floor(diff/60)} min`;
+    if (diff < 86400)return `Hace ${Math.floor(diff/3600)}h`;
+    return new Date(date).toLocaleDateString('es-AR', { day:'numeric', month:'short' });
+  }
+  function roleLabel(r) {
+    return { admin:'Administrador', empleado:'Empleado', supervisor:'Supervisor' }[r] || (r || 'Usuario');
+  }
+  const ICONS = {
+    check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 8px;width:36px;height:36px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+    clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 8px;width:36px;height:36px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+    cal:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+    up:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`,
+    down:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`,
+    adj:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>`,
+  };
 
   // ── Populate user UI ──────────────────────────────────
   function initUserUI() {
-    if (!session) return;
-    const name = session.name || 'Usuario';
+    const name = session.name || session.email || 'Usuario';
     const role = session.role || 'empleado';
     document.getElementById('userName').textContent = name;
     document.getElementById('userRole').textContent = roleLabel(role);
     document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
-    document.getElementById('topbarName').textContent = name.split(' ')[0];
-
-    // Show admin section
-    if (role === 'admin') {
-      document.getElementById('adminSection').style.display = 'block';
-    }
+    if (role === 'admin') document.getElementById('adminSection').style.display = 'block';
   }
 
-  function roleLabel(r) {
-    return { admin: 'Administrador', empleado: 'Empleado', supervisor: 'Supervisor' }[r] || r;
-  }
-
-  // ── Date ──────────────────────────────────────────────
-  function updateDate() {
-    const now = new Date();
-    const opts = { weekday:'long', day:'numeric', month:'long' };
-    const label = now.toLocaleDateString('es-AR', opts);
-    document.getElementById('topbarDate').textContent =
-      label.charAt(0).toUpperCase() + label.slice(1);
-  }
-
-  // ── Greeting ──────────────────────────────────────────
   function initGreeting() {
     const h = new Date().getHours();
-    let g = 'Buenos días';
-    if (h >= 12 && h < 18) g = 'Buenas tardes';
-    else if (h >= 18) g = 'Buenas noches';
-    const span = document.querySelector('.topbar-title');
-    if (span) span.innerHTML = `${g}, <span id="topbarName">${(session?.name||'').split(' ')[0]}</span> 👋`;
+    const g = h < 12 ? 'Buenos días' : h < 18 ? 'Buenas tardes' : 'Buenas noches';
+    const firstName = (session.name || session.email || '').split(' ')[0];
+    document.querySelector('.topbar-title').innerHTML =
+      `${g}, <span style="color:var(--blue-light)">${esc(firstName)}</span> 👋`;
+  }
+
+  function initDate() {
+    const label = new Date().toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'long' });
+    document.getElementById('topbarDate').textContent = label.charAt(0).toUpperCase() + label.slice(1);
   }
 
   // ── Load data ─────────────────────────────────────────
+  // Cada función es independiente — un error no bloquea las demás
   async function loadDashboard() {
-    try {
-      await Promise.all([
-        loadProductCount(),
-        loadLowStock(),
-        loadLastInventory(),
-        loadMovimientosHoy(),
-        loadActivity(),
-      ]);
-    } catch (e) {
-      console.error('Dashboard error:', e);
-    }
+    loadProductCount();
+    loadLowStock();
+    loadLastInventory();
+    loadMovimientosHoy();
+    loadActivity();
+    loadBranch();
   }
 
+  // Card: total productos
   async function loadProductCount() {
-    const { count, error } = await supabase
-      .from('products')
-      .select('*', { count: 'exact', head: true })
-      .eq('active', true);
     const el = document.getElementById('totalProductos');
-    el.textContent = error ? '—' : (count ?? 0);
+    try {
+      // Primero intentamos sin filtro de 'active' por si no existe la columna
+      const { count, error } = await sb
+        .from('products')
+        .select('*', { count:'exact', head:true });
+      if (error) throw error;
+      el.textContent = count ?? 0;
+    } catch(e) {
+      console.warn('[productos]', e.message);
+      el.textContent = '—';
+    }
   }
 
+  // Card + panel: stock bajo
   async function loadLowStock() {
-    // Obtener productos con stock ≤ stock_min
-    const { data, error } = await supabase
-      .from('products')
-      .select('id, name, stock_min')
-      .eq('active', true);
-
-    const panel = document.getElementById('stockAlertsPanel');
+    const panel   = document.getElementById('stockAlertsPanel');
     const countEl = document.getElementById('alertasStock');
+    const trendEl = document.getElementById('alertasTrend');
 
-    if (error || !data) {
+    try {
+      // Traer todos los productos (sin filtrar por 'active' que puede no existir)
+      const { data: products, error: pErr } = await sb
+        .from('products')
+        .select('id, name, stock_min');
+      if (pErr) throw pErr;
+      if (!products || products.length === 0) {
+        countEl.textContent = '0';
+        panel.innerHTML = `<div class="empty-state">${ICONS.check}Sin productos cargados aún</div>`;
+        return;
+      }
+
+      // Calcular stock actual desde movimientos
+      const { data: moves } = await sb
+        .from('stock_movements')
+        .select('product_id, quantity, movement_type, type');
+
+      const stockMap = {};
+      if (moves) {
+        moves.forEach(m => {
+          const pid = m.product_id;
+          if (!stockMap[pid]) stockMap[pid] = 0;
+          // Soportamos tanto 'type' como 'movement_type' por si el schema difiere
+          const t = m.movement_type || m.type || '';
+          if (t === 'entrada' || t === 'ingreso' || t === 'in') stockMap[pid] += Number(m.quantity);
+          else if (t === 'salida' || t === 'egreso' || t === 'out') stockMap[pid] -= Number(m.quantity);
+          else if (t === 'ajuste' || t === 'adjustment') stockMap[pid] = Number(m.quantity);
+        });
+      }
+
+      const alerts = products
+        .map(p => ({ ...p, cur: stockMap[p.id] ?? 0 }))
+        .filter(p => p.cur <= (p.stock_min ?? 5))
+        .sort((a, b) => a.cur - b.cur)
+        .slice(0, 6);
+
+      countEl.textContent = alerts.length;
+
+      if (alerts.length === 0) {
+        panel.innerHTML = `<div class="empty-state">${ICONS.check}¡Todo en orden! Sin alertas de stock.</div>`;
+        if (trendEl) { trendEl.innerHTML = '✓ Stock en orden'; trendEl.className = 'card-trend up'; }
+        return;
+      }
+
+      // Mostrar filas de alerta
+      panel.innerHTML = alerts.map(p => {
+        const crit = p.cur <= 0 ? 'critical' : p.cur <= Math.ceil((p.stock_min||5)/2) ? 'critical' : 'warning';
+        return `<div class="alert-row">
+          <div class="alert-dot ${crit}"></div>
+          <div class="alert-info">
+            <div class="alert-name">${esc(p.name)}</div>
+            <div class="alert-branch">Mín: ${p.stock_min ?? 5} ud.</div>
+          </div>
+          <div>
+            <div class="alert-stock ${crit}">${p.cur} ud.</div>
+            <div class="alert-min">${crit === 'critical' ? '⚠ Crítico' : '! Bajo'}</div>
+          </div>
+        </div>`;
+      }).join('');
+
+    } catch(e) {
+      console.warn('[stockBajo]', e.message);
       countEl.textContent = '—';
-      panel.innerHTML = '<div class="empty-state">Error al cargar alertas</div>';
-      return;
+      panel.innerHTML = `<div class="empty-state">No se pudo cargar (${esc(e.message)})</div>`;
     }
-
-    // Obtener stock actual de cada producto (suma de movimientos o tabla stock)
-    // Por simplicidad consultamos stock_movements para calcular stock actual
-    const { data: moves } = await supabase
-      .from('stock_movements')
-      .select('product_id, quantity, type');
-
-    const stockMap = {};
-    if (moves) {
-      moves.forEach(m => {
-        if (!stockMap[m.product_id]) stockMap[m.product_id] = 0;
-        if (m.type === 'entrada') stockMap[m.product_id] += m.quantity;
-        else if (m.type === 'salida') stockMap[m.product_id] -= m.quantity;
-        else if (m.type === 'ajuste') stockMap[m.product_id] = m.quantity;
-      });
-    }
-
-    const alerts = data
-      .map(p => ({ ...p, currentStock: stockMap[p.id] ?? 0 }))
-      .filter(p => p.currentStock <= (p.stock_min ?? 5))
-      .sort((a, b) => a.currentStock - b.currentStock)
-      .slice(0, 6);
-
-    countEl.textContent = alerts.length;
-
-    if (alerts.length === 0) {
-      panel.innerHTML = `
-        <div class="empty-state">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 8px">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-            <polyline points="22 4 12 14.01 9 11.01"/>
-          </svg>
-          ¡Todo en orden! No hay alertas de stock.
-        </div>`;
-      document.getElementById('alertasTrend').innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        Stock en orden`;
-      document.getElementById('alertasTrend').className = 'card-trend up';
-      return;
-    }
-
-    panel.innerHTML = alerts.map(p => {
-      const crit = p.currentStock === 0 ? 'critical' : p.currentStock <= Math.ceil((p.stock_min||5)/2) ? 'critical' : 'warning';
-      return `
-      <div class="alert-row">
-        <div class="alert-dot ${crit}"></div>
-        <div class="alert-info">
-          <div class="alert-name">${escHtml(p.name)}</div>
-          <div class="alert-branch">Mín. requerido: ${p.stock_min ?? 5}</div>
-        </div>
-        <div>
-          <div class="alert-stock ${crit}">${p.currentStock} ud.</div>
-          <div class="alert-min">${crit === 'critical' ? 'Crítico' : 'Bajo'}</div>
-        </div>
-      </div>`;
-    }).join('');
   }
 
+  // Card: último inventario
   async function loadLastInventory() {
-    const { data, error } = await supabase
-      .from('inventories')
-      .select('id, created_at, status')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
-
-    const el     = document.getElementById('ultimoInventario');
-    const fecha  = document.getElementById('inventarioFecha');
-
-    if (error || !data) {
+    const el    = document.getElementById('ultimoInventario');
+    const fecha = document.getElementById('inventarioFecha');
+    try {
+      const { data, error } = await sb
+        .from('inventories')
+        .select('id, created_at')
+        .order('created_at', { ascending: false })
+        .limit(1);
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        el.textContent = 'N/A';
+        if (fecha) fecha.innerHTML = `${ICONS.cal} Sin registros`;
+        return;
+      }
+      const d = new Date(data[0].created_at);
+      const days = Math.floor((Date.now() - d) / 86400000);
+      el.textContent = days === 0 ? 'Hoy' : days === 1 ? 'Ayer' : `Hace ${days}d`;
+      if (fecha) fecha.innerHTML = `${ICONS.cal} ${d.toLocaleDateString('es-AR', { day:'numeric', month:'short', year:'numeric' })}`;
+    } catch(e) {
+      console.warn('[inventario]', e.message);
       el.textContent = 'N/A';
-      fecha.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
-          <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-        </svg>Sin inventarios registrados`;
-      return;
+      if (fecha) fecha.textContent = 'Sin datos';
     }
-
-    const d = new Date(data.created_at);
-    const diffDays = Math.floor((Date.now() - d) / 86400000);
-    el.textContent = diffDays === 0 ? 'Hoy' : diffDays === 1 ? 'Ayer' : `Hace ${diffDays}d`;
-    fecha.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
-        <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-      </svg>${d.toLocaleDateString('es-AR', { day:'numeric', month:'short', year:'numeric' })}`;
   }
 
+  // Card: movimientos hoy
   async function loadMovimientosHoy() {
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    const { count, error } = await supabase
-      .from('stock_movements')
-      .select('*', { count:'exact', head:true })
-      .gte('created_at', today.toISOString());
-    document.getElementById('movimientosHoy').textContent = error ? '—' : (count ?? 0);
-  }
-
-  async function loadActivity() {
-    const { data, error } = await supabase
-      .from('stock_movements')
-      .select('id, type, quantity, created_at, products(name)')
-      .order('created_at', { ascending: false })
-      .limit(5);
-
-    const panel = document.getElementById('activityPanel');
-
-    if (error || !data || data.length === 0) {
-      panel.innerHTML = `
-        <div class="empty-state">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 8px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Sin movimientos registrados aún
-        </div>`;
-      return;
+    const el = document.getElementById('movimientosHoy');
+    try {
+      const today = new Date(); today.setHours(0,0,0,0);
+      const { count, error } = await sb
+        .from('stock_movements')
+        .select('*', { count:'exact', head:true })
+        .gte('created_at', today.toISOString());
+      if (error) throw error;
+      el.textContent = count ?? 0;
+    } catch(e) {
+      console.warn('[movHoy]', e.message);
+      el.textContent = '—';
     }
-
-    panel.innerHTML = data.map(m => {
-      const typeMap = { entrada: 'Entrada de stock', salida: 'Salida de stock', ajuste: 'Ajuste de inventario' };
-      const iconMap = {
-        entrada: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`,
-        salida:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`,
-        ajuste:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>`,
-      };
-      const sign = m.type === 'entrada' ? '+' : m.type === 'salida' ? '-' : '~';
-      const d = new Date(m.created_at);
-      const relTime = timeAgo(d);
-      return `
-      <div class="activity-row">
-        <div class="activity-icon ${m.type}">${iconMap[m.type] || iconMap.ajuste}</div>
-        <div class="activity-body">
-          <div class="activity-title">${escHtml(m.products?.name || 'Producto')}</div>
-          <div class="activity-meta">${typeMap[m.type] || m.type} · ${relTime}</div>
-        </div>
-        <div class="activity-qty ${m.type}">${sign}${m.quantity}</div>
-      </div>`;
-    }).join('');
   }
 
-  // ── Branch name ────────────────────────────────────────
+  // Panel: actividad reciente
+  async function loadActivity() {
+    const panel = document.getElementById('activityPanel');
+    try {
+      // Traer movimientos sin join para evitar problemas de FK
+      const { data, error } = await sb
+        .from('stock_movements')
+        .select('id, product_id, movement_type, type, quantity, created_at, notes')
+        .order('created_at', { ascending: false })
+        .limit(6);
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        panel.innerHTML = `<div class="empty-state">${ICONS.clock}Sin movimientos registrados aún</div>`;
+        return;
+      }
+
+      // Intentar obtener nombres de productos en batch
+      const pids = [...new Set(data.map(m => m.product_id).filter(Boolean))];
+      let nameMap = {};
+      if (pids.length) {
+        const { data: prods } = await sb.from('products').select('id, name').in('id', pids);
+        if (prods) prods.forEach(p => nameMap[p.id] = p.name);
+      }
+
+      const typeLabels = { entrada:'Entrada', salida:'Salida', ajuste:'Ajuste', ingreso:'Entrada', egreso:'Salida' };
+      const iconMap    = { entrada: ICONS.up, salida: ICONS.down, ajuste: ICONS.adj, ingreso: ICONS.up, egreso: ICONS.down };
+      const cssMap     = { entrada:'entrada', salida:'salida', ajuste:'ajuste', ingreso:'entrada', egreso:'salida' };
+
+      panel.innerHTML = data.map(m => {
+        const t    = m.movement_type || m.type || 'ajuste';
+        const css  = cssMap[t] || 'ajuste';
+        const sign = (t === 'entrada' || t === 'ingreso') ? '+' : (t === 'salida' || t === 'egreso') ? '-' : '~';
+        const icon = iconMap[t] || ICONS.adj;
+        const name = nameMap[m.product_id] || `Producto #${m.product_id || '?'}`;
+        return `<div class="activity-row">
+          <div class="activity-icon ${css}">${icon}</div>
+          <div class="activity-body">
+            <div class="activity-title">${esc(name)}</div>
+            <div class="activity-meta">${typeLabels[t] || t} · ${timeAgo(m.created_at)}</div>
+          </div>
+          <div class="activity-qty ${css}">${sign}${m.quantity}</div>
+        </div>`;
+      }).join('');
+
+    } catch(e) {
+      console.warn('[activity]', e.message);
+      panel.innerHTML = `<div class="empty-state">${ICONS.clock}No se pudo cargar la actividad</div>`;
+    }
+  }
+
+  // Branch name
   async function loadBranch() {
-    if (!session?.branch_id) return;
-    const { data } = await supabase
-      .from('branches')
-      .select('name')
-      .eq('id', session.branch_id)
-      .single();
-    if (data) document.getElementById('branchName').textContent = data.name;
+    const bid = session.branch_id;
+    if (!bid) return;
+    try {
+      const { data } = await sb.from('branches').select('name').eq('id', bid).single();
+      if (data?.name) document.getElementById('branchName').textContent = data.name;
+    } catch(e) { /* silencioso */ }
   }
 
-  // ── Utils ──────────────────────────────────────────────
-  function escHtml(s) {
-    const d = document.createElement('div');
-    d.appendChild(document.createTextNode(s));
-    return d.innerHTML;
-  }
-
-  function timeAgo(date) {
-    const diff = Math.floor((Date.now() - date) / 1000);
-    if (diff < 60) return 'Hace un momento';
-    if (diff < 3600) return `Hace ${Math.floor(diff/60)} min`;
-    if (diff < 86400) return `Hace ${Math.floor(diff/3600)}h`;
-    return date.toLocaleDateString('es-AR', { day:'numeric', month:'short' });
-  }
-
-  // ── Sidebar toggle (mobile) ────────────────────────────
+  // ── Sidebar (mobile) ───────────────────────────────────
   function toggleSidebar() {
-    const sb = document.getElementById('sidebar');
-    const ov = document.getElementById('sidebarOverlay');
-    const isOpen = sb.classList.contains('open');
-    sb.classList.toggle('open', !isOpen);
-    ov.classList.toggle('show', !isOpen);
+    const sb2 = document.getElementById('sidebar');
+    const ov  = document.getElementById('sidebarOverlay');
+    const open = sb2.classList.toggle('open');
+    ov.classList.toggle('show', open);
   }
   function closeSidebar() {
     document.getElementById('sidebar').classList.remove('open');
@@ -1194,9 +1205,8 @@
 
   // ── Init ──────────────────────────────────────────────
   initUserUI();
-  updateDate();
   initGreeting();
-  loadBranch();
+  initDate();
   loadDashboard();
 </script>
 </body>
