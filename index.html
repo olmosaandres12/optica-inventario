@@ -3,239 +3,388 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Óptica Inventario — Login</title>
+  <title>Olvisión — Inventario</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     body {
       font-family: 'Nunito', sans-serif;
       font-weight: 600;
-      background: #f8fafc;
+      background: #1E3A8A;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px;
+    }
+
+    /* ── LOGO ── */
+    .logo-wrap {
+      margin-bottom: 48px;
+      text-align: center;
+    }
+    .logo-wrap img {
+      width: 200px;
+      max-width: 60vw;
+    }
+
+    /* ── PANTALLA ── */
+    .pantalla {
+      width: 100%;
+      max-width: 380px;
+    }
+    .pantalla.oculto { display: none; }
+
+    /* ── PREGUNTA ── */
+    .quien {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+
+    /* ── USUARIO CARD ── */
+    .usuario-card {
+      background: rgba(255,255,255,0.1);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 18px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: all 0.15s;
+    }
+    .usuario-card:active {
+      transform: scale(0.97);
+      background: rgba(255,255,255,0.18);
+    }
+
+    .avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
-    }
-
-    .login-wrap {
-      width: 100%;
-      max-width: 400px;
-    }
-
-    /* Logo / Header */
-    .login-header {
-      background: linear-gradient(135deg, #1E3A8A 0%, #2563eb 100%);
-      border-radius: 22px;
-      padding: 36px 24px;
-      text-align: center;
-      color: white;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 20px rgba(30, 58, 138, 0.25);
-    }
-
-    .login-header .icono {
-      font-size: 48px;
-      margin-bottom: 12px;
-    }
-
-    .login-header h1 {
-      font-size: 22px;
+      font-size: 18px;
       font-weight: 900;
-      margin-bottom: 4px;
-    }
-
-    .login-header p {
-      font-size: 13px;
-      opacity: 0.8;
-      font-weight: 600;
-    }
-
-    /* Card del formulario */
-    .login-card {
-      background: white;
-      border-radius: 22px;
-      padding: 28px 24px;
-      border: 1.5px solid #f1f5f9;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    }
-
-    .campo {
-      margin-bottom: 16px;
-    }
-
-    .campo label {
-      display: block;
-      font-size: 13px;
-      font-weight: 800;
-      color: #1E3A8A;
-      margin-bottom: 6px;
-    }
-
-    .campo input {
-      width: 100%;
-      border: 1.5px solid #f1f5f9;
-      border-radius: 14px;
-      padding: 12px 16px;
-      font-size: 15px;
-      font-family: 'Nunito', sans-serif;
-      font-weight: 600;
-      color: #1e293b;
-      background: white;
-      outline: none;
-      transition: all 0.15s;
-    }
-
-    .campo input:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-    }
-
-    .btn-login {
-      width: 100%;
-      background: linear-gradient(135deg, #1E3A8A, #2563eb);
       color: white;
-      border: none;
-      border-radius: 14px;
-      padding: 14px;
-      font-size: 16px;
-      font-family: 'Nunito', sans-serif;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.28);
-      transition: opacity 0.15s;
-      margin-top: 8px;
+      flex-shrink: 0;
     }
 
-    .btn-login:active { opacity: 0.88; }
-    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
+    .usuario-info { flex: 1; }
+    .usuario-nombre { font-size: 16px; font-weight: 800; color: white; }
+    .usuario-rol { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 600; text-transform: capitalize; }
+    .usuario-arrow { color: rgba(255,255,255,0.4); font-size: 18px; }
 
-    /* Error */
-    .error-msg {
-      background: #fef2f2;
-      border: 1.5px solid #fca5a5;
-      border-radius: 14px;
-      padding: 12px 16px;
-      font-size: 13px;
-      font-weight: 700;
-      color: #dc2626;
-      margin-top: 14px;
-      display: none;
+    /* ── PANTALLA PIN ── */
+    .pin-header { text-align: center; margin-bottom: 32px; }
+
+    .pin-avatar-grande {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: 900;
+      color: white;
+      margin: 0 auto 12px;
     }
 
-    .error-msg.visible { display: block; }
+    .pin-nombre { font-size: 20px; font-weight: 900; color: white; }
+    .pin-sub { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 600; margin-top: 4px; }
 
-    /* Loading */
-    .spinner {
-      display: inline-block;
+    /* Puntos del PIN */
+    .pin-dots {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .pin-dot {
       width: 16px;
       height: 16px;
+      border-radius: 50%;
       border: 2px solid rgba(255,255,255,0.4);
+      background: transparent;
+      transition: all 0.15s;
+    }
+    .pin-dot.lleno { background: #f9f4ab; border-color: #f9f4ab; }
+    .pin-dot.error { background: #ef4444; border-color: #ef4444; }
+
+    /* Teclado */
+    .teclado {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 280px;
+      margin: 0 auto 24px;
+    }
+    .tecla {
+      background: rgba(255,255,255,0.1);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 18px;
+      height: 68px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.1s;
+      color: white;
+      user-select: none;
+    }
+    .tecla:active { transform: scale(0.93); background: rgba(255,255,255,0.22); }
+    .tecla .num { font-size: 24px; font-weight: 800; line-height: 1; }
+    .tecla .letras { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.4); letter-spacing: 1px; margin-top: 2px; }
+    .tecla.vacia { background: transparent; border-color: transparent; cursor: default; }
+    .tecla.vacia:active { transform: none; }
+    .tecla.borrar { font-size: 22px; }
+
+    .btn-volver {
+      display: block;
+      text-align: center;
+      color: rgba(255,255,255,0.5);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 8px;
+      margin-top: 4px;
+    }
+    .btn-volver:active { opacity: 0.7; }
+
+    .error-pin {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fca5a5;
+      margin-bottom: 16px;
+      min-height: 20px;
+    }
+
+    /* Loading */
+    .loading {
+      position: fixed;
+      inset: 0;
+      background: #1E3A8A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .loading.oculto { display: none; }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255,255,255,0.2);
       border-top-color: white;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
-      margin-right: 8px;
-      vertical-align: middle;
     }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .version {
-      text-align: center;
+    .footer {
+      position: fixed;
+      bottom: 20px;
       font-size: 11px;
-      color: #94a3b8;
-      margin-top: 16px;
+      color: rgba(255,255,255,0.25);
+      font-weight: 600;
+      letter-spacing: 1px;
     }
   </style>
 </head>
 <body>
 
-<div class="login-wrap">
-
-  <div class="login-header">
-    <div class="icono">👓</div>
-    <h1>Óptica Inventario</h1>
-    <p>Sistema de gestión de stock</p>
-  </div>
-
-  <div class="login-card">
-    <div class="campo">
-      <label>Correo electrónico</label>
-      <input type="email" id="email" placeholder="tu@email.com" autocomplete="email" />
-    </div>
-
-    <div class="campo">
-      <label>Contraseña</label>
-      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
-    </div>
-
-    <button class="btn-login" id="btnLogin" onclick="login()">
-      Ingresar
-    </button>
-
-    <div class="error-msg" id="errorMsg"></div>
-  </div>
-
-  <p class="version">v1.0 — Olvisión</p>
+<div class="loading" id="loading">
+  <div class="spinner"></div>
 </div>
 
+<div class="logo-wrap">
+  <img src="logo.png" alt="Olvisión" />
+</div>
+
+<!-- PANTALLA 1: Elegir usuario -->
+<div class="pantalla" id="pantallaUsuarios">
+  <p class="quien">¿Quién sos?</p>
+  <div id="listaUsuarios"></div>
+</div>
+
+<!-- PANTALLA 2: PIN -->
+<div class="pantalla oculto" id="pantallaPin">
+  <div class="pin-header">
+    <div class="pin-avatar-grande" id="pinAvatar"></div>
+    <div class="pin-nombre" id="pinNombre"></div>
+    <div class="pin-sub">Ingresá tu PIN</div>
+  </div>
+
+  <div class="pin-dots">
+    <div class="pin-dot" id="dot0"></div>
+    <div class="pin-dot" id="dot1"></div>
+    <div class="pin-dot" id="dot2"></div>
+    <div class="pin-dot" id="dot3"></div>
+  </div>
+
+  <div class="error-pin" id="errorPin"></div>
+
+  <div class="teclado">
+    <div class="tecla" onclick="tecla('1')"><span class="num">1</span></div>
+    <div class="tecla" onclick="tecla('2')"><span class="num">2</span><span class="letras">ABC</span></div>
+    <div class="tecla" onclick="tecla('3')"><span class="num">3</span><span class="letras">DEF</span></div>
+    <div class="tecla" onclick="tecla('4')"><span class="num">4</span><span class="letras">GHI</span></div>
+    <div class="tecla" onclick="tecla('5')"><span class="num">5</span><span class="letras">JKL</span></div>
+    <div class="tecla" onclick="tecla('6')"><span class="num">6</span><span class="letras">MNO</span></div>
+    <div class="tecla" onclick="tecla('7')"><span class="num">7</span><span class="letras">PQRS</span></div>
+    <div class="tecla" onclick="tecla('8')"><span class="num">8</span><span class="letras">TUV</span></div>
+    <div class="tecla" onclick="tecla('9')"><span class="num">9</span><span class="letras">WXYZ</span></div>
+    <div class="tecla vacia"></div>
+    <div class="tecla" onclick="tecla('0')"><span class="num">0</span></div>
+    <div class="tecla borrar" onclick="borrar()">⌫</div>
+  </div>
+
+  <div class="btn-volver" onclick="volver()">← Cambiar usuario</div>
+</div>
+
+<p class="footer">OLVISIÓN © 2025 — Sistema interno</p>
+
 <script>
-  // ── CONFIGURACIÓN SUPABASE ──
   const SUPABASE_URL  = 'https://nrmjlfpbtjqyvtpdexej.supabase.co'
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ybWpsZnBidGpxeXZ0cGRleGVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NjM0MTcsImV4cCI6MjA5MjUzOTQxN30.cg36SF1XXpFbg3hRl2Xl7Tof_OhNJRa9B1BIUcNLpoQ'
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
 
-  const { createClient } = supabase
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON)
+  const COLORES = ['#f59e0b', '#8b5cf6', '#10b981', '#ef4444', '#3b82f6', '#ec4899']
 
-  // Verificar si ya está logueado
-  sb.auth.getSession().then(({ data: { session } }) => {
-    if (session) window.location.href = 'dashboard.html'
-  })
+  let usuarios = []
+  let usuarioActual = null
+  let indexActual = 0
+  let pinIngresado = ''
 
-  async function login() {
-    const email    = document.getElementById('email').value.trim()
-    const password = document.getElementById('password').value
-    const btn      = document.getElementById('btnLogin')
-    const errorMsg = document.getElementById('errorMsg')
+  async function iniciar() {
+    const { data: { session } } = await sb.auth.getSession()
+    if (session) { window.location.href = 'dashboard.html'; return }
 
-    // Validar campos
-    if (!email || !password) {
-      mostrarError('Completá todos los campos')
+    const { data, error } = await sb
+      .from('profiles')
+      .select('id, full_name, role, email, pin')
+      .eq('is_active', true)
+      .order('full_name')
+
+    document.getElementById('loading').classList.add('oculto')
+
+    if (error || !data?.length) {
+      document.getElementById('listaUsuarios').innerHTML =
+        '<p style="color:rgba(255,255,255,0.5);text-align:center;font-size:14px;padding:20px">No hay usuarios configurados</p>'
       return
     }
 
-    // Loading
-    btn.disabled = true
-    btn.innerHTML = '<span class="spinner"></span>Ingresando...'
-    errorMsg.classList.remove('visible')
+    usuarios = data
+    renderUsuarios()
+  }
 
-    const { data, error } = await sb.auth.signInWithPassword({ email, password })
+  function renderUsuarios() {
+    const lista = document.getElementById('listaUsuarios')
+    lista.innerHTML = usuarios.map((u, i) => {
+      const inicial = u.full_name?.charAt(0).toUpperCase() || '?'
+      const color   = COLORES[i % COLORES.length]
+      const rol     = u.role === 'admin' ? 'Administrador' : u.role === 'contadora' ? 'Contadora' : 'Empleado'
+      return `
+        <div class="usuario-card" onclick="seleccionarUsuario(${i})">
+          <div class="avatar" style="background:${color}">${inicial}</div>
+          <div class="usuario-info">
+            <div class="usuario-nombre">${u.full_name}</div>
+            <div class="usuario-rol">${rol}</div>
+          </div>
+          <div class="usuario-arrow">›</div>
+        </div>
+      `
+    }).join('')
+  }
+
+  function seleccionarUsuario(index) {
+    usuarioActual = usuarios[index]
+    indexActual   = index
+    pinIngresado  = ''
+
+    const inicial = usuarioActual.full_name?.charAt(0).toUpperCase() || '?'
+    const color   = COLORES[index % COLORES.length]
+
+    document.getElementById('pinAvatar').textContent       = inicial
+    document.getElementById('pinAvatar').style.background  = color
+    document.getElementById('pinNombre').textContent       = usuarioActual.full_name
+    document.getElementById('errorPin').textContent        = ''
+    actualizarDots()
+
+    document.getElementById('pantallaUsuarios').classList.add('oculto')
+    document.getElementById('pantallaPin').classList.remove('oculto')
+  }
+
+  function volver() {
+    pinIngresado  = ''
+    usuarioActual = null
+    document.getElementById('pantallaPin').classList.add('oculto')
+    document.getElementById('pantallaUsuarios').classList.remove('oculto')
+  }
+
+  function tecla(num) {
+    if (pinIngresado.length >= 4) return
+    pinIngresado += num
+    actualizarDots()
+    if (pinIngresado.length === 4) setTimeout(verificarPin, 150)
+  }
+
+  function borrar() {
+    if (!pinIngresado.length) return
+    pinIngresado = pinIngresado.slice(0, -1)
+    actualizarDots()
+    document.getElementById('errorPin').textContent = ''
+  }
+
+  function actualizarDots() {
+    for (let i = 0; i < 4; i++) {
+      const dot = document.getElementById(`dot${i}`)
+      dot.classList.toggle('lleno', i < pinIngresado.length)
+      dot.classList.remove('error')
+    }
+  }
+
+  async function verificarPin() {
+    if (usuarioActual.pin !== pinIngresado) {
+      for (let i = 0; i < 4; i++) document.getElementById(`dot${i}`).classList.add('error')
+      document.getElementById('errorPin').textContent = 'PIN incorrecto, intentá de nuevo'
+      setTimeout(() => { pinIngresado = ''; actualizarDots(); document.getElementById('errorPin').textContent = '' }, 1200)
+      return
+    }
+
+    document.getElementById('loading').classList.remove('oculto')
+
+    const { error } = await sb.auth.signInWithPassword({
+      email: usuarioActual.email,
+      password: pinIngresado
+    })
 
     if (error) {
-      btn.disabled = false
-      btn.innerHTML = 'Ingresar'
-      mostrarError('Email o contraseña incorrectos')
-      return
+      // Si la contraseña en Supabase no coincide con el PIN, guardar sesión local
+      localStorage.setItem('olvision_user', JSON.stringify({
+        id: usuarioActual.id,
+        name: usuarioActual.full_name,
+        role: usuarioActual.role,
+        email: usuarioActual.email
+      }))
     }
 
-    // Login exitoso → ir al dashboard
     window.location.href = 'dashboard.html'
   }
 
-  function mostrarError(msg) {
-    const el = document.getElementById('errorMsg')
-    el.textContent = msg
-    el.classList.add('visible')
-  }
-
-  // Permitir Enter para loguear
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Enter') login()
-  })
+  iniciar()
 </script>
 
 </body>
