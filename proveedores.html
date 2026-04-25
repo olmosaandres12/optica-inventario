@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Olvisión Inventario — Proveedores</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --azul:    #034295;
+      --azul2:   #2563eb;
+      --azul-bg: #eff6ff;
+      --amarillo:#f9f4ab;
+      --rojo:    #ef4444;
+      --verde:   #10b981;
+      --gris:    #64748b;
+      --borde:   #e2e8f0;
+      --fondo:   #f1f5f9;
+      --radio:   16px;
+    }
+    body { font-family: 'Nunito', sans-serif; background: var(--fondo); color: #1e293b; min-height: 100vh; }
+    .app { display: flex; min-height: 100vh; }
+
+    /* SIDEBAR */
+    .sidebar { width: 220px; background: var(--azul); color: white; display: none; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+    @media(min-width:768px){ .sidebar{ display:flex; } .main-wrap{ margin-left:220px; } .bottom-nav{ display:none!important; } }
+    .sb-brand { padding: 22px 20px 14px; border-bottom: 1px solid rgba(255,255,255,0.12); }
+    .sb-brand img { height: 44px; object-fit: contain; }
+    .sb-brand-sub { font-size: 10px; font-weight: 700; color: #93c5fd; letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+    .sb-nav { flex: 1; padding: 12px 0; }
+    .sb-item { display: flex; align-items: center; gap: 10px; padding: 11px 20px; font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.7); text-decoration: none; transition: all 0.15s; border-left: 3px solid transparent; }
+    .sb-item:hover { background: rgba(255,255,255,0.08); color: white; }
+    .sb-item.activo { background: rgba(255,255,255,0.12); color: white; border-left-color: var(--amarillo); }
+    .sb-icon { font-size: 16px; width: 20px; text-align: center; }
+    .sb-footer { padding: 14px 20px; border-top: 1px solid rgba(255,255,255,0.12); }
+    .btn-salir { width: 100%; background: rgba(255,255,255,0.1); border: none; border-radius: 10px; color: rgba(255,255,255,0.7); font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; padding: 9px; cursor: pointer; }
+    .btn-salir:hover { background: rgba(255,255,255,0.18); color: white; }
+
+    /* MAIN */
+    .main-wrap { flex: 1; display: flex; flex-direction: column; }
+    .topnav { background: white; padding: 14px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--borde); position: sticky; top: 0; z-index: 50; }
+    .topnav-back { font-size: 22px; color: var(--azul); text-decoration: none; font-weight: 900; }
+    .topnav-titulo { font-size: 17px; font-weight: 900; color: #1e293b; }
+    .topnav-sub { font-size: 12px; color: var(--gris); font-weight: 600; }
+
+    .content { padding: 16px; max-width: 860px; margin: 0 auto; width: 100%; padding-bottom: 90px; }
+
+    /* BUSCADOR */
+    .search-wrap { position: relative; margin-bottom: 14px; }
+    .search-wrap input { width: 100%; padding: 12px 16px 12px 42px; border: 1.5px solid var(--borde); border-radius: var(--radio); font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600; color: #1e293b; background: white; outline: none; transition: border-color 0.15s; }
+    .search-wrap input:focus { border-color: var(--azul2); }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 16px; pointer-events: none; }
+
+    /* BTN AGREGAR */
+    .btn-agregar { width: 100%; background: var(--azul); color: white; border: none; border-radius: var(--radio); padding: 14px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; cursor: pointer; margin-bottom: 14px; }
+
+    /* LISTA */
+    .lista { display: flex; flex-direction: column; gap: 10px; }
+
+    .prov-card { background: white; border-radius: var(--radio); box-shadow: 0 2px 6px rgba(0,0,0,0.05); overflow: hidden; }
+    .prov-header { display: flex; align-items: center; gap: 12px; padding: 16px; cursor: pointer; }
+    .prov-avatar { width: 46px; height: 46px; border-radius: 14px; background: var(--azul-bg); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .prov-info { flex: 1; min-width: 0; }
+    .prov-nombre { font-size: 15px; font-weight: 800; color: #1e293b; }
+    .prov-sub { font-size: 12px; color: var(--gris); margin-top: 2px; }
+    .prov-chevron { font-size: 16px; color: var(--gris); transition: transform 0.2s; flex-shrink: 0; }
+    .prov-chevron.abierto { transform: rotate(180deg); }
+
+    .prov-detalle { display: none; border-top: 1px solid #f1f5f9; }
+    .prov-detalle.vis { display: block; }
+
+    .prov-datos { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+    .dato-item { padding: 12px 16px; border-bottom: 1px solid #f8fafc; }
+    .dato-item:nth-child(odd) { border-right: 1px solid #f8fafc; }
+    .dato-lab { font-size: 10px; font-weight: 800; color: var(--gris); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }
+    .dato-val { font-size: 14px; font-weight: 700; color: #1e293b; }
+    .dato-val.vacio { color: #cbd5e1; font-weight: 600; font-style: italic; }
+    .dato-val.copiable { cursor: pointer; display: flex; align-items: center; gap: 6px; }
+    .dato-val.copiable:hover { color: var(--azul); }
+    .dato-val.copiable::after { content: '📋'; font-size: 12px; opacity: 0.5; }
+    .dato-val.copiable:hover::after { opacity: 1; }
+
+    .prov-btns { display: flex; gap: 8px; padding: 12px 16px; background: #fafafa; border-top: 1px solid #f1f5f9; }
+    .btn-edit { flex: 1; background: var(--azul-bg); color: var(--azul); border: none; border-radius: 10px; padding: 10px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; }
+    .btn-del  { background: #fee2e2; color: var(--rojo); border: none; border-radius: 10px; padding: 10px 14px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; }
+    .btn-wsp  { background: #d1fae5; color: #065f46; border: none; border-radius: 10px; padding: 10px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 4px; }
+
+    .empty { text-align: center; padding: 48px 20px; color: var(--gris); font-size: 14px; background: white; border-radius: var(--radio); }
+    .empty-icono { font-size: 40px; margin-bottom: 12px; }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1e293b; color: white; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 700; opacity: 0; transition: all 0.3s; z-index: 999; pointer-events: none; white-space: nowrap; }
+    .toast.vis { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* BOTTOM NAV */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; background: white; border-top: 1px solid var(--borde); display: flex; padding: 8px 0 env(safe-area-inset-bottom); }
+    .bnav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; text-decoration: none; color: var(--gris); font-size: 10px; font-weight: 700; }
+    .bnav-item.activo { color: var(--azul); }
+    .bnav-icon { font-size: 20px; }
+
+    /* OVERLAY / MODAL */
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-end; justify-content: center; }
+    .overlay.vis { display: flex; }
+    @media(min-width:768px){ .overlay{ align-items:center; } .modal{ border-radius:20px; max-height:85vh; max-width:540px; margin:20px; } }
+    .modal { background: white; border-radius: 24px 24px 0 0; padding: 24px 20px 40px; width: 100%; max-height: 92vh; overflow-y: auto; }
+    .modal-titulo { font-size: 20px; font-weight: 900; color: #1e293b; margin-bottom: 20px; text-align: center; }
+
+    /* FORM */
+    .campo { margin-bottom: 14px; }
+    .campo label { display: block; font-size: 11px; font-weight: 800; color: var(--gris); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
+    .campo input, .campo select, .campo textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--borde); border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600; color: #1e293b; background: white; outline: none; transition: border-color 0.15s; }
+    .campo input:focus, .campo select:focus { border-color: var(--azul2); }
+    .campos-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .seccion-label { font-size: 11px; font-weight: 800; color: var(--azul); text-transform: uppercase; letter-spacing: 0.8px; margin: 18px 0 12px; padding-bottom: 6px; border-bottom: 2px solid var(--azul-bg); }
+
+    .btn-guardar { width: 100%; background: var(--azul); color: white; border: none; border-radius: 14px; padding: 15px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; cursor: pointer; margin-bottom: 10px; }
+    .btn-cancelar { width: 100%; background: #f1f5f9; color: var(--gris); border: none; border-radius: 14px; padding: 13px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; }
+
+    @media(min-width:768px){ .prov-datos{ grid-template-columns: repeat(3, 1fr); } }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <img src="logo_app.png" alt="Olvisión" onerror="this.style.display='none'" />
+      <div class="sb-brand-sub">📦 Inventario</div>
+    </div>
+    <nav class="sb-nav">
+      <a class="sb-item" href="dashboard.html"><span class="sb-icon">🏠</span> Inicio</a>
+      <a class="sb-item" href="productos.html"><span class="sb-icon">📦</span> Productos</a>
+      <a class="sb-item" href="inventario.html"><span class="sb-icon">🔍</span> Inventario</a>
+      <a class="sb-item" href="movimientos.html"><span class="sb-icon">↕️</span> Movimientos</a>
+      <a class="sb-item activo" href="proveedores.html"><span class="sb-icon">🏢</span> Proveedores</a>
+      <a class="sb-item" href="reportes.html"><span class="sb-icon">📊</span> Reportes</a>
+      <a class="sb-item" href="configuracion.html"><span class="sb-icon">⚙️</span> Configuración</a>
+    </nav>
+    <div class="sb-footer">
+      <button class="btn-salir" onclick="salir()">🚪 Salir</button>
+    </div>
+  </aside>
+
+  <div class="main-wrap">
+    <nav class="topnav">
+      <a class="topnav-back" href="dashboard.html">‹</a>
+      <div>
+        <div class="topnav-titulo">🏢 Proveedores</div>
+        <div class="topnav-sub" id="nav-sub">Cargando...</div>
+      </div>
+    </nav>
+
+    <div class="content">
+      <button class="btn-agregar" onclick="abrirModal()">+ Agregar proveedor</button>
+
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="buscador" placeholder="Buscar por nombre, rubro o ciudad…" oninput="aplicarFiltro()" />
+      </div>
+
+      <div class="lista" id="lista">
+        <div class="empty"><div class="empty-icono">⏳</div>Cargando...</div>
+      </div>
+    </div>
+
+    <nav class="bottom-nav">
+      <a class="bnav-item" href="dashboard.html"><span class="bnav-icon">🏠</span>Inicio</a>
+      <a class="bnav-item" href="productos.html"><span class="bnav-icon">📦</span>Productos</a>
+      <a class="bnav-item" href="inventario.html"><span class="bnav-icon">🔍</span>Inventario</a>
+      <a class="bnav-item" href="movimientos.html"><span class="bnav-icon">↕️</span>Movimientos</a>
+      <a class="bnav-item activo" href="proveedores.html"><span class="bnav-icon">🏢</span>Proveedores</a>
+    </nav>
+  </div>
+</div>
+
+<!-- MODAL AGREGAR / EDITAR -->
+<div class="overlay" id="overlay-form" onclick="cerrarFuera(event,'overlay-form')">
+  <div class="modal">
+    <div class="modal-titulo" id="modal-titulo">Nuevo proveedor</div>
+    <input type="hidden" id="f-id" />
+
+    <div class="seccion-label">Datos generales</div>
+    <div class="campo"><label>Nombre / Empresa *</label><input type="text" id="f-nombre" placeholder="Ej: Óptica Mayorista SA" /></div>
+    <div class="campos-2">
+      <div class="campo"><label>Rubro</label><input type="text" id="f-rubro" placeholder="Ej: Marcos, Lentes…" /></div>
+      <div class="campo"><label>Ciudad</label><input type="text" id="f-ciudad" placeholder="Ej: Buenos Aires" /></div>
+    </div>
+    <div class="campo"><label>CUIT</label><input type="text" id="f-cuit" placeholder="Ej: 30-12345678-9" inputmode="numeric" /></div>
+
+    <div class="seccion-label">Contacto</div>
+    <div class="campo"><label>Nombre del contacto</label><input type="text" id="f-contacto" placeholder="Ej: Carlos López" /></div>
+    <div class="campos-2">
+      <div class="campo"><label>Teléfono / WhatsApp</label><input type="text" id="f-telefono" placeholder="Ej: 381 555-1234" inputmode="tel" /></div>
+      <div class="campo"><label>Email</label><input type="text" id="f-email" placeholder="Ej: ventas@..." /></div>
+    </div>
+
+    <div class="seccion-label">Datos bancarios</div>
+    <div class="campo"><label>Banco</label><input type="text" id="f-banco" placeholder="Ej: Galicia" /></div>
+    <div class="campos-2">
+      <div class="campo"><label>CBU</label><input type="text" id="f-cbu" placeholder="22 dígitos" inputmode="numeric" /></div>
+      <div class="campo"><label>Alias</label><input type="text" id="f-alias" placeholder="Ej: proveedor.optica" /></div>
+    </div>
+
+    <div class="seccion-label">Condiciones</div>
+    <div class="campos-2">
+      <div class="campo"><label>Condición de pago</label>
+        <select id="f-condpago">
+          <option value="">Sin especificar</option>
+          <option value="contado">Contado</option>
+          <option value="30dias">30 días</option>
+          <option value="60dias">60 días</option>
+          <option value="cheque">Cheque</option>
+          <option value="consignacion">Consignación</option>
+        </select>
+      </div>
+      <div class="campo"><label>Días de visita</label><input type="text" id="f-visita" placeholder="Ej: Lunes y jueves" /></div>
+    </div>
+    <div class="campo"><label>Notas</label><textarea id="f-notas" rows="2" placeholder="Descuentos, condiciones especiales…"></textarea></div>
+
+    <button class="btn-guardar" id="btn-guardar" onclick="guardar()">✅ Guardar proveedor</button>
+    <button class="btn-cancelar" onclick="cerrarModal('overlay-form')">Cancelar</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── AUTH ─────────────────────────────────────────────────
+  const userJson = localStorage.getItem('olvision_user');
+  if (!userJson) window.location.href = 'index.html';
+  let currentUser;
+  try { currentUser = JSON.parse(userJson); } catch(e) { window.location.href = 'index.html'; }
+  function salir() { localStorage.removeItem('olvision_user'); window.location.href = 'index.html'; }
+
+  // ── SUPABASE ──────────────────────────────────────────────
+  const { createClient } = supabase;
+  const sb = createClient(
+    'https://nrmjlfpbtjqyvtpdexej.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ybWpsZnBidGpxeXZ0cGRleGVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NjM0MTcsImV4cCI6MjA5MjUzOTQxN30.cg36SF1XXpFbg3hRl2Xl7Tof_OhNJRa9B1BIUcNLpoQ'
+  );
+
+  // ── ESTADO ────────────────────────────────────────────────
+  let proveedores = [];
+  let abierto = null;
+
+  const COND_LABELS = { contado:'Contado', '30dias':'30 días', '60dias':'60 días', cheque:'Cheque', consignacion:'Consignación' };
+
+  // ── CARGA ─────────────────────────────────────────────────
+  async function cargar() {
+    const { data, error } = await sb.from('suppliers').select('*').order('name');
+    if (error) { console.error(error); return; }
+    proveedores = data || [];
+    document.getElementById('nav-sub').textContent = `${proveedores.length} proveedor${proveedores.length !== 1 ? 'es' : ''}`;
+    renderLista(proveedores);
+  }
+
+  // ── FILTRO ────────────────────────────────────────────────
+  function aplicarFiltro() {
+    const q = document.getElementById('buscador').value.trim().toLowerCase();
+    if (!q) { renderLista(proveedores); return; }
+    renderLista(proveedores.filter(p =>
+      (p.name||'').toLowerCase().includes(q) ||
+      (p.rubro||'').toLowerCase().includes(q) ||
+      (p.ciudad||'').toLowerCase().includes(q) ||
+      (p.contacto||'').toLowerCase().includes(q)
+    ));
+  }
+
+  // ── RENDER ────────────────────────────────────────────────
+  function renderLista(lista) {
+    const cont = document.getElementById('lista');
+    if (lista.length === 0) {
+      cont.innerHTML = `<div class="empty"><div class="empty-icono">${proveedores.length === 0 ? '🏢' : '🔍'}</div>${proveedores.length === 0 ? 'Aún no hay proveedores.<br>Tocá "Agregar proveedor" para empezar.' : 'Sin resultados.'}</div>`;
+      return;
+    }
+    cont.innerHTML = lista.map(p => {
+      const inicial = (p.name || '?')[0].toUpperCase();
+      const sub = [p.rubro, p.ciudad].filter(Boolean).join(' · ');
+      const est = abierto === p.id;
+      return `
+      <div class="prov-card" id="card-${p.id}">
+        <div class="prov-header" onclick="toggleDetalle('${p.id}')">
+          <div class="prov-avatar">${p.rubro ? iconoRubro(p.rubro) : '🏢'}</div>
+          <div class="prov-info">
+            <div class="prov-nombre">${p.name}</div>
+            <div class="prov-sub">${sub || 'Sin rubro'}</div>
+          </div>
+          <span class="prov-chevron ${est ? 'abierto' : ''}">▾</span>
+        </div>
+        <div class="prov-detalle ${est ? 'vis' : ''}" id="det-${p.id}">
+          <div class="prov-datos">
+            <div class="dato-item">
+              <div class="dato-lab">Contacto</div>
+              <div class="dato-val ${!p.contacto ? 'vacio' : ''}">${p.contacto || 'No cargado'}</div>
+            </div>
+            <div class="dato-item">
+              <div class="dato-lab">Teléfono</div>
+              <div class="dato-val ${!p.telefono ? 'vacio' : 'copiable'}" onclick="${p.telefono ? `copiar('${p.telefono}','Teléfono copiado')` : ''}">${p.telefono || 'No cargado'}</div>
+            </div>
+            <div class="dato-item">
+              <div class="dato-lab">Email</div>
+              <div class="dato-val ${!p.email ? 'vacio' : 'copiable'}" onclick="${p.email ? `copiar('${p.email}','Email copiado')` : ''}">${p.email || 'No cargado'}</div>
+            </div>
+            <div class="dato-item">
+              <div class="dato-lab">CUIT</div>
+              <div class="dato-val ${!p.cuit ? 'vacio' : 'copiable'}" onclick="${p.cuit ? `copiar('${p.cuit}','CUIT copiado')` : ''}">${p.cuit || 'No cargado'}</div>
+            </div>
+            <div class="dato-item">
+              <div class="dato-lab">CBU</div>
+              <div class="dato-val ${!p.cbu ? 'vacio' : 'copiable'}" onclick="${p.cbu ? `copiar('${p.cbu}','CBU copiado')` : ''}">${p.cbu ? p.cbu.substring(0,8)+'…' : 'No cargado'}</div>
+            </div>
+            <div class="dato-item">
+              <div class="dato-lab">Alias</div>
+              <div class="dato-val ${!p.alias ? 'vacio' : 'copiable'}" onclick="${p.alias ? `copiar('${p.alias}','Alias copiado')` : ''}">${p.alias || 'No cargado'}</div>
+            </div>
+            <div class="dato-item">
+              <div class="dato-lab">Banco</div>
+              <div class="dato-val ${!p.banco ? 'vacio' : ''}">${p.banco || 'No cargado'}</div>
+            </div>
+            <div class="dato-item">
+              <div class="dato-lab">Cond. pago</div>
+              <div class="dato-val ${!p.condicion_pago ? 'vacio' : ''}">${COND_LABELS[p.condicion_pago] || p.condicion_pago || 'No cargada'}</div>
+            </div>
+            <div class="dato-item">
+              <div class="dato-lab">Días visita</div>
+              <div class="dato-val ${!p.dias_visita ? 'vacio' : ''}">${p.dias_visita || 'No cargados'}</div>
+            </div>
+            ${p.notes ? `<div class="dato-item" style="grid-column:1/-1"><div class="dato-lab">Notas</div><div class="dato-val" style="color:var(--gris);font-weight:600">${p.notes}</div></div>` : ''}
+          </div>
+          <div class="prov-btns">
+            ${p.telefono ? `<a class="btn-wsp" href="https://wa.me/54${p.telefono.replace(/\D/g,'')}" target="_blank">📲 WhatsApp</a>` : ''}
+            <button class="btn-edit" onclick="editarProveedor('${p.id}')">✏️ Editar</button>
+            <button class="btn-del" onclick="eliminarProveedor('${p.id}')">🗑️</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function iconoRubro(rubro) {
+    const r = (rubro || '').toLowerCase();
+    if (r.includes('marco') || r.includes('armazon') || r.includes('armaz')) return '🕶';
+    if (r.includes('lente') && r.includes('contact')) return '👁';
+    if (r.includes('lente') || r.includes('oftál') || r.includes('oftal')) return '🔬';
+    if (r.includes('sol') || r.includes('solar')) return '☀️';
+    if (r.includes('liquid') || r.includes('soluc')) return '💧';
+    if (r.includes('accesori')) return '🎀';
+    return '🏢';
+  }
+
+  function toggleDetalle(id) {
+    abierto = abierto === id ? null : id;
+    aplicarFiltro();
+  }
+
+  // ── MODAL FORM ────────────────────────────────────────────
+  function abrirModal(idEdit) {
+    document.getElementById('modal-titulo').textContent = idEdit ? 'Editar proveedor' : 'Nuevo proveedor';
+    document.getElementById('btn-guardar').textContent = idEdit ? '💾 Guardar cambios' : '✅ Guardar proveedor';
+    if (!idEdit) {
+      ['f-id','f-nombre','f-rubro','f-ciudad','f-cuit','f-contacto','f-telefono','f-email','f-banco','f-cbu','f-alias','f-visita','f-notas'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('f-condpago').selectedIndex = 0;
+    }
+    document.getElementById('overlay-form').classList.add('vis');
+    document.querySelector('#overlay-form .modal').scrollTop = 0;
+  }
+
+  function editarProveedor(id) {
+    const p = proveedores.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('f-id').value = p.id;
+    document.getElementById('f-nombre').value = p.name || '';
+    document.getElementById('f-rubro').value = p.rubro || '';
+    document.getElementById('f-ciudad').value = p.ciudad || '';
+    document.getElementById('f-cuit').value = p.cuit || '';
+    document.getElementById('f-contacto').value = p.contacto || '';
+    document.getElementById('f-telefono').value = p.telefono || '';
+    document.getElementById('f-email').value = p.email || '';
+    document.getElementById('f-banco').value = p.banco || '';
+    document.getElementById('f-cbu').value = p.cbu || '';
+    document.getElementById('f-alias').value = p.alias || '';
+    document.getElementById('f-visita').value = p.dias_visita || '';
+    document.getElementById('f-notas').value = p.notes || '';
+    setSelect('f-condpago', p.condicion_pago || '');
+    abrirModal(p.id);
+  }
+
+  async function guardar() {
+    const id = document.getElementById('f-id').value;
+    const nombre = document.getElementById('f-nombre').value.trim();
+    if (!nombre) { alert('El nombre es obligatorio'); return; }
+
+    const payload = {
+      name:            nombre,
+      rubro:           document.getElementById('f-rubro').value.trim() || null,
+      ciudad:          document.getElementById('f-ciudad').value.trim() || null,
+      cuit:            document.getElementById('f-cuit').value.trim() || null,
+      contacto:        document.getElementById('f-contacto').value.trim() || null,
+      telefono:        document.getElementById('f-telefono').value.trim() || null,
+      email:           document.getElementById('f-email').value.trim() || null,
+      banco:           document.getElementById('f-banco').value.trim() || null,
+      cbu:             document.getElementById('f-cbu').value.trim() || null,
+      alias:           document.getElementById('f-alias').value.trim() || null,
+      condicion_pago:  document.getElementById('f-condpago').value || null,
+      dias_visita:     document.getElementById('f-visita').value.trim() || null,
+      notes:           document.getElementById('f-notas').value.trim() || null,
+    };
+
+    const btn = document.getElementById('btn-guardar');
+    btn.textContent = 'Guardando…'; btn.disabled = true;
+
+    const { error } = id
+      ? await sb.from('suppliers').update(payload).eq('id', id)
+      : await sb.from('suppliers').insert([payload]);
+
+    btn.textContent = id ? '💾 Guardar cambios' : '✅ Guardar proveedor'; btn.disabled = false;
+    if (error) { alert('Error: ' + error.message); return; }
+    cerrarModal('overlay-form');
+    await cargar();
+    toast('✅ Proveedor guardado');
+  }
+
+  async function eliminarProveedor(id) {
+    const p = proveedores.find(x => x.id === id);
+    if (!confirm(`¿Eliminás a "${p?.name}"?\n\nEsta acción no se puede deshacer.`)) return;
+    const { error } = await sb.from('suppliers').delete().eq('id', id);
+    if (error) { alert('Error: ' + error.message); return; }
+    abierto = null;
+    await cargar();
+    toast('🗑️ Proveedor eliminado');
+  }
+
+  // ── UTILS ─────────────────────────────────────────────────
+  function copiar(texto, msg) {
+    navigator.clipboard.writeText(texto).then(() => toast('📋 ' + msg));
+  }
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('vis');
+    setTimeout(() => t.classList.remove('vis'), 2000);
+  }
+
+  function cerrarModal(id) { document.getElementById(id).classList.remove('vis'); }
+  function cerrarFuera(e, id) { if (e.target === document.getElementById(id)) cerrarModal(id); }
+  function setSelect(id, val) {
+    const sel = document.getElementById(id);
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === val) { sel.selectedIndex = i; return; }
+    }
+    sel.selectedIndex = 0;
+  }
+
+  cargar();
+</script>
+</body>
+</html>
