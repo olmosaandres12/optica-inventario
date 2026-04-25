@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Olvisión Inventario — Configuración</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --azul:#034295; --azul2:#2563eb; --azul-bg:#eff6ff; --amarillo:#f9f4ab;
+      --rojo:#ef4444; --verde:#10b981; --gris:#64748b;
+      --borde:#e2e8f0; --fondo:#f1f5f9; --radio:16px;
+    }
+    body { font-family:'Nunito',sans-serif; background:var(--fondo); color:#1e293b; min-height:100vh; }
+    .app { display:flex; min-height:100vh; }
+    .sidebar { width:220px; background:var(--azul); color:white; display:none; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:100; }
+    @media(min-width:768px){ .sidebar{display:flex;} .main-wrap{margin-left:220px;} .bottom-nav{display:none!important;} }
+    .sb-brand { padding:22px 20px 14px; border-bottom:1px solid rgba(255,255,255,0.12); }
+    .sb-brand img { height:44px; object-fit:contain; }
+    .sb-brand-sub { font-size:10px; font-weight:700; color:#93c5fd; letter-spacing:1px; text-transform:uppercase; margin-top:4px; }
+    .sb-nav { flex:1; padding:12px 0; }
+    .sb-item { display:flex; align-items:center; gap:10px; padding:11px 20px; font-size:13px; font-weight:700; color:rgba(255,255,255,0.7); text-decoration:none; transition:all 0.15s; border-left:3px solid transparent; }
+    .sb-item:hover { background:rgba(255,255,255,0.08); color:white; }
+    .sb-item.activo { background:rgba(255,255,255,0.12); color:white; border-left-color:var(--amarillo); }
+    .sb-icon { font-size:16px; width:20px; text-align:center; }
+    .sb-footer { padding:14px 20px; border-top:1px solid rgba(255,255,255,0.12); }
+    .btn-salir { width:100%; background:rgba(255,255,255,0.1); border:none; border-radius:10px; color:rgba(255,255,255,0.7); font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; padding:9px; cursor:pointer; }
+    .btn-salir:hover { background:rgba(255,255,255,0.18); color:white; }
+    .main-wrap { flex:1; display:flex; flex-direction:column; }
+    .topnav { background:white; padding:14px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--borde); position:sticky; top:0; z-index:50; }
+    .topnav-back { font-size:22px; color:var(--azul); text-decoration:none; font-weight:900; }
+    .topnav-titulo { font-size:17px; font-weight:900; }
+    .topnav-sub { font-size:12px; color:var(--gris); font-weight:600; }
+    .content { padding:16px; max-width:640px; margin:0 auto; width:100%; padding-bottom:90px; }
+
+    /* SECCIONES */
+    .seccion { background:white; border-radius:var(--radio); margin-bottom:14px; box-shadow:0 2px 6px rgba(0,0,0,0.05); overflow:hidden; }
+    .sec-header { padding:18px 18px 14px; border-bottom:1px solid #f1f5f9; }
+    .sec-titulo { font-size:15px; font-weight:800; color:#1e293b; }
+    .sec-sub { font-size:12px; color:var(--gris); margin-top:3px; }
+
+    /* FILA DE CONFIG */
+    .cfg-fila { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid #f8fafc; gap:12px; }
+    .cfg-fila:last-child { border-bottom:none; }
+    .cfg-label { font-size:14px; font-weight:700; color:#1e293b; }
+    .cfg-sub { font-size:11px; color:var(--gris); margin-top:2px; }
+    .cfg-val { font-size:14px; font-weight:800; color:var(--azul); cursor:pointer; padding:6px 12px; background:var(--azul-bg); border-radius:10px; white-space:nowrap; transition:background 0.15s; }
+    .cfg-val:hover { background:#dbeafe; }
+
+    /* TAGS (marcas/categorías) */
+    .tags-wrap { padding:14px 18px; }
+    .tags-list { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; min-height:32px; }
+    .tag-item { display:flex; align-items:center; gap:6px; background:var(--azul-bg); border:1.5px solid #bfdbfe; border-radius:20px; padding:5px 10px 5px 12px; font-size:13px; font-weight:700; color:var(--azul); }
+    .tag-del { background:none; border:none; font-size:14px; cursor:pointer; color:#93c5fd; padding:0 2px; line-height:1; }
+    .tag-del:hover { color:var(--rojo); }
+    .tag-add-wrap { display:flex; gap:8px; }
+    .tag-add-input { flex:1; padding:10px 12px; border:1.5px solid var(--borde); border-radius:12px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:600; color:#1e293b; outline:none; }
+    .tag-add-input:focus { border-color:var(--azul2); }
+    .tag-add-btn { background:var(--azul); color:white; border:none; border-radius:12px; padding:10px 16px; font-family:'Nunito',sans-serif; font-size:13px; font-weight:800; cursor:pointer; white-space:nowrap; }
+
+    /* INFO USUARIO */
+    .user-card { display:flex; align-items:center; gap:14px; padding:18px; }
+    .user-avatar { width:50px; height:50px; border-radius:50%; background:var(--azul-bg); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+    .user-nombre { font-size:16px; font-weight:800; color:#1e293b; }
+    .user-email { font-size:12px; color:var(--gris); margin-top:2px; }
+    .user-role { display:inline-block; margin-top:6px; padding:2px 10px; border-radius:20px; font-size:11px; font-weight:800; background:#d1fae5; color:#065f46; }
+
+    /* TOAST */
+    .toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px); background:#1e293b; color:white; padding:10px 20px; border-radius:20px; font-size:13px; font-weight:700; opacity:0; transition:all 0.3s; z-index:999; pointer-events:none; white-space:nowrap; }
+    .toast.vis { opacity:1; transform:translateX(-50%) translateY(0); }
+
+    /* MODAL */
+    .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200; align-items:flex-end; justify-content:center; }
+    .overlay.vis { display:flex; }
+    @media(min-width:768px){ .overlay{align-items:center;} .modal{border-radius:20px;max-width:400px;margin:20px;} }
+    .modal { background:white; border-radius:24px 24px 0 0; padding:24px 20px 40px; width:100%; }
+    .modal-titulo { font-size:18px; font-weight:900; color:#1e293b; margin-bottom:16px; text-align:center; }
+    .campo { margin-bottom:14px; }
+    .campo label { display:block; font-size:11px; font-weight:800; color:var(--gris); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px; }
+    .campo input { width:100%; padding:12px 14px; border:1.5px solid var(--borde); border-radius:12px; font-family:'Nunito',sans-serif; font-size:16px; font-weight:700; color:#1e293b; outline:none; }
+    .campo input:focus { border-color:var(--azul2); }
+    .btn-guardar { width:100%; background:var(--azul); color:white; border:none; border-radius:14px; padding:14px; font-family:'Nunito',sans-serif; font-size:15px; font-weight:800; cursor:pointer; margin-bottom:10px; }
+    .btn-cancelar { width:100%; background:#f1f5f9; color:var(--gris); border:none; border-radius:14px; padding:12px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; cursor:pointer; }
+
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; z-index:100; background:white; border-top:1px solid var(--borde); display:flex; padding:8px 0 env(safe-area-inset-bottom); }
+    .bnav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 4px; text-decoration:none; color:var(--gris); font-size:10px; font-weight:700; }
+    .bnav-item.activo { color:var(--azul); }
+    .bnav-icon { font-size:20px; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <img src="logo_app.png" alt="Olvisión" onerror="this.style.display='none'" />
+      <div class="sb-brand-sub">📦 Inventario</div>
+    </div>
+    <nav class="sb-nav">
+      <a class="sb-item" href="dashboard.html"><span class="sb-icon">🏠</span> Inicio</a>
+      <a class="sb-item" href="productos.html"><span class="sb-icon">📦</span> Productos</a>
+      <a class="sb-item" href="inventario.html"><span class="sb-icon">🔍</span> Inventario</a>
+      <a class="sb-item" href="movimientos.html"><span class="sb-icon">↕️</span> Movimientos</a>
+      <a class="sb-item" href="proveedores.html"><span class="sb-icon">🏢</span> Proveedores</a>
+      <a class="sb-item" href="reportes.html"><span class="sb-icon">📊</span> Reportes</a>
+      <a class="sb-item activo" href="configuracion.html"><span class="sb-icon">⚙️</span> Configuración</a>
+    </nav>
+    <div class="sb-footer"><button class="btn-salir" onclick="salir()">🚪 Salir</button></div>
+  </aside>
+
+  <div class="main-wrap">
+    <nav class="topnav">
+      <a class="topnav-back" href="dashboard.html">‹</a>
+      <div>
+        <div class="topnav-titulo">⚙️ Configuración</div>
+        <div class="topnav-sub">Ajustes de la app</div>
+      </div>
+    </nav>
+
+    <div class="content">
+
+      <!-- USUARIO -->
+      <div class="seccion">
+        <div class="user-card">
+          <div class="user-avatar">👤</div>
+          <div>
+            <div class="user-nombre" id="user-nombre">—</div>
+            <div class="user-email" id="user-email">—</div>
+            <span class="user-role">Administrador</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALERTAS DE STOCK -->
+      <div class="seccion">
+        <div class="sec-header">
+          <div class="sec-titulo">🔔 Alertas de stock</div>
+          <div class="sec-sub">Define el umbral por defecto para avisar stock bajo</div>
+        </div>
+        <div class="cfg-fila">
+          <div>
+            <div class="cfg-label">Stock mínimo por defecto</div>
+            <div class="cfg-sub">Se usa cuando no se define stock mínimo por producto</div>
+          </div>
+          <div class="cfg-val" onclick="editarValor('stock_min_default','Stock mínimo por defecto','number')">
+            <span id="val-stock-min">—</span> u.
+          </div>
+        </div>
+      </div>
+
+      <!-- MARCAS ARMAZÓN -->
+      <div class="seccion">
+        <div class="sec-header">
+          <div class="sec-titulo">🕶 Marcas de armazón</div>
+          <div class="sec-sub">Aparecen en el desplegable de la app de caja</div>
+        </div>
+        <div class="tags-wrap">
+          <div class="tags-list" id="tags-marcas-armazon"></div>
+          <div class="tag-add-wrap">
+            <input type="text" class="tag-add-input" id="input-marcas-armazon" placeholder="Nueva marca…" onkeydown="if(event.key==='Enter')agregarTag('marcas_armazon')" />
+            <button class="tag-add-btn" onclick="agregarTag('marcas_armazon')">+ Agregar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MARCAS LENTES CONTACTO -->
+      <div class="seccion">
+        <div class="sec-header">
+          <div class="sec-titulo">👁 Marcas de lentes de contacto</div>
+          <div class="sec-sub">Aparecen en el desplegable de la app de caja</div>
+        </div>
+        <div class="tags-wrap">
+          <div class="tags-list" id="tags-marcas-lentes-contacto"></div>
+          <div class="tag-add-wrap">
+            <input type="text" class="tag-add-input" id="input-marcas-lentes-contacto" placeholder="Nueva marca…" onkeydown="if(event.key==='Enter')agregarTag('marcas_lentes_contacto')" />
+            <button class="tag-add-btn" onclick="agregarTag('marcas_lentes_contacto')">+ Agregar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SESIÓN -->
+      <div class="seccion">
+        <div class="sec-header">
+          <div class="sec-titulo">🔐 Sesión</div>
+        </div>
+        <div class="cfg-fila">
+          <div>
+            <div class="cfg-label">Cerrar sesión</div>
+            <div class="cfg-sub">Salir de la app de inventario</div>
+          </div>
+          <button onclick="salir()" style="background:#fee2e2;color:#991b1b;border:none;border-radius:10px;padding:8px 16px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer">Salir</button>
+        </div>
+      </div>
+
+    </div>
+
+    <nav class="bottom-nav">
+      <a class="bnav-item" href="dashboard.html"><span class="bnav-icon">🏠</span>Inicio</a>
+      <a class="bnav-item" href="productos.html"><span class="bnav-icon">📦</span>Productos</a>
+      <a class="bnav-item" href="inventario.html"><span class="bnav-icon">🔍</span>Inventario</a>
+      <a class="bnav-item" href="movimientos.html"><span class="bnav-icon">↕️</span>Movimientos</a>
+      <a class="bnav-item activo" href="configuracion.html"><span class="bnav-icon">⚙️</span>Config.</a>
+    </nav>
+  </div>
+</div>
+
+<!-- MODAL EDITAR VALOR -->
+<div class="overlay" id="overlay-edit" onclick="cerrarFuera(event,'overlay-edit')">
+  <div class="modal">
+    <div class="modal-titulo" id="edit-titulo">Editar</div>
+    <div class="campo">
+      <label id="edit-label">Valor</label>
+      <input type="number" id="edit-input" />
+    </div>
+    <button class="btn-guardar" onclick="guardarValor()">✅ Guardar</button>
+    <button class="btn-cancelar" onclick="cerrarModal('overlay-edit')">Cancelar</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const userJson = localStorage.getItem('olvision_user');
+  if (!userJson) window.location.href = 'index.html';
+  let currentUser;
+  try { currentUser = JSON.parse(userJson); } catch(e) { window.location.href = 'index.html'; }
+  function salir() { localStorage.removeItem('olvision_user'); window.location.href = 'index.html'; }
+
+  const { createClient } = supabase;
+  const sb = createClient(
+    'https://nrmjlfpbtjqyvtpdexej.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ybWpsZnBidGpxeXZ0cGRleGVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NjM0MTcsImV4cCI6MjA5MjUzOTQxN30.cg36SF1XXpFbg3hRl2Xl7Tof_OhNJRa9B1BIUcNLpoQ'
+  );
+
+  // ── ESTADO ────────────────────────────────────────────────
+  let config = {};
+  let editandoClave = '';
+
+  // ── INIT ──────────────────────────────────────────────────
+  async function cargar() {
+    // Usuario
+    if (currentUser) {
+      document.getElementById('user-nombre').textContent = currentUser.user_metadata?.nombre || currentUser.email || '—';
+      document.getElementById('user-email').textContent = currentUser.email || '';
+    }
+
+    // Config desde Supabase (tabla configuracion del inventario)
+    const { data } = await sb.from('configuracion').select('clave, valor');
+    config = {};
+    (data || []).forEach(r => {
+      try { config[r.clave] = JSON.parse(r.valor); } catch { config[r.clave] = r.valor; }
+    });
+
+    // Stock mínimo default
+    document.getElementById('val-stock-min').textContent = config['stock_min_default'] ?? 2;
+
+    // Tags
+    renderTags('marcas-armazon', config['marcas_armazon'] || []);
+    renderTags('marcas-lentes-contacto', config['marcas_lentes_contacto'] || []);
+  }
+
+  // ── TAGS ──────────────────────────────────────────────────
+  function renderTags(tipo, lista) {
+    const cont = document.getElementById('tags-' + tipo);
+    cont.innerHTML = lista.length === 0
+      ? '<span style="font-size:13px;color:var(--gris);font-style:italic">Sin marcas cargadas</span>'
+      : lista.map((t, i) => `
+        <div class="tag-item">
+          ${t}
+          <button class="tag-del" onclick="eliminarTag('${tipo}',${i})">✕</button>
+        </div>`).join('');
+  }
+
+  function claveDeId(tipo) {
+    return tipo === 'marcas-armazon' ? 'marcas_armazon' : 'marcas_lentes_contacto';
+  }
+
+  async function agregarTag(clave) {
+    const tipo = clave === 'marcas_armazon' ? 'marcas-armazon' : 'marcas-lentes-contacto';
+    const input = document.getElementById('input-' + tipo);
+    const val = input.value.trim();
+    if (!val) return;
+    const lista = [...(config[clave] || [])];
+    if (lista.includes(val)) { toast('⚠️ Ya existe esa marca'); return; }
+    lista.push(val);
+    await guardarConfig(clave, lista);
+    input.value = '';
+    renderTags(tipo, lista);
+    toast('✅ Marca agregada');
+  }
+
+  async function eliminarTag(tipo, idx) {
+    const clave = claveDeId(tipo);
+    const lista = [...(config[clave] || [])];
+    lista.splice(idx, 1);
+    await guardarConfig(clave, lista);
+    renderTags(tipo, lista);
+    toast('🗑️ Marca eliminada');
+  }
+
+  // ── EDITAR VALOR SIMPLE ───────────────────────────────────
+  function editarValor(clave, titulo, tipo) {
+    editandoClave = clave;
+    document.getElementById('edit-titulo').textContent = titulo;
+    document.getElementById('edit-label').textContent = titulo;
+    const input = document.getElementById('edit-input');
+    input.type = tipo || 'text';
+    input.value = config[clave] ?? '';
+    document.getElementById('overlay-edit').classList.add('vis');
+    setTimeout(() => input.focus(), 200);
+  }
+
+  async function guardarValor() {
+    const val = document.getElementById('edit-input').value.trim();
+    if (val === '') return;
+    const parsed = isNaN(val) ? val : parseFloat(val);
+    await guardarConfig(editandoClave, parsed);
+    document.getElementById('val-stock-min').textContent = parsed;
+    cerrarModal('overlay-edit');
+    toast('✅ Guardado');
+  }
+
+  // ── GUARDAR EN SUPABASE ───────────────────────────────────
+  async function guardarConfig(clave, valor) {
+    config[clave] = valor;
+    const { error } = await sb.from('configuracion').upsert({ clave, valor: JSON.stringify(valor) }, { onConflict: 'clave' });
+    if (error) console.error('Error guardando config:', error.message);
+  }
+
+  // ── UTILS ─────────────────────────────────────────────────
+  function cerrarModal(id) { document.getElementById(id).classList.remove('vis'); }
+  function cerrarFuera(e, id) { if (e.target === document.getElementById(id)) cerrarModal(id); }
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('vis');
+    setTimeout(() => t.classList.remove('vis'), 2000);
+  }
+
+  cargar();
+</script>
+</body>
+</html>
