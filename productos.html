@@ -397,7 +397,12 @@
 
     <div class="campos-2">
       <div class="campo" style="grid-column:1/-1"><label>Nombre (se completa automáticamente)</label><input type="text" id="f-nombre" placeholder="Se genera con Marca + Código…" style="background:#f8fafc;color:#64748b" readonly /></div>
-      <div class="campo"><label>Marca</label><input type="text" id="f-marca" placeholder="Ej: Lisbon" oninput="autoNombre()" /></div>
+      <div class="campo"><label>Marca</label>
+        <select id="f-marca" onchange="onMarcaChange()" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none">
+          <option value="">Seleccionar marca</option>
+        </select>
+        <input type="text" id="f-marca-otra" placeholder="Escribí la marca…" oninput="autoNombre()" style="display:none;margin-top:8px" />
+      </div>
       <div class="campo"><label>SKU / Código</label><input type="text" id="f-sku" placeholder="Ej: Palermo" oninput="autoNombre()" /></div>
     </div>
 
@@ -657,12 +662,15 @@
     document.getElementById('modal-titulo').textContent = idEdit ? 'Editar producto' : 'Nuevo producto';
     document.getElementById('btn-guardar-prod').textContent = idEdit ? '💾 Guardar cambios' : '✅ Guardar producto';
     if (!idEdit) {
-      ['f-id','f-nombre','f-marca','f-sku','f-stock','f-stock-min','f-costo','f-venta','f-subcat','f-notas'].forEach(id => {
+      ['f-id','f-nombre','f-sku','f-stock','f-stock-min','f-costo','f-venta','f-subcat','f-notas'].forEach(id => {
         const el = document.getElementById(id);
         el.value = id === 'f-stock' || id === 'f-stock-min' ? '0' : '';
       });
       document.getElementById('f-categoria').selectedIndex = 0;
       document.getElementById('f-zona').selectedIndex = 0;
+      document.getElementById('f-marca').selectedIndex = 0;
+      document.getElementById('f-marca-otra').value = '';
+      document.getElementById('f-marca-otra').style.display = 'none';
     }
     document.getElementById('overlay-form').classList.add('vis');
     document.querySelector('#overlay-form .modal').scrollTop = 0;
@@ -673,7 +681,21 @@
     if (!p) return;
     document.getElementById('f-id').value = p.id;
     document.getElementById('f-nombre').value = p.name || '';
-    document.getElementById('f-marca').value = p.brand || '';
+    // Marca en select
+    const marcaSel = document.getElementById('f-marca');
+    const marcaOtra = document.getElementById('f-marca-otra');
+    const opciones = [...marcaSel.options].map(o => o.value);
+    if (p.brand && opciones.includes(p.brand)) {
+      marcaSel.value = p.brand;
+      marcaOtra.style.display = 'none';
+    } else if (p.brand) {
+      marcaSel.value = '__otra__';
+      marcaOtra.value = p.brand;
+      marcaOtra.style.display = 'block';
+    } else {
+      marcaSel.selectedIndex = 0;
+      marcaOtra.style.display = 'none';
+    }
     document.getElementById('f-sku').value = p.sku || '';
     document.getElementById('f-stock').value = p.stock_current ?? 0;
     document.getElementById('f-stock-min').value = p.stock_min ?? 0;
@@ -695,7 +717,11 @@
 
     const payload = {
       name:          nombre,
-      brand:         document.getElementById('f-marca').value.trim() || null,
+      brand: (() => {
+        const s = document.getElementById('f-marca');
+        if (s.value === '__otra__') return document.getElementById('f-marca-otra').value.trim() || null;
+        return s.value || null;
+      })(),
       sku:           document.getElementById('f-sku').value.trim() || null,
       category:      cat,
       zona:          document.getElementById('f-zona').value || null,
@@ -808,9 +834,39 @@
     sel.selectedIndex = 0;
   }
 
+  // ── MARCAS DESDE CONFIG ───────────────────────────────────
+  async function cargarMarcas() {
+    const { data } = await sb.from('configuracion').select('valor').eq('clave','marcas').maybeSingle();
+    let marcas = [];
+    if (data?.valor) { try { marcas = JSON.parse(data.valor) || []; } catch{} }
+    marcas = [...marcas].sort((a,b) => a.localeCompare(b,'es'));
+    const sel = document.getElementById('f-marca');
+    if (!sel) return;
+    const valActual = sel.value;
+    sel.innerHTML = '<option value="">Seleccionar marca</option>';
+    marcas.forEach(m => {
+      const o = document.createElement('option');
+      o.value = m; o.textContent = m;
+      sel.appendChild(o);
+    });
+    const otraOpt = document.createElement('option');
+    otraOpt.value = '__otra__'; otraOpt.textContent = '✏️ Otra marca…';
+    sel.appendChild(otraOpt);
+    if (valActual) sel.value = valActual;
+  }
+
+  function onMarcaChange() {
+    const sel = document.getElementById('f-marca');
+    const otraInput = document.getElementById('f-marca-otra');
+    otraInput.style.display = sel.value === '__otra__' ? 'block' : 'none';
+    autoNombre();
+  }
+
   // ── AUTO NOMBRE ───────────────────────────────────────────
   function autoNombre() {
-    const marca = document.getElementById('f-marca').value.trim();
+    const sel = document.getElementById('f-marca');
+    const otraInput = document.getElementById('f-marca-otra');
+    const marca = sel.value === '__otra__' ? otraInput.value.trim() : sel.value.trim();
     const sku   = document.getElementById('f-sku').value.trim();
     const parts = [marca, sku].filter(Boolean);
     document.getElementById('f-nombre').value = parts.join(' ');
@@ -818,6 +874,7 @@
 
   // ── INIT ──────────────────────────────────────────────────
   cargar();
+  cargarMarcas();
 </script>
 </body>
 </html>
