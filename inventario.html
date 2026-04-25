@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Olvisión Inventario — Conteo físico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --azul:#034295; --azul2:#2563eb; --azul-bg:#eff6ff; --amarillo:#f9f4ab;
+      --rojo:#ef4444; --verde:#10b981; --naranja:#f59e0b;
+      --gris:#64748b; --borde:#e2e8f0; --fondo:#f1f5f9; --radio:16px;
+    }
+    body { font-family:'Nunito',sans-serif; background:var(--fondo); color:#1e293b; min-height:100vh; }
+    .app { display:flex; min-height:100vh; }
+    .sidebar { width:220px; background:var(--azul); color:white; display:none; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:100; }
+    @media(min-width:768px){ .sidebar{display:flex;} .main-wrap{margin-left:220px;} .bottom-nav{display:none!important;} }
+    .sb-brand { padding:22px 20px 14px; border-bottom:1px solid rgba(255,255,255,0.12); }
+    .sb-brand img { height:44px; object-fit:contain; }
+    .sb-brand-sub { font-size:10px; font-weight:700; color:#93c5fd; letter-spacing:1px; text-transform:uppercase; margin-top:4px; }
+    .sb-nav { flex:1; padding:12px 0; }
+    .sb-item { display:flex; align-items:center; gap:10px; padding:11px 20px; font-size:13px; font-weight:700; color:rgba(255,255,255,0.7); text-decoration:none; transition:all 0.15s; border-left:3px solid transparent; }
+    .sb-item:hover { background:rgba(255,255,255,0.08); color:white; }
+    .sb-item.activo { background:rgba(255,255,255,0.12); color:white; border-left-color:var(--amarillo); }
+    .sb-icon { font-size:16px; width:20px; text-align:center; }
+    .sb-footer { padding:14px 20px; border-top:1px solid rgba(255,255,255,0.12); }
+    .btn-salir { width:100%; background:rgba(255,255,255,0.1); border:none; border-radius:10px; color:rgba(255,255,255,0.7); font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; padding:9px; cursor:pointer; }
+    .btn-salir:hover { background:rgba(255,255,255,0.18); color:white; }
+    .main-wrap { flex:1; display:flex; flex-direction:column; }
+    .topnav { background:white; padding:14px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--borde); position:sticky; top:0; z-index:50; }
+    .topnav-back { font-size:22px; color:var(--azul); text-decoration:none; font-weight:900; }
+    .topnav-titulo { font-size:17px; font-weight:900; }
+    .topnav-sub { font-size:12px; color:var(--gris); font-weight:600; }
+    .content { padding:16px; max-width:700px; margin:0 auto; width:100%; padding-bottom:90px; }
+
+    /* PANTALLA INICIO */
+    .pantalla { display:none; }
+    .pantalla.activa { display:block; }
+
+    /* HERO INICIO */
+    .inicio-hero { background:var(--azul); border-radius:20px; padding:28px 20px; text-align:center; color:white; margin-bottom:20px; }
+    .inicio-hero-icon { font-size:48px; margin-bottom:10px; }
+    .inicio-hero-titulo { font-size:22px; font-weight:900; }
+    .inicio-hero-sub { font-size:13px; color:#93c5fd; margin-top:6px; }
+
+    /* SELECCIÓN ZONA */
+    .zonas-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+    .zona-card { background:white; border-radius:var(--radio); padding:16px; box-shadow:0 2px 6px rgba(0,0,0,0.05); cursor:pointer; border:2px solid transparent; transition:all 0.15s; text-align:center; }
+    .zona-card:hover { border-color:var(--azul2); }
+    .zona-card.activo { border-color:var(--azul); background:var(--azul-bg); }
+    .zona-card-icon { font-size:28px; margin-bottom:6px; }
+    .zona-card-nombre { font-size:13px; font-weight:800; color:#1e293b; }
+    .zona-card-cant { font-size:11px; color:var(--gris); margin-top:3px; }
+    .zona-card.todas { grid-column:1/-1; display:flex; align-items:center; gap:14px; text-align:left; padding:18px; }
+    .zona-card.todas .zona-card-icon { font-size:32px; margin:0; }
+
+    .btn-iniciar { width:100%; background:var(--azul); color:white; border:none; border-radius:var(--radio); padding:16px; font-family:'Nunito',sans-serif; font-size:16px; font-weight:800; cursor:pointer; margin-top:4px; opacity:0.4; pointer-events:none; transition:opacity 0.2s; }
+    .btn-iniciar.listo { opacity:1; pointer-events:all; }
+
+    /* PANTALLA CONTEO */
+    .progreso-wrap { background:white; border-radius:var(--radio); padding:14px 16px; margin-bottom:14px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
+    .progreso-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+    .progreso-label { font-size:13px; font-weight:800; color:#1e293b; }
+    .progreso-num { font-size:13px; font-weight:700; color:var(--gris); }
+    .progreso-bar { height:8px; background:#f1f5f9; border-radius:20px; overflow:hidden; }
+    .progreso-fill { height:100%; background:var(--azul); border-radius:20px; transition:width 0.4s; }
+
+    /* CARD PRODUCTO CONTEO */
+    .prod-conteo-card { background:white; border-radius:20px; box-shadow:0 4px 16px rgba(0,0,0,0.08); padding:24px 20px; margin-bottom:14px; }
+    .prod-conteo-cat { font-size:11px; font-weight:800; color:var(--gris); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:8px; }
+    .prod-conteo-nombre { font-size:20px; font-weight:900; color:#1e293b; margin-bottom:4px; }
+    .prod-conteo-sku { font-size:13px; color:var(--gris); margin-bottom:16px; }
+    .prod-conteo-sistema { display:flex; align-items:center; justify-content:space-between; background:var(--fondo); border-radius:12px; padding:12px 16px; margin-bottom:16px; }
+    .pcs-label { font-size:12px; font-weight:700; color:var(--gris); }
+    .pcs-val { font-size:20px; font-weight:900; color:var(--azul); }
+
+    .conteo-controles { display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:16px; }
+    .btn-cnt { width:56px; height:56px; border-radius:50%; border:none; font-size:28px; font-weight:900; cursor:pointer; font-family:'Nunito',sans-serif; transition:transform 0.1s; }
+    .btn-cnt:active { transform:scale(0.92); }
+    .btn-cnt.menos { background:#fee2e2; color:var(--rojo); }
+    .btn-cnt.mas   { background:#d1fae5; color:#065f46; }
+    .conteo-input  { width:80px; text-align:center; font-size:28px; font-weight:900; padding:10px; border:2px solid var(--borde); border-radius:14px; font-family:'Nunito',sans-serif; color:#1e293b; outline:none; }
+    .conteo-input:focus { border-color:var(--azul2); }
+
+    .dif-badge { text-align:center; padding:8px 16px; border-radius:12px; font-size:14px; font-weight:800; margin-bottom:16px; }
+    .dif-badge.igual   { background:#f0fdf4; color:#065f46; }
+    .dif-badge.mas-dif { background:#d1fae5; color:#065f46; }
+    .dif-badge.menos-dif { background:#fee2e2; color:#991b1b; }
+
+    .conteo-btns { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .btn-saltar { background:#f1f5f9; color:var(--gris); border:none; border-radius:14px; padding:14px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; }
+    .btn-confirmar { background:var(--azul); color:white; border:none; border-radius:14px; padding:14px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; }
+
+    /* PANTALLA RESUMEN */
+    .resumen-hero { background:var(--azul); border-radius:20px; padding:24px 20px; text-align:center; color:white; margin-bottom:16px; }
+    .resumen-hero-titulo { font-size:20px; font-weight:900; }
+    .resumen-hero-sub { font-size:13px; color:#93c5fd; margin-top:6px; }
+    .resumen-kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:16px; }
+    .rkpi { background:rgba(255,255,255,0.1); border-radius:12px; padding:12px; text-align:center; }
+    .rkpi-val { font-size:22px; font-weight:900; }
+    .rkpi-lab { font-size:11px; color:#93c5fd; margin-top:2px; }
+
+    .dif-item { background:white; border-radius:var(--radio); padding:14px 16px; margin-bottom:8px; box-shadow:0 2px 6px rgba(0,0,0,0.05); display:flex; align-items:center; gap:12px; }
+    .dif-item.mas  { border-left:4px solid var(--verde); }
+    .dif-item.menos { border-left:4px solid var(--rojo); }
+    .dif-item.igual { border-left:4px solid #e2e8f0; }
+    .dif-info { flex:1; min-width:0; }
+    .dif-nombre { font-size:14px; font-weight:800; color:#1e293b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .dif-det { font-size:12px; color:var(--gris); margin-top:2px; }
+    .dif-num { text-align:right; flex-shrink:0; }
+    .dif-delta { font-size:18px; font-weight:900; }
+    .dif-delta.pos { color:var(--verde); }
+    .dif-delta.neg { color:var(--rojo); }
+    .dif-delta.cero { color:#cbd5e1; }
+    .dif-stocks { font-size:11px; color:var(--gris); margin-top:2px; }
+
+    .sec-titulo { font-size:14px; font-weight:800; color:#1e293b; margin:16px 0 10px; }
+
+    .btn-aplicar { width:100%; background:var(--verde); color:white; border:none; border-radius:var(--radio); padding:16px; font-family:'Nunito',sans-serif; font-size:16px; font-weight:800; cursor:pointer; margin-bottom:10px; }
+    .btn-volver  { width:100%; background:#f1f5f9; color:var(--gris); border:none; border-radius:var(--radio); padding:14px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; cursor:pointer; }
+
+    /* TOAST */
+    .toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px); background:#1e293b; color:white; padding:10px 20px; border-radius:20px; font-size:13px; font-weight:700; opacity:0; transition:all 0.3s; z-index:999; pointer-events:none; white-space:nowrap; }
+    .toast.vis { opacity:1; transform:translateX(-50%) translateY(0); }
+
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; z-index:100; background:white; border-top:1px solid var(--borde); display:flex; padding:8px 0 env(safe-area-inset-bottom); }
+    .bnav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 4px; text-decoration:none; color:var(--gris); font-size:10px; font-weight:700; }
+    .bnav-item.activo { color:var(--azul); }
+    .bnav-icon { font-size:20px; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <img src="logo_app.png" alt="Olvisión" onerror="this.style.display='none'" />
+      <div class="sb-brand-sub">📦 Inventario</div>
+    </div>
+    <nav class="sb-nav">
+      <a class="sb-item" href="dashboard.html"><span class="sb-icon">🏠</span> Inicio</a>
+      <a class="sb-item" href="productos.html"><span class="sb-icon">📦</span> Productos</a>
+      <a class="sb-item activo" href="inventario.html"><span class="sb-icon">🔍</span> Inventario</a>
+      <a class="sb-item" href="movimientos.html"><span class="sb-icon">↕️</span> Movimientos</a>
+      <a class="sb-item" href="proveedores.html"><span class="sb-icon">🏢</span> Proveedores</a>
+      <a class="sb-item" href="reportes.html"><span class="sb-icon">📊</span> Reportes</a>
+      <a class="sb-item" href="configuracion.html"><span class="sb-icon">⚙️</span> Configuración</a>
+    </nav>
+    <div class="sb-footer"><button class="btn-salir" onclick="salir()">🚪 Salir</button></div>
+  </aside>
+
+  <div class="main-wrap">
+    <nav class="topnav">
+      <a class="topnav-back" href="dashboard.html" id="btn-back">‹</a>
+      <div>
+        <div class="topnav-titulo">🔍 Inventario físico</div>
+        <div class="topnav-sub" id="nav-sub">Conteo de stock</div>
+      </div>
+    </nav>
+
+    <div class="content">
+
+      <!-- ══ PANTALLA 1: INICIO ══ -->
+      <div class="pantalla activa" id="pantalla-inicio">
+        <div class="inicio-hero">
+          <div class="inicio-hero-icon">📋</div>
+          <div class="inicio-hero-titulo">Conteo físico</div>
+          <div class="inicio-hero-sub">Seleccioná una zona y contá los productos uno por uno</div>
+        </div>
+
+        <div style="font-size:14px;font-weight:800;color:#1e293b;margin-bottom:12px">¿Qué zona querés contar?</div>
+
+        <div class="zonas-grid" id="zonas-grid">
+          <div class="zona-card todas" onclick="seleccionarZona('todas')">
+            <div class="zona-card-icon">🏪</div>
+            <div>
+              <div class="zona-card-nombre">Todo el inventario</div>
+              <div class="zona-card-cant" id="cant-todas">Cargando...</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-iniciar" id="btn-iniciar" onclick="iniciarConteo()">🔍 Iniciar conteo</button>
+      </div>
+
+      <!-- ══ PANTALLA 2: CONTEO ══ -->
+      <div class="pantalla" id="pantalla-conteo">
+        <div class="progreso-wrap">
+          <div class="progreso-header">
+            <div class="progreso-label" id="prog-label">Contando...</div>
+            <div class="progreso-num" id="prog-num">0 / 0</div>
+          </div>
+          <div class="progreso-bar"><div class="progreso-fill" id="prog-fill" style="width:0%"></div></div>
+        </div>
+
+        <div class="prod-conteo-card" id="prod-card">
+          <div class="prod-conteo-cat" id="pc-cat">—</div>
+          <div class="prod-conteo-nombre" id="pc-nombre">—</div>
+          <div class="prod-conteo-sku" id="pc-sku">—</div>
+          <div class="prod-conteo-sistema">
+            <div>
+              <div class="pcs-label">Stock en sistema</div>
+            </div>
+            <div class="pcs-val" id="pc-stock-sistema">—</div>
+          </div>
+          <div class="conteo-controles">
+            <button class="btn-cnt menos" onclick="ajustarConteo(-1)">−</button>
+            <input class="conteo-input" type="number" id="conteo-input" value="0" min="0" oninput="conteoDesdeInput(this.value)" />
+            <button class="btn-cnt mas" onclick="ajustarConteo(1)">+</button>
+          </div>
+          <div class="dif-badge igual" id="dif-badge">✅ Sin diferencia</div>
+          <div class="conteo-btns">
+            <button class="btn-saltar" onclick="saltar()">⏭ Saltar</button>
+            <button class="btn-confirmar" onclick="confirmar()">✅ Confirmar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PANTALLA 3: RESUMEN ══ -->
+      <div class="pantalla" id="pantalla-resumen">
+        <div class="resumen-hero">
+          <div class="resumen-hero-titulo">📊 Resumen del conteo</div>
+          <div class="resumen-hero-sub" id="res-zona-label">—</div>
+          <div class="resumen-kpis">
+            <div class="rkpi"><div class="rkpi-val" id="res-total">—</div><div class="rkpi-lab">Contados</div></div>
+            <div class="rkpi"><div class="rkpi-val" id="res-difs" style="color:#fca5a5">—</div><div class="rkpi-lab">Con diferencia</div></div>
+            <div class="rkpi"><div class="rkpi-val" id="res-saltados" style="color:var(--amarillo)">—</div><div class="rkpi-lab">Saltados</div></div>
+          </div>
+        </div>
+
+        <div id="res-difs-section" style="display:none">
+          <div class="sec-titulo">⚠️ Diferencias encontradas</div>
+          <div id="res-difs-lista"></div>
+        </div>
+
+        <div id="res-ok-section" style="display:none">
+          <div class="sec-titulo">✅ Sin diferencias</div>
+          <div id="res-ok-lista"></div>
+        </div>
+
+        <button class="btn-aplicar" onclick="aplicarConteo()">💾 Aplicar y actualizar stock</button>
+        <button class="btn-volver" onclick="volverInicio()">↩ Volver a empezar</button>
+      </div>
+
+    </div>
+
+    <nav class="bottom-nav">
+      <a class="bnav-item" href="dashboard.html"><span class="bnav-icon">🏠</span>Inicio</a>
+      <a class="bnav-item" href="productos.html"><span class="bnav-icon">📦</span>Productos</a>
+      <a class="bnav-item activo" href="inventario.html"><span class="bnav-icon">🔍</span>Inventario</a>
+      <a class="bnav-item" href="movimientos.html"><span class="bnav-icon">↕️</span>Movimientos</a>
+      <a class="bnav-item" href="proveedores.html"><span class="bnav-icon">🏢</span>Proveedores</a>
+    </nav>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const userJson = localStorage.getItem('olvision_user');
+  if (!userJson) window.location.href = 'index.html';
+  let currentUser;
+  try { currentUser = JSON.parse(userJson); } catch(e) { window.location.href = 'index.html'; }
+  function salir() { localStorage.removeItem('olvision_user'); window.location.href = 'index.html'; }
+
+  const { createClient } = supabase;
+  const sb = createClient(
+    'https://nrmjlfpbtjqyvtpdexej.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ybWpsZnBidGpxeXZ0cGRleGVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NjM0MTcsImV4cCI6MjA5MjUzOTQxN30.cg36SF1XXpFbg3hRl2Xl7Tof_OhNJRa9B1BIUcNLpoQ'
+  );
+
+  const CAT_LABELS = { armazon_receta:'Armazón receta', armazon_sol:'Armazón sol', lentes_oftalmicos:'Oftálmicos', lentes_contacto:'Contacto', accesorios:'Accesorios', soluciones:'Soluciones', otro:'Otro' };
+  const ZONA_LABELS = { todas:'Todo el inventario', exhibidor_1:'Exhibidor 1', exhibidor_2:'Exhibidor 2', exhibidor_3:'Exhibidor 3', vidriera_1:'Vidriera 1', vidriera_2:'Vidriera 2', vidriera_3:'Vidriera 3', vidriera_4:'Vidriera 4', cajonera_1:'Cajonera 1', cajonera_2:'Cajonera 2' };
+  const ZONA_ICONOS = { todas:'🏪', exhibidor_1:'🗄', exhibidor_2:'🗄', exhibidor_3:'🗄', vidriera_1:'🪟', vidriera_2:'🪟', vidriera_3:'🪟', vidriera_4:'🪟', cajonera_1:'🗃', cajonera_2:'🗃' };
+
+  let todosProductos = [];
+  let zonaSeleccionada = null;
+  let productosConteo = [];
+  let indexActual = 0;
+  let resultados = []; // { producto, stockSistema, stockContado, saltado }
+  let conteoActual = 0;
+
+  // ── INICIO ────────────────────────────────────────────────
+  async function cargar() {
+    const { data } = await sb.from('products').select('*').eq('active', true).order('zona').order('name');
+    todosProductos = data || [];
+
+    // Total
+    document.getElementById('cant-todas').textContent = `${todosProductos.length} productos`;
+
+    // Calcular productos por zona
+    const porZona = {};
+    todosProductos.forEach(p => {
+      const z = p.zona || 'sin_zona';
+      porZona[z] = (porZona[z] || 0) + 1;
+    });
+
+    // Renderizar zonas con productos
+    const zonasConProds = Object.keys(porZona).filter(z => z !== 'sin_zona' && porZona[z] > 0);
+    const grid = document.getElementById('zonas-grid');
+
+    // Mantener el botón "Todas" y agregar las zonas
+    const todasCard = grid.querySelector('.zona-card.todas');
+    grid.innerHTML = '';
+    grid.appendChild(todasCard);
+
+    zonasConProds.sort().forEach(zona => {
+      const div = document.createElement('div');
+      div.className = 'zona-card';
+      div.setAttribute('data-zona', zona);
+      div.onclick = () => seleccionarZona(zona);
+      div.innerHTML = `
+        <div class="zona-card-icon">${ZONA_ICONOS[zona] || '📦'}</div>
+        <div class="zona-card-nombre">${ZONA_LABELS[zona] || zona}</div>
+        <div class="zona-card-cant">${porZona[zona]} producto${porZona[zona] !== 1 ? 's' : ''}</div>`;
+      grid.appendChild(div);
+    });
+  }
+
+  function seleccionarZona(zona) {
+    zonaSeleccionada = zona;
+    document.querySelectorAll('.zona-card').forEach(c => c.classList.remove('activo'));
+    const card = zona === 'todas'
+      ? document.querySelector('.zona-card.todas')
+      : document.querySelector(`.zona-card[data-zona="${zona}"]`);
+    if (card) card.classList.add('activo');
+    document.getElementById('btn-iniciar').classList.add('listo');
+  }
+
+  function iniciarConteo() {
+    if (!zonaSeleccionada) return;
+    productosConteo = zonaSeleccionada === 'todas'
+      ? [...todosProductos]
+      : todosProductos.filter(p => p.zona === zonaSeleccionada);
+    if (productosConteo.length === 0) { toast('Sin productos en esta zona'); return; }
+    indexActual = 0;
+    resultados = productosConteo.map(p => ({ producto: p, stockSistema: p.stock_current, stockContado: p.stock_current, saltado: false }));
+    mostrarPantalla('pantalla-conteo');
+    document.getElementById('nav-sub').textContent = ZONA_LABELS[zonaSeleccionada] || zonaSeleccionada;
+    mostrarProducto();
+  }
+
+  // ── CONTEO ────────────────────────────────────────────────
+  function mostrarProducto() {
+    const r = resultados[indexActual];
+    const p = r.producto;
+    const total = productosConteo.length;
+    const pct = Math.round((indexActual / total) * 100);
+
+    document.getElementById('prog-label').textContent = `Producto ${indexActual + 1} de ${total}`;
+    document.getElementById('prog-num').textContent = `${indexActual + 1} / ${total}`;
+    document.getElementById('prog-fill').style.width = pct + '%';
+
+    document.getElementById('pc-cat').textContent = CAT_LABELS[p.category] || p.category || '—';
+    document.getElementById('pc-nombre').textContent = [p.brand, p.name].filter(Boolean).join(' · ');
+    document.getElementById('pc-sku').textContent = p.sku ? `Código: ${p.sku}` : 'Sin código';
+    document.getElementById('pc-stock-sistema').textContent = r.stockSistema;
+
+    conteoActual = r.stockContado;
+    document.getElementById('conteo-input').value = conteoActual;
+    actualizarDifBadge();
+  }
+
+  function ajustarConteo(delta) {
+    conteoActual = Math.max(0, conteoActual + delta);
+    document.getElementById('conteo-input').value = conteoActual;
+    resultados[indexActual].stockContado = conteoActual;
+    actualizarDifBadge();
+  }
+
+  function conteoDesdeInput(val) {
+    conteoActual = Math.max(0, parseInt(val) || 0);
+    resultados[indexActual].stockContado = conteoActual;
+    actualizarDifBadge();
+  }
+
+  function actualizarDifBadge() {
+    const sistema = resultados[indexActual].stockSistema;
+    const contado = conteoActual;
+    const dif = contado - sistema;
+    const badge = document.getElementById('dif-badge');
+    if (dif === 0) { badge.className = 'dif-badge igual'; badge.textContent = '✅ Sin diferencia'; }
+    else if (dif > 0) { badge.className = 'dif-badge mas-dif'; badge.textContent = `▲ ${dif} unidades de más`; }
+    else { badge.className = 'dif-badge menos-dif'; badge.textContent = `▼ ${Math.abs(dif)} unidades de menos`; }
+  }
+
+  function confirmar() {
+    resultados[indexActual].stockContado = conteoActual;
+    resultados[indexActual].saltado = false;
+    avanzar();
+  }
+
+  function saltar() {
+    resultados[indexActual].saltado = true;
+    avanzar();
+  }
+
+  function avanzar() {
+    indexActual++;
+    if (indexActual >= productosConteo.length) {
+      mostrarResumen();
+    } else {
+      mostrarProducto();
+    }
+  }
+
+  // ── RESUMEN ───────────────────────────────────────────────
+  function mostrarResumen() {
+    mostrarPantalla('pantalla-resumen');
+    document.getElementById('res-zona-label').textContent = ZONA_LABELS[zonaSeleccionada] || zonaSeleccionada;
+
+    const contados  = resultados.filter(r => !r.saltado);
+    const saltados  = resultados.filter(r => r.saltado);
+    const conDif    = contados.filter(r => r.stockContado !== r.stockSistema);
+    const sinDif    = contados.filter(r => r.stockContado === r.stockSistema);
+
+    document.getElementById('res-total').textContent = contados.length;
+    document.getElementById('res-difs').textContent = conDif.length;
+    document.getElementById('res-saltados').textContent = saltados.length;
+
+    // Diferencias
+    const difSection = document.getElementById('res-difs-section');
+    const difLista   = document.getElementById('res-difs-lista');
+    if (conDif.length > 0) {
+      difSection.style.display = 'block';
+      difLista.innerHTML = conDif.map(r => {
+        const dif = r.stockContado - r.stockSistema;
+        const esPos = dif > 0;
+        const nombre = [r.producto.brand, r.producto.name].filter(Boolean).join(' · ');
+        return `<div class="dif-item ${esPos ? 'mas' : 'menos'}">
+          <div class="dif-info">
+            <div class="dif-nombre">${nombre}</div>
+            <div class="dif-det">${CAT_LABELS[r.producto.category] || '—'}</div>
+          </div>
+          <div class="dif-num">
+            <div class="dif-delta ${esPos ? 'pos' : 'neg'}">${esPos ? '+' : ''}${dif}</div>
+            <div class="dif-stocks">${r.stockSistema} → ${r.stockContado}</div>
+          </div>
+        </div>`;
+      }).join('');
+    } else { difSection.style.display = 'none'; }
+
+    // Sin diferencias (colapsado, solo cantidad)
+    const okSection = document.getElementById('res-ok-section');
+    if (sinDif.length > 0) {
+      okSection.style.display = 'block';
+      document.getElementById('res-ok-lista').innerHTML = `
+        <div style="background:white;border-radius:var(--radio);padding:14px 16px;box-shadow:0 2px 6px rgba(0,0,0,0.05);color:var(--gris);font-size:13px;font-weight:700;text-align:center">
+          ${sinDif.length} producto${sinDif.length !== 1 ? 's' : ''} sin diferencia ✅
+        </div>`;
+    } else { okSection.style.display = 'none'; }
+  }
+
+  async function aplicarConteo() {
+    const conDif = resultados.filter(r => !r.saltado && r.stockContado !== r.stockSistema);
+    if (conDif.length === 0) { toast('✅ Sin diferencias, nada que actualizar'); return; }
+
+    const btn = document.querySelector('.btn-aplicar');
+    btn.textContent = '⏳ Actualizando...'; btn.disabled = true;
+
+    let errores = 0;
+    for (const r of conDif) {
+      const { error: errUpd } = await sb.from('products')
+        .update({ stock_current: r.stockContado, updated_at: new Date().toISOString() })
+        .eq('id', r.producto.id);
+      if (errUpd) { errores++; continue; }
+
+      await sb.from('stock_movements').insert([{
+        product_id:      r.producto.id,
+        branch_id:       r.producto.branch_id || null,
+        user_id:         currentUser?.id || null,
+        type:            'ajuste_inventario',
+        quantity:        r.stockContado - r.stockSistema,
+        quantity_before: r.stockSistema,
+        quantity_after:  r.stockContado,
+        notes:           `Conteo físico · ${ZONA_LABELS[zonaSeleccionada] || zonaSeleccionada}`
+      }]);
+    }
+
+    btn.textContent = '💾 Aplicar y actualizar stock'; btn.disabled = false;
+
+    if (errores > 0) { toast(`⚠️ ${errores} error(es) al actualizar`); }
+    else { toast(`✅ Stock actualizado — ${conDif.length} producto${conDif.length !== 1 ? 's' : ''} ajustado${conDif.length !== 1 ? 's' : ''}`); }
+
+    setTimeout(() => volverInicio(), 1500);
+  }
+
+  function volverInicio() {
+    zonaSeleccionada = null;
+    document.querySelectorAll('.zona-card').forEach(c => c.classList.remove('activo'));
+    document.getElementById('btn-iniciar').classList.remove('listo');
+    document.getElementById('nav-sub').textContent = 'Conteo de stock';
+    mostrarPantalla('pantalla-inicio');
+    cargar();
+  }
+
+  // ── UTILS ─────────────────────────────────────────────────
+  function mostrarPantalla(id) {
+    document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
+    document.getElementById(id).classList.add('activa');
+    // Back button
+    const back = document.getElementById('btn-back');
+    if (id === 'pantalla-inicio') { back.href = 'dashboard.html'; back.onclick = null; }
+    else { back.href = '#'; back.onclick = (e) => { e.preventDefault(); volverInicio(); }; }
+  }
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('vis');
+    setTimeout(() => t.classList.remove('vis'), 2500);
+  }
+
+  cargar();
+</script>
+</body>
+</html>
