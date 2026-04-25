@@ -217,32 +217,17 @@
         </div>
       </div>
 
-      <!-- MARCAS ARMAZÓN -->
+      <!-- MARCAS -->
       <div class="seccion">
         <div class="sec-header">
-          <div class="sec-titulo">🕶 Marcas de armazón</div>
-          <div class="sec-sub">Aparecen en el desplegable de la app de caja</div>
+          <div class="sec-titulo">🏷️ Marcas de productos</div>
+          <div class="sec-sub">Lista única de marcas para todos los productos del inventario</div>
         </div>
         <div class="tags-wrap">
-          <div class="tags-list" id="tags-marcas-armazon"></div>
+          <div class="tags-list" id="tags-marcas"></div>
           <div class="tag-add-wrap">
-            <input type="text" class="tag-add-input" id="input-marcas-armazon" placeholder="Nueva marca…" onkeydown="if(event.key==='Enter')agregarTag('marcas_armazon')" />
-            <button class="tag-add-btn" onclick="agregarTag('marcas_armazon')">+ Agregar</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- MARCAS LENTES CONTACTO -->
-      <div class="seccion">
-        <div class="sec-header">
-          <div class="sec-titulo">👁 Marcas de lentes de contacto</div>
-          <div class="sec-sub">Aparecen en el desplegable de la app de caja</div>
-        </div>
-        <div class="tags-wrap">
-          <div class="tags-list" id="tags-marcas-lentes-contacto"></div>
-          <div class="tag-add-wrap">
-            <input type="text" class="tag-add-input" id="input-marcas-lentes-contacto" placeholder="Nueva marca…" onkeydown="if(event.key==='Enter')agregarTag('marcas_lentes_contacto')" />
-            <button class="tag-add-btn" onclick="agregarTag('marcas_lentes_contacto')">+ Agregar</button>
+            <input type="text" class="tag-add-input" id="input-marcas" placeholder="Nueva marca…" onkeydown="if(event.key==='Enter')agregarTag('marcas')" />
+            <button class="tag-add-btn" onclick="agregarTag('marcas')">+ Agregar</button>
           </div>
         </div>
       </div>
@@ -324,33 +309,30 @@
     document.getElementById('val-stock-min').textContent = config['stock_min_default'] ?? 2;
 
     // Tags
-    renderTags('marcas-armazon', config['marcas_armazon'] || []);
-    renderTags('marcas-lentes-contacto', config['marcas_lentes_contacto'] || []);
+    renderTags('marcas', config['marcas'] || []);
   }
 
   // ── TAGS ──────────────────────────────────────────────────
   function renderTags(tipo, lista) {
     const cont = document.getElementById('tags-' + tipo);
-    cont.innerHTML = lista.length === 0
+    if (!cont) return;
+    const sorted = [...lista].sort((a,b) => a.localeCompare(b, 'es'));
+    cont.innerHTML = sorted.length === 0
       ? '<span style="font-size:13px;color:var(--gris);font-style:italic">Sin marcas cargadas</span>'
-      : lista.map((t, i) => `
+      : sorted.map((t, i) => `
         <div class="tag-item">
           ${t}
-          <button class="tag-del" onclick="eliminarTag('${tipo}',${i})">✕</button>
+          <button class="tag-del" onclick="eliminarTag('${tipo}',${lista.indexOf(t)})">✕</button>
         </div>`).join('');
   }
 
-  function claveDeId(tipo) {
-    return tipo === 'marcas-armazon' ? 'marcas_armazon' : 'marcas_lentes_contacto';
-  }
-
   async function agregarTag(clave) {
-    const tipo = clave === 'marcas_armazon' ? 'marcas-armazon' : 'marcas-lentes-contacto';
+    const tipo = clave; // tipo === clave en lista única
     const input = document.getElementById('input-' + tipo);
     const val = input.value.trim();
     if (!val) return;
     const lista = [...(config[clave] || [])];
-    if (lista.includes(val)) { toast('⚠️ Ya existe esa marca'); return; }
+    if (lista.map(m=>m.toLowerCase()).includes(val.toLowerCase())) { toast('⚠️ Ya existe esa marca'); return; }
     lista.push(val);
     await guardarConfig(clave, lista);
     input.value = '';
@@ -359,7 +341,7 @@
   }
 
   async function eliminarTag(tipo, idx) {
-    const clave = claveDeId(tipo);
+    const clave = tipo;
     const lista = [...(config[clave] || [])];
     lista.splice(idx, 1);
     await guardarConfig(clave, lista);
