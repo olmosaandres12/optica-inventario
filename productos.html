@@ -291,10 +291,10 @@
         </div>
         <div class="filtros" id="filtros-cat">
           <button class="filtro-chip activo" data-cat="" onclick="setFiltroCategoria(this, '')">Todos</button>
-          <button class="filtro-chip" data-cat="marcos" onclick="setFiltroCategoria(this,'marcos')">🕶 Marcos</button>
+          <button class="filtro-chip" data-cat="armazon_receta" onclick="setFiltroCategoria(this,'armazon_receta')">🕶 Receta</button>
+          <button class="filtro-chip" data-cat="armazon_sol" onclick="setFiltroCategoria(this,'armazon_sol')">☀️ Sol</button>
           <button class="filtro-chip" data-cat="lentes_oftalmicos" onclick="setFiltroCategoria(this,'lentes_oftalmicos')">🔬 Oftálmicos</button>
           <button class="filtro-chip" data-cat="lentes_contacto" onclick="setFiltroCategoria(this,'lentes_contacto')">👁 Contacto</button>
-          <button class="filtro-chip" data-cat="solares" onclick="setFiltroCategoria(this,'solares')">☀️ Solares</button>
           <button class="filtro-chip" data-cat="accesorios" onclick="setFiltroCategoria(this,'accesorios')">🎀 Accesorios</button>
           <button class="filtro-chip" data-cat="soluciones" onclick="setFiltroCategoria(this,'soluciones')">💧 Soluciones</button>
           <button class="filtro-chip" data-cat="otro" onclick="setFiltroCategoria(this,'otro')">📦 Otro</button>
@@ -334,19 +334,19 @@
     <input type="hidden" id="f-id" />
 
     <div class="campos-2">
-      <div class="campo" style="grid-column:1/-1"><label>Nombre *</label><input type="text" id="f-nombre" placeholder="Ej: Montura acetato redonda" /></div>
-      <div class="campo"><label>Marca</label><input type="text" id="f-marca" placeholder="Ej: Ray-Ban" /></div>
-      <div class="campo"><label>SKU / Código</label><input type="text" id="f-sku" placeholder="Ej: RB-2140" /></div>
+      <div class="campo" style="grid-column:1/-1"><label>Nombre (se completa automáticamente)</label><input type="text" id="f-nombre" placeholder="Se genera con Marca + Código…" style="background:#f8fafc;color:#64748b" readonly /></div>
+      <div class="campo"><label>Marca</label><input type="text" id="f-marca" placeholder="Ej: Lisbon" oninput="autoNombre()" /></div>
+      <div class="campo"><label>SKU / Código</label><input type="text" id="f-sku" placeholder="Ej: Palermo" oninput="autoNombre()" /></div>
     </div>
 
     <div class="campos-2">
       <div class="campo"><label>Categoría *</label>
         <select id="f-categoria">
           <option value="">Seleccionar</option>
-          <option value="marcos">🕶 Marcos</option>
+          <option value="armazon_receta">🕶 Armazón receta</option>
+          <option value="armazon_sol">☀️ Armazón sol</option>
           <option value="lentes_oftalmicos">🔬 Lentes oftálmicos</option>
           <option value="lentes_contacto">👁 Lentes de contacto</option>
-          <option value="solares">☀️ Solares</option>
           <option value="accesorios">🎀 Accesorios</option>
           <option value="soluciones">💧 Soluciones</option>
           <option value="otro">📦 Otro</option>
@@ -355,9 +355,15 @@
       <div class="campo"><label>Zona</label>
         <select id="f-zona">
           <option value="">Sin zona</option>
-          <option value="exhibidor">🗄 Exhibidor</option>
-          <option value="vidriera">🪟 Vidriera</option>
-          <option value="deposito">📦 Depósito</option>
+          <option value="exhibidor_1">🗄 Exhibidor 1</option>
+          <option value="exhibidor_2">🗄 Exhibidor 2</option>
+          <option value="exhibidor_3">🗄 Exhibidor 3</option>
+          <option value="vidriera_1">🪟 Vidriera 1</option>
+          <option value="vidriera_2">🪟 Vidriera 2</option>
+          <option value="vidriera_3">🪟 Vidriera 3</option>
+          <option value="vidriera_4">🪟 Vidriera 4</option>
+          <option value="cajonera_1">🗃 Cajonera 1</option>
+          <option value="cajonera_2">🗃 Cajonera 2</option>
         </select>
       </div>
     </div>
@@ -443,18 +449,23 @@
 
   // ── HELPERS ───────────────────────────────────────────────
   const CAT_LABELS = {
-    marcos:'Marcos', lentes_oftalmicos:'Oftálmicos', lentes_contacto:'Contacto',
-    solares:'Solares', accesorios:'Accesorios', soluciones:'Soluciones', otro:'Otro'
+    armazon_receta:'Armazón receta', armazon_sol:'Armazón sol',
+    lentes_oftalmicos:'Oftálmicos', lentes_contacto:'Contacto',
+    accesorios:'Accesorios', soluciones:'Soluciones', otro:'Otro'
   };
   const CAT_ICONOS = {
-    marcos:'🕶', lentes_oftalmicos:'🔬', lentes_contacto:'👁',
-    solares:'☀️', accesorios:'🎀', soluciones:'💧', otro:'📦'
+    armazon_receta:'🕶', armazon_sol:'☀️', lentes_oftalmicos:'🔬',
+    lentes_contacto:'👁', accesorios:'🎀', soluciones:'💧', otro:'📦'
   };
   const CAT_COLORES = {
-    marcos:'#eff6ff', lentes_oftalmicos:'#f0fdf4', lentes_contacto:'#faf5ff',
-    solares:'#fffbeb', accesorios:'#fdf2f8', soluciones:'#ecfeff', otro:'#f8fafc'
+    armazon_receta:'#eff6ff', armazon_sol:'#fffbeb', lentes_oftalmicos:'#f0fdf4',
+    lentes_contacto:'#faf5ff', accesorios:'#fdf2f8', soluciones:'#ecfeff', otro:'#f8fafc'
   };
-  const ZONA_LABELS = { exhibidor:'🗄 Exhibidor', vidriera:'🪟 Vidriera', deposito:'📦 Depósito' };
+  const ZONA_LABELS = {
+    exhibidor_1:'🗄 Exhibidor 1', exhibidor_2:'🗄 Exhibidor 2', exhibidor_3:'🗄 Exhibidor 3',
+    vidriera_1:'🪟 Vidriera 1', vidriera_2:'🪟 Vidriera 2', vidriera_3:'🪟 Vidriera 3', vidriera_4:'🪟 Vidriera 4',
+    cajonera_1:'🗃 Cajonera 1', cajonera_2:'🗃 Cajonera 2'
+  };
 
   function getStockClase(p) {
     if (p.stock_current <= 0) return 'cero';
@@ -733,6 +744,14 @@
       if (sel.options[i].value === val) { sel.selectedIndex = i; return; }
     }
     sel.selectedIndex = 0;
+  }
+
+  // ── AUTO NOMBRE ───────────────────────────────────────────
+  function autoNombre() {
+    const marca = document.getElementById('f-marca').value.trim();
+    const sku   = document.getElementById('f-sku').value.trim();
+    const parts = [marca, sku].filter(Boolean);
+    document.getElementById('f-nombre').value = parts.join(' ');
   }
 
   // ── INIT ──────────────────────────────────────────────────
