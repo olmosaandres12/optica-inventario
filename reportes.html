@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Olvisión Inventario — Reportes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --azul:#034295; --azul2:#2563eb; --azul-bg:#eff6ff; --amarillo:#f9f4ab;
+      --rojo:#ef4444; --verde:#10b981; --naranja:#f59e0b;
+      --gris:#64748b; --borde:#e2e8f0; --fondo:#f1f5f9; --radio:16px;
+    }
+    body { font-family:'Nunito',sans-serif; background:var(--fondo); color:#1e293b; min-height:100vh; }
+    .app { display:flex; min-height:100vh; }
+    .sidebar { width:220px; background:var(--azul); color:white; display:none; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:100; }
+    @media(min-width:768px){ .sidebar{display:flex;} .main-wrap{margin-left:220px;} .bottom-nav{display:none!important;} }
+    .sb-brand { padding:22px 20px 14px; border-bottom:1px solid rgba(255,255,255,0.12); }
+    .sb-brand img { height:44px; object-fit:contain; }
+    .sb-brand-sub { font-size:10px; font-weight:700; color:#93c5fd; letter-spacing:1px; text-transform:uppercase; margin-top:4px; }
+    .sb-nav { flex:1; padding:12px 0; }
+    .sb-item { display:flex; align-items:center; gap:10px; padding:11px 20px; font-size:13px; font-weight:700; color:rgba(255,255,255,0.7); text-decoration:none; transition:all 0.15s; border-left:3px solid transparent; }
+    .sb-item:hover { background:rgba(255,255,255,0.08); color:white; }
+    .sb-item.activo { background:rgba(255,255,255,0.12); color:white; border-left-color:var(--amarillo); }
+    .sb-icon { font-size:16px; width:20px; text-align:center; }
+    .sb-footer { padding:14px 20px; border-top:1px solid rgba(255,255,255,0.12); }
+    .btn-salir { width:100%; background:rgba(255,255,255,0.1); border:none; border-radius:10px; color:rgba(255,255,255,0.7); font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; padding:9px; cursor:pointer; }
+    .main-wrap { flex:1; display:flex; flex-direction:column; }
+    .topnav { background:white; padding:14px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--borde); position:sticky; top:0; z-index:50; }
+    .topnav-back { font-size:22px; color:var(--azul); text-decoration:none; font-weight:900; }
+    .topnav-titulo { font-size:17px; font-weight:900; }
+    .topnav-sub { font-size:12px; color:var(--gris); font-weight:600; }
+    .content { padding:16px; max-width:860px; margin:0 auto; width:100%; padding-bottom:90px; }
+
+    .kpi-hero { background:var(--azul); border-radius:20px; padding:24px 20px; margin-bottom:16px; color:white; text-align:center; }
+    .kpi-hero-label { font-size:12px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+    .kpi-hero-val { font-size:38px; font-weight:900; }
+    .kpi-hero-sub { font-size:13px; color:#93c5fd; margin-top:6px; }
+    .kpi-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px; }
+    @media(min-width:768px){ .kpi-grid{grid-template-columns:repeat(4,1fr);} }
+    .kpi-mini { background:rgba(255,255,255,0.1); border-radius:12px; padding:12px; text-align:center; }
+    .kpi-mini-val { font-size:20px; font-weight:900; }
+    .kpi-mini-lab { font-size:11px; color:#93c5fd; margin-top:2px; }
+
+    .seccion { background:white; border-radius:var(--radio); padding:18px; margin-bottom:14px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
+    .sec-titulo { font-size:15px; font-weight:800; color:#1e293b; margin-bottom:16px; }
+
+    .cat-fila { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #f8fafc; }
+    .cat-fila:last-child { border-bottom:none; }
+    .cat-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .cat-nombre { font-size:13px; font-weight:700; color:#475569; min-width:120px; }
+    .cat-barra-wrap { flex:1; }
+    .cat-barra { height:8px; background:#f1f5f9; border-radius:20px; overflow:hidden; }
+    .cat-fill { height:100%; border-radius:20px; }
+    .cat-cant { font-size:12px; color:var(--gris); font-weight:700; min-width:30px; text-align:right; }
+    .cat-val { font-size:13px; font-weight:800; color:#1e293b; min-width:90px; text-align:right; }
+
+    .alerta-item { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f8fafc; }
+    .alerta-item:last-child { border-bottom:none; }
+    .alerta-info { flex:1; min-width:0; }
+    .alerta-nombre { font-size:13px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .alerta-det { font-size:11px; color:var(--gris); margin-top:2px; }
+    .alerta-badge { padding:4px 10px; border-radius:20px; font-size:12px; font-weight:900; flex-shrink:0; }
+    .alerta-badge.cero { background:#fee2e2; color:#991b1b; }
+    .alerta-badge.bajo { background:#fef3c7; color:#92400e; }
+
+    .zona-fila { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f8fafc; }
+    .zona-fila:last-child { border-bottom:none; }
+    .zona-nombre { font-size:13px; font-weight:700; color:#475569; }
+    .zona-cant { font-size:14px; font-weight:900; color:var(--azul); }
+
+    .empty-sec { text-align:center; padding:20px; color:var(--gris); font-size:13px; }
+
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; z-index:100; background:white; border-top:1px solid var(--borde); display:flex; padding:8px 0 env(safe-area-inset-bottom); }
+    .bnav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 4px; text-decoration:none; color:var(--gris); font-size:10px; font-weight:700; }
+    .bnav-item.activo { color:var(--azul); }
+    .bnav-icon { font-size:20px; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <img src="logo_app.png" alt="Olvisión" onerror="this.style.display='none'" />
+      <div class="sb-brand-sub">📦 Inventario</div>
+    </div>
+    <nav class="sb-nav">
+      <a class="sb-item" href="dashboard.html"><span class="sb-icon">🏠</span> Inicio</a>
+      <a class="sb-item" href="productos.html"><span class="sb-icon">📦</span> Productos</a>
+      <a class="sb-item" href="inventario.html"><span class="sb-icon">🔍</span> Inventario</a>
+      <a class="sb-item" href="movimientos.html"><span class="sb-icon">↕️</span> Movimientos</a>
+      <a class="sb-item" href="proveedores.html"><span class="sb-icon">🏢</span> Proveedores</a>
+      <a class="sb-item activo" href="reportes.html"><span class="sb-icon">📊</span> Reportes</a>
+      <a class="sb-item" href="configuracion.html"><span class="sb-icon">⚙️</span> Configuración</a>
+    </nav>
+    <div class="sb-footer"><button class="btn-salir" onclick="salir()">🚪 Salir</button></div>
+  </aside>
+
+  <div class="main-wrap">
+    <nav class="topnav">
+      <a class="topnav-back" href="dashboard.html">‹</a>
+      <div>
+        <div class="topnav-titulo">📊 Reportes</div>
+        <div class="topnav-sub" id="nav-sub">Cargando...</div>
+      </div>
+    </nav>
+
+    <div class="content">
+      <div class="kpi-hero">
+        <div class="kpi-hero-label">💰 Valor total del inventario (costo)</div>
+        <div class="kpi-hero-val" id="kpi-valor">$—</div>
+        <div class="kpi-hero-sub" id="kpi-venta-sub">Valor a precio de venta: $—</div>
+        <div class="kpi-grid">
+          <div class="kpi-mini"><div class="kpi-mini-val" id="kpi-total">—</div><div class="kpi-mini-lab">Productos</div></div>
+          <div class="kpi-mini"><div class="kpi-mini-val" id="kpi-unidades">—</div><div class="kpi-mini-lab">Unidades</div></div>
+          <div class="kpi-mini"><div class="kpi-mini-val" id="kpi-cero" style="color:#fca5a5">—</div><div class="kpi-mini-lab">Sin stock</div></div>
+          <div class="kpi-mini"><div class="kpi-mini-val" id="kpi-bajo" style="color:var(--amarillo)">—</div><div class="kpi-mini-lab">Stock bajo</div></div>
+        </div>
+      </div>
+
+      <div class="seccion">
+        <div class="sec-titulo">📦 Stock por categoría</div>
+        <div id="cats-lista"><div class="empty-sec">Cargando...</div></div>
+      </div>
+
+      <div class="seccion">
+        <div class="sec-titulo">🗺️ Stock por zona</div>
+        <div id="zonas-lista"><div class="empty-sec">Cargando...</div></div>
+      </div>
+
+      <div class="seccion">
+        <div class="sec-titulo">⚠️ Alertas de stock</div>
+        <div id="alertas-lista"><div class="empty-sec">Cargando...</div></div>
+      </div>
+
+      <div class="seccion">
+        <div class="sec-titulo">🏆 Más movimientos (últimos 30 días)</div>
+        <div id="top-movs"><div class="empty-sec">Cargando...</div></div>
+      </div>
+    </div>
+
+    <nav class="bottom-nav">
+      <a class="bnav-item" href="dashboard.html"><span class="bnav-icon">🏠</span>Inicio</a>
+      <a class="bnav-item" href="productos.html"><span class="bnav-icon">📦</span>Productos</a>
+      <a class="bnav-item" href="inventario.html"><span class="bnav-icon">🔍</span>Inventario</a>
+      <a class="bnav-item" href="movimientos.html"><span class="bnav-icon">↕️</span>Movimientos</a>
+      <a class="bnav-item activo" href="reportes.html"><span class="bnav-icon">📊</span>Reportes</a>
+    </nav>
+  </div>
+</div>
+
+<script>
+  const userJson = localStorage.getItem('olvision_user');
+  if (!userJson) window.location.href = 'index.html';
+  let currentUser;
+  try { currentUser = JSON.parse(userJson); } catch(e) { window.location.href = 'index.html'; }
+  function salir() { localStorage.removeItem('olvision_user'); window.location.href = 'index.html'; }
+
+  const { createClient } = supabase;
+  const sb = createClient(
+    'https://nrmjlfpbtjqyvtpdexej.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ybWpsZnBidGpxeXZ0cGRleGVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NjM0MTcsImV4cCI6MjA5MjUzOTQxN30.cg36SF1XXpFbg3hRl2Xl7Tof_OhNJRa9B1BIUcNLpoQ'
+  );
+
+  const CAT_LABELS  = { armazon_receta:'Armazón receta', armazon_sol:'Armazón sol', lentes_oftalmicos:'Oftálmicos', lentes_contacto:'Contacto', accesorios:'Accesorios', soluciones:'Soluciones', otro:'Otro' };
+  const CAT_COLORES = { armazon_receta:'#2563eb', armazon_sol:'#f59e0b', lentes_oftalmicos:'#10b981', lentes_contacto:'#8b5cf6', accesorios:'#ec4899', soluciones:'#06b6d4', otro:'#94a3b8' };
+  const ZONA_LABELS = { exhibidor_1:'🗄 Exhibidor 1', exhibidor_2:'🗄 Exhibidor 2', exhibidor_3:'🗄 Exhibidor 3', vidriera_1:'🪟 Vidriera 1', vidriera_2:'🪟 Vidriera 2', vidriera_3:'🪟 Vidriera 3', vidriera_4:'🪟 Vidriera 4', cajonera_1:'🗃 Cajonera 1', cajonera_2:'🗃 Cajonera 2' };
+
+  function fmtPesos(n) { if (!n || isNaN(n)) return '$0'; return '$' + Math.round(n).toLocaleString('es-AR'); }
+
+  async function cargar() {
+    const { data: prods, error } = await sb.from('products').select('*').eq('active', true);
+    if (error) { console.error(error); return; }
+    const productos = prods || [];
+    document.getElementById('nav-sub').textContent = `${productos.length} productos activos`;
+
+    // KPIs
+    const totalUnidades = productos.reduce((s,p) => s+(p.stock_current||0), 0);
+    const valorCosto    = productos.reduce((s,p) => s+((p.cost_price||0)*(p.stock_current||0)), 0);
+    const valorVenta    = productos.reduce((s,p) => s+((p.sale_price||0)*(p.stock_current||0)), 0);
+    const sinStock      = productos.filter(p => p.stock_current <= 0).length;
+    const stockBajo     = productos.filter(p => p.stock_current > 0 && p.stock_min > 0 && p.stock_current <= p.stock_min).length;
+
+    document.getElementById('kpi-valor').textContent = fmtPesos(valorCosto);
+    document.getElementById('kpi-venta-sub').textContent = `Valor a precio de venta: ${fmtPesos(valorVenta)}`;
+    document.getElementById('kpi-total').textContent = productos.length;
+    document.getElementById('kpi-unidades').textContent = totalUnidades;
+    document.getElementById('kpi-cero').textContent = sinStock;
+    document.getElementById('kpi-bajo').textContent = stockBajo;
+
+    // Por categoría
+    const cats = {};
+    productos.forEach(p => {
+      const c = p.category || 'otro';
+      if (!cats[c]) cats[c] = { cantidad:0, unidades:0, valor:0 };
+      cats[c].cantidad++;
+      cats[c].unidades += p.stock_current||0;
+      cats[c].valor += (p.cost_price||0)*(p.stock_current||0);
+    });
+    const maxU = Math.max(...Object.values(cats).map(c=>c.unidades), 1);
+    document.getElementById('cats-lista').innerHTML = Object.entries(cats).length === 0
+      ? '<div class="empty-sec">Sin productos cargados</div>'
+      : Object.entries(cats).sort((a,b)=>b[1].unidades-a[1].unidades).map(([cat,d]) =>
+        `<div class="cat-fila">
+          <div class="cat-dot" style="background:${CAT_COLORES[cat]||'#94a3b8'}"></div>
+          <div class="cat-nombre">${CAT_LABELS[cat]||cat}</div>
+          <div class="cat-barra-wrap"><div class="cat-barra"><div class="cat-fill" style="width:${Math.round(d.unidades/maxU*90)}%;background:${CAT_COLORES[cat]||'#94a3b8'}"></div></div></div>
+          <div class="cat-cant">${d.unidades} u.</div>
+          <div class="cat-val">${fmtPesos(d.valor)}</div>
+        </div>`).join('');
+
+    // Por zona
+    const zonas = {};
+    productos.forEach(p => {
+      if (!p.zona) return;
+      if (!zonas[p.zona]) zonas[p.zona] = { cantidad:0, unidades:0 };
+      zonas[p.zona].cantidad++;
+      zonas[p.zona].unidades += p.stock_current||0;
+    });
+    document.getElementById('zonas-lista').innerHTML = Object.entries(zonas).length === 0
+      ? '<div class="empty-sec">Sin zonas asignadas</div>'
+      : Object.entries(zonas).sort((a,b)=>b[1].unidades-a[1].unidades).map(([zona,d]) =>
+        `<div class="zona-fila">
+          <div class="zona-nombre">${ZONA_LABELS[zona]||zona}</div>
+          <div style="flex:1;margin:0 12px"><div style="font-size:11px;color:var(--gris);font-weight:700">${d.cantidad} producto${d.cantidad!==1?'s':''}</div></div>
+          <div class="zona-cant">${d.unidades} u.</div>
+        </div>`).join('');
+
+    // Alertas
+    const alertas = productos.filter(p => p.stock_current <= 0 || (p.stock_min > 0 && p.stock_current <= p.stock_min)).sort((a,b)=>a.stock_current-b.stock_current);
+    document.getElementById('alertas-lista').innerHTML = alertas.length === 0
+      ? '<div class="empty-sec">✅ Todo el stock está en niveles normales</div>'
+      : alertas.map(p => {
+          const esCero = p.stock_current <= 0;
+          const nombre = [p.brand, p.name].filter(Boolean).join(' · ');
+          return `<div class="alerta-item">
+            <div style="font-size:20px">${esCero?'🔴':'🟡'}</div>
+            <div class="alerta-info">
+              <div class="alerta-nombre">${nombre}</div>
+              <div class="alerta-det">${CAT_LABELS[p.category]||p.category||'—'}${p.zona?' · '+(ZONA_LABELS[p.zona]||p.zona):''}</div>
+            </div>
+            <div class="alerta-badge ${esCero?'cero':'bajo'}">${esCero?'Sin stock':'Stock: '+p.stock_current}</div>
+          </div>`;
+        }).join('');
+
+    // Top movimientos 30 días
+    const hace30 = new Date(); hace30.setDate(hace30.getDate()-30);
+    const { data: movs } = await sb.from('stock_movements').select('product_id, type, products(name, brand)').gte('created_at', hace30.toISOString()).in('type',['entrada','salida']);
+    if (movs && movs.length > 0) {
+      const conteo = {};
+      movs.forEach(m => {
+        const id = m.product_id;
+        if (!conteo[id]) conteo[id] = { nombre:[m.products?.brand,m.products?.name].filter(Boolean).join(' · '), total:0, entradas:0, salidas:0 };
+        conteo[id].total++;
+        if (m.type==='entrada') conteo[id].entradas++; else conteo[id].salidas++;
+      });
+      const top = Object.values(conteo).sort((a,b)=>b.total-a.total).slice(0,8);
+      const maxMov = top[0]?.total||1;
+      document.getElementById('top-movs').innerHTML = top.map(p =>
+        `<div class="cat-fila">
+          <div class="cat-nombre" style="min-width:140px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.nombre||'Producto'}</div>
+          <div class="cat-barra-wrap"><div class="cat-barra"><div class="cat-fill" style="width:${Math.round(p.total/maxMov*90)}%;background:var(--azul2)"></div></div></div>
+          <div style="font-size:11px;color:var(--gris);font-weight:700;white-space:nowrap;min-width:80px;text-align:right">+${p.entradas} / -${p.salidas}</div>
+        </div>`).join('');
+    } else {
+      document.getElementById('top-movs').innerHTML = '<div class="empty-sec">Sin movimientos en los últimos 30 días</div>';
+    }
+  }
+
+  cargar();
+</script>
+</body>
+</html>
