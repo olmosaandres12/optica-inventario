@@ -20,19 +20,17 @@
       font-weight: 600;
       background: #034295;
       min-height: 100vh;
-      min-height: -webkit-fill-available;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 0 20px env(safe-area-inset-bottom, 20px);
+      justify-content: center;
+      padding: 24px 20px;
     }
 
     /* ── LOGO ── */
     .logo-wrap {
-      padding-top: max(48px, env(safe-area-inset-top, 48px));
       margin-bottom: 40px;
       text-align: center;
-      flex-shrink: 0;
     }
     .logo-wrap img {
       width: 180px;
@@ -43,17 +41,11 @@
     .pantalla {
       width: 100%;
       max-width: 380px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
     }
     .pantalla.oculto { display: none; }
 
     /* ── PANTALLA USUARIOS ── */
-    #pantallaUsuarios {
-      justify-content: center;
-      padding-bottom: 40px;
-    }
+    #pantallaUsuarios { padding-bottom: 20px; }
 
     .quien {
       text-align: center;
@@ -90,12 +82,10 @@
     .usuario-arrow { color: rgba(255,255,255,0.4); font-size: 18px; }
 
     /* ── PANTALLA PIN ── */
-    #pantallaPin {
-      justify-content: flex-start;
-      padding-top: 16px;
-      padding-bottom: max(24px, env(safe-area-inset-bottom, 24px));
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
+    #pantallaPin { padding-top: 8px; }
+    /* Mobile: permitir scroll si no entra */
+    @media(max-height: 700px) {
+      body { justify-content: flex-start; padding-top: 40px; overflow-y: auto; }
     }
 
     .pin-header { text-align: center; margin-bottom: 28px; }
@@ -170,13 +160,12 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .footer {
-      text-align: center;
+      position: fixed;
+      bottom: 16px;
       font-size: 11px;
       color: rgba(255,255,255,0.25);
       font-weight: 600;
       letter-spacing: 1px;
-      padding: 16px 0 max(16px, env(safe-area-inset-bottom, 16px));
-      flex-shrink: 0;
     }
   </style>
 </head>
