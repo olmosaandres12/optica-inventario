@@ -205,6 +205,20 @@
     .btn-cancelar { width: 100%; background: #f1f5f9; color: var(--gris); border: none; border-radius: 14px; padding: 13px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; }
 
     @media(min-width:768px){ .stats-row{ grid-template-columns: repeat(4, 1fr); } }
+
+    /* ── MOBILE FIX ── */
+    * { -webkit-tap-highlight-color: transparent; }
+    html, body { overflow-x: hidden; width: 100%; }
+    .main-wrap { width: 100%; min-width: 0; overflow-x: hidden; }
+    .content { padding: 12px; padding-bottom: 80px; overflow-x: hidden; }
+    .topnav { padding: 12px 14px; }
+    .stats-row { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .stat-mini { padding: 12px 8px; }
+    .stat-mini-val { font-size: 18px; }
+    .stat-mini-lab { font-size: 10px; }
+    .filtros { padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+    .bottom-nav { display: flex !important; position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid var(--borde); z-index: 100; padding: 6px 0 env(safe-area-inset-bottom, 12px); }
+    @media(min-width:768px){ .bottom-nav{ display:none!important; } }
   </style>
 </head>
 <body>
