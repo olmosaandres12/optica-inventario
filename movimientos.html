@@ -6,6 +6,7 @@
   <title>Olvisión Inventario — Movimientos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -206,19 +207,26 @@
 
     @media(min-width:768px){ .stats-row{ grid-template-columns: repeat(4, 1fr); } }
 
-    /* ── MOBILE FIX ── */
+
+    /* ── MOBILE FIX v2 ── */
     * { -webkit-tap-highlight-color: transparent; }
     html, body { overflow-x: hidden; width: 100%; }
-    .main-wrap { width: 100%; min-width: 0; overflow-x: hidden; }
-    .content { padding: 12px; padding-bottom: 80px; overflow-x: hidden; }
-    .topnav { padding: 12px 14px; }
-    .stats-row { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .stat-mini { padding: 12px 8px; }
-    .stat-mini-val { font-size: 18px; }
-    .stat-mini-lab { font-size: 10px; }
-    .filtros { padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
-    .bottom-nav { display: flex !important; position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid var(--borde); z-index: 100; padding: 6px 0 env(safe-area-inset-bottom, 12px); }
-    @media(min-width:768px){ .bottom-nav{ display:none!important; } }
+    .sidebar { display: none !important; }
+    .main-wrap { margin-left: 0 !important; width: 100% !important; min-width: 0; overflow-x: hidden; }
+    .content { padding: 12px !important; padding-bottom: 80px !important; box-sizing: border-box; width: 100%; }
+    .topnav { padding: 12px 14px !important; }
+    .stats-row { gap: 8px !important; }
+    .stat-mini { padding: 12px 8px !important; }
+    .stat-mini-val { font-size: 18px !important; }
+    .stat-mini-lab { font-size: 10px !important; }
+    .filtros { -webkit-overflow-scrolling: touch; }
+    .bottom-nav { display: flex !important; }
+    @media(min-width:768px){
+      .sidebar { display: flex !important; }
+      .main-wrap { margin-left: 240px !important; }
+      .bottom-nav { display: none !important; }
+      .content { padding: 16px !important; padding-bottom: 90px !important; }
+    }
   </style>
 </head>
 <body>
@@ -629,6 +637,5 @@
   function cerrarFuera(e, id) { if (e.target === document.getElementById(id)) cerrarModal(id); }
 
   cargar();
-</script>
-</body>
+</script></body>
 </html>
