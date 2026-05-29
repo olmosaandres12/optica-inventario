@@ -32,69 +32,40 @@
       align-items: center;
       overflow-y: auto;
     }
-    /* Pantalla usuarios: centrada verticalmente */
     body.pantalla-usuarios {
       justify-content: center;
       padding: 24px 20px;
     }
-    /* Pantalla PIN: scroll libre, padding generoso */
     body.pantalla-pin {
       justify-content: flex-start;
       padding: 0 20px 40px;
     }
 
     /* ── LOGO ── */
-    .logo-wrap {
-      text-align: center;
-      transition: all 0.2s;
-    }
-    .logo-wrap img {
-      width: 180px;
-      max-width: 55vw;
-      transition: all 0.2s;
-    }
-    body.pantalla-usuarios .logo-wrap {
-      margin-bottom: 40px;
-    }
-    body.pantalla-pin .logo-wrap {
-      margin-top: 36px;
-      margin-bottom: 20px;
-    }
-    body.pantalla-pin .logo-wrap img {
-      width: 120px;
-    }
+    .logo-wrap { text-align: center; transition: all 0.2s; }
+    .logo-wrap img { width: 180px; max-width: 55vw; transition: all 0.2s; }
+    body.pantalla-usuarios .logo-wrap { margin-bottom: 40px; }
+    body.pantalla-pin .logo-wrap { margin-top: 36px; margin-bottom: 20px; }
+    body.pantalla-pin .logo-wrap img { width: 120px; }
 
     /* ── PANTALLAS ── */
-    .pantalla {
-      width: 100%;
-      max-width: 380px;
-    }
+    .pantalla { width: 100%; max-width: 380px; }
     .pantalla.oculto { display: none; }
 
-    /* ── PANTALLA USUARIOS ── */
     #pantallaUsuarios { width: 100%; max-width: 380px; padding-bottom: 20px; }
 
     .quien {
-      text-align: center;
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      color: rgba(255,255,255,0.5);
-      margin-bottom: 16px;
-      text-transform: uppercase;
+      text-align: center; font-size: 12px; font-weight: 800;
+      letter-spacing: 2px; color: rgba(255,255,255,0.5);
+      margin-bottom: 16px; text-transform: uppercase;
     }
 
     .usuario-card {
       background: rgba(255,255,255,0.1);
       border: 1.5px solid rgba(255,255,255,0.15);
-      border-radius: 18px;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      cursor: pointer;
-      margin-bottom: 12px;
-      transition: all 0.15s;
+      border-radius: 18px; padding: 16px 20px;
+      display: flex; align-items: center; gap: 16px;
+      cursor: pointer; margin-bottom: 12px; transition: all 0.15s;
     }
     .usuario-card:active { transform: scale(0.97); background: rgba(255,255,255,0.18); }
 
@@ -112,26 +83,21 @@
     #pantallaPin { width: 100%; max-width: 380px; }
 
     .pin-header { text-align: center; margin-bottom: 28px; }
-
     .pin-avatar-grande {
       width: 72px; height: 72px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 28px; font-weight: 900; color: white;
-      margin: 0 auto 12px;
+      font-size: 28px; font-weight: 900; color: white; margin: 0 auto 12px;
     }
-
     .pin-nombre { font-size: 22px; font-weight: 900; color: white; }
     .pin-sub { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 600; margin-top: 4px; }
 
-    .pin-dots {
-      display: flex; justify-content: center; gap: 16px; margin-bottom: 24px;
-    }
+    .pin-dots { display: flex; justify-content: center; gap: 16px; margin-bottom: 24px; }
     .pin-dot {
       width: 14px; height: 14px; border-radius: 50%;
       border: 2px solid rgba(255,255,255,0.4); background: transparent; transition: all 0.15s;
     }
-    .pin-dot.lleno { background: #f9f4ab; border-color: #f9f4ab; }
-    .pin-dot.error { background: #ef4444; border-color: #ef4444; }
+    .pin-dot.lleno  { background: #f9f4ab; border-color: #f9f4ab; }
+    .pin-dot.error  { background: #ef4444; border-color: #ef4444; }
 
     .error-pin {
       text-align: center; font-size: 13px; font-weight: 800;
@@ -139,28 +105,23 @@
     }
 
     .teclado {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      max-width: 300px;
-      margin: 0 auto 16px;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 10px; max-width: 300px; margin: 0 auto 16px;
     }
     .tecla {
       background: rgba(255,255,255,0.1);
       border: 1.5px solid rgba(255,255,255,0.15);
-      border-radius: 16px;
-      height: 64px;
+      border-radius: 16px; height: 64px;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      cursor: pointer; transition: all 0.1s;
-      color: white; user-select: none;
+      cursor: pointer; transition: all 0.1s; color: white; user-select: none;
     }
     .tecla:active { transform: scale(0.93); background: rgba(255,255,255,0.22); }
-    .tecla .num { font-size: 24px; font-weight: 800; line-height: 1; }
+    .tecla .num    { font-size: 24px; font-weight: 800; line-height: 1; }
     .tecla .letras { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.4); letter-spacing: 1px; margin-top: 2px; }
-    .tecla.vacia { background: transparent; border-color: transparent; cursor: default; }
+    .tecla.vacia   { background: transparent; border-color: transparent; cursor: default; }
     .tecla.vacia:active { transform: none; }
-    .tecla.borrar { font-size: 22px; }
+    .tecla.borrar  { font-size: 22px; }
 
     .btn-volver {
       display: block; text-align: center;
@@ -168,7 +129,6 @@
       cursor: pointer; padding: 12px; margin-top: 4px;
     }
 
-    /* Loading */
     .loading {
       position: fixed; inset: 0; background: #034295;
       display: flex; align-items: center; justify-content: center; z-index: 100;
@@ -183,12 +143,9 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .footer {
-      position: fixed;
-      bottom: 16px;
-      font-size: 11px;
-      color: rgba(255,255,255,0.25);
-      font-weight: 600;
-      letter-spacing: 1px;
+      position: fixed; bottom: 16px;
+      font-size: 11px; color: rgba(255,255,255,0.25);
+      font-weight: 600; letter-spacing: 1px;
     }
   </style>
 </head>
@@ -255,12 +212,15 @@
   let usuarios = [], usuarioActual = null, pinIngresado = ''
 
   async function iniciar() {
-    const { data: { session } } = await sb.auth.getSession()
-    if (session) { window.location.href = 'dashboard.html'; return }
+    // Si ya hay sesión activa en localStorage, ir directo al dashboard
+    if (localStorage.getItem('olvision_user')) {
+      window.location.href = 'dashboard.html'
+      return
+    }
 
     const { data, error } = await sb
       .from('profiles')
-      .select('id, full_name, role, email, pin')
+      .select('id, full_name, role, pin')
       .eq('is_active', true)
       .order('full_name')
 
@@ -282,7 +242,7 @@
     lista.innerHTML = usuarios.map((u, i) => {
       const inicial = u.full_name?.charAt(0).toUpperCase() || '?'
       const color   = COLORES[i % COLORES.length]
-      const rol     = u.role === 'admin' ? 'Administrador' : u.role === 'contadora' ? 'Contadora' : 'Empleado'
+      const rol     = u.role === 'admin' ? 'Administrador' : u.role === 'contadora' ? 'Contadora' : 'Empleada'
       return `
         <div class="usuario-card" onclick="seleccionarUsuario(${i})">
           <div class="avatar" style="background:${color}">${inicial}</div>
@@ -309,8 +269,7 @@
     actualizarDots()
 
     document.getElementById('pantallaUsuarios').classList.add('oculto')
-    const panPin = document.getElementById('pantallaPin')
-    panPin.classList.remove('oculto')
+    document.getElementById('pantallaPin').classList.remove('oculto')
     document.body.className = 'pantalla-pin'
     window.scrollTo(0, 0)
   }
@@ -346,30 +305,25 @@
     }
   }
 
-  async function verificarPin() {
+  function verificarPin() {
     if (usuarioActual.pin !== pinIngresado) {
       for (let i = 0; i < 4; i++) document.getElementById(`dot${i}`).classList.add('error')
       document.getElementById('errorPin').textContent = 'PIN incorrecto, intentá de nuevo'
-      setTimeout(() => { pinIngresado = ''; actualizarDots(); document.getElementById('errorPin').textContent = '' }, 1200)
+      setTimeout(() => {
+        pinIngresado = ''
+        actualizarDots()
+        document.getElementById('errorPin').textContent = ''
+      }, 1200)
       return
     }
 
+    // PIN correcto — guardar sesión y entrar
     document.getElementById('loading').classList.remove('oculto')
-
-    const { error } = await sb.auth.signInWithPassword({
-      email:    usuarioActual.email,
-      password: pinIngresado
-    })
-
-    if (error) {
-      localStorage.setItem('olvision_user', JSON.stringify({
-        id:    usuarioActual.id,
-        name:  usuarioActual.full_name,
-        role:  usuarioActual.role,
-        email: usuarioActual.email
-      }))
-    }
-
+    localStorage.setItem('olvision_user', JSON.stringify({
+      id:   usuarioActual.id,
+      name: usuarioActual.full_name,
+      role: usuarioActual.role
+    }))
     window.location.href = 'dashboard.html'
   }
 
