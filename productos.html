@@ -41,7 +41,6 @@
     }
     .btn-agregar:hover { opacity: 0.9; }
 
-    /* ── BOTÓN EXPORTAR ── */
     .btn-exportar {
       width: 100%; background: white; color: #065f46;
       border: 2px solid #d1fae5; border-radius: var(--radio); padding: 12px;
@@ -60,89 +59,109 @@
     .prod-card {
       background: white; border-radius: var(--radio);
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      overflow: hidden; border-left: 4px solid transparent;
-      transition: box-shadow 0.15s;
+      overflow: hidden; border-left: 4px solid transparent; transition: box-shadow 0.15s;
     }
-    .prod-card.ok    { border-left-color: var(--verde); }
-    .prod-card.bajo  { border-left-color: var(--naranja); }
-    .prod-card.cero  { border-left-color: var(--rojo); }
+    .prod-card.ok   { border-left-color: var(--verde); }
+    .prod-card.bajo { border-left-color: var(--naranja); }
+    .prod-card.cero { border-left-color: var(--rojo); }
 
     .prod-header { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; cursor: pointer; }
-    .prod-icono { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-    .prod-info { flex: 1; min-width: 0; }
+    .prod-icono  { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; overflow: hidden; }
+    .prod-icono img { width: 100%; height: 100%; object-fit: contain; background: white; }
+    .prod-info  { flex: 1; min-width: 0; }
     .prod-nombre { font-size: 15px; font-weight: 800; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .prod-sub { font-size: 12px; color: var(--gris); margin-top: 2px; }
-    .prod-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+    .prod-sub    { font-size: 12px; color: var(--gris); margin-top: 2px; }
+    .prod-right  { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
     .stock-badge { padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: 900; }
-    .stock-badge.ok    { background: #d1fae5; color: #065f46; }
-    .stock-badge.bajo  { background: #fef3c7; color: #92400e; }
-    .stock-badge.cero  { background: #fee2e2; color: #991b1b; }
+    .stock-badge.ok   { background: #d1fae5; color: #065f46; }
+    .stock-badge.bajo { background: #fef3c7; color: #92400e; }
+    .stock-badge.cero { background: #fee2e2; color: #991b1b; }
 
     .prod-detalle { display: none; border-top: 1px solid #f1f5f9; padding: 12px 16px; }
     .prod-detalle.vis { display: block; }
     .det-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-    .det-item { }
     .det-lab { font-size: 10px; font-weight: 700; color: var(--gris); text-transform: uppercase; letter-spacing: 0.4px; }
     .det-val { font-size: 13px; font-weight: 700; color: #1e293b; margin-top: 2px; }
     .det-btns { display: flex; gap: 8px; }
-    .btn-edit { flex: 1; background: var(--azul-bg); color: var(--azul); border: none; border-radius: 10px; padding: 10px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; }
-    .btn-del  { background: #fee2e2; color: var(--rojo); border: none; border-radius: 10px; padding: 10px 14px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; }
+    .btn-edit  { flex: 1; background: var(--azul-bg); color: var(--azul); border: none; border-radius: 10px; padding: 10px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; }
+    .btn-del   { background: #fee2e2; color: var(--rojo); border: none; border-radius: 10px; padding: 10px 14px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; }
     .btn-stock { flex: 1; background: #f0fdf4; color: #065f46; border: none; border-radius: 10px; padding: 10px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; }
 
-    .cat-tag { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; }
-
-    .stock-display { text-align: center; padding: 20px 0; }
-    .stock-num { font-size: 52px; font-weight: 900; color: var(--azul); line-height: 1; }
-    .stock-label { font-size: 13px; color: var(--gris); font-weight: 600; margin-top: 4px; }
+    .stock-display   { text-align: center; padding: 20px 0; }
+    .stock-num       { font-size: 52px; font-weight: 900; color: var(--azul); line-height: 1; }
+    .stock-label     { font-size: 13px; color: var(--gris); font-weight: 600; margin-top: 4px; }
     .stock-controles { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 16px 0; }
-    .btn-stock-num { width: 52px; height: 52px; border-radius: 50%; border: none; font-size: 24px; font-weight: 900; cursor: pointer; font-family: 'Nunito', sans-serif; }
+    .btn-stock-num   { width: 52px; height: 52px; border-radius: 50%; border: none; font-size: 24px; font-weight: 900; cursor: pointer; font-family: 'Nunito', sans-serif; }
     .btn-stock-num.menos { background: #fee2e2; color: var(--rojo); }
     .btn-stock-num.mas   { background: #d1fae5; color: #065f46; }
     .stock-input-directo { width: 80px; text-align: center; font-size: 20px; font-weight: 900; padding: 10px; border: 1.5px solid var(--borde); border-radius: 12px; font-family: 'Nunito', sans-serif; }
 
-    /* ── MODAL EXPORTAR ── */
-    .export-info {
-      background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px;
-      padding: 12px 14px; margin-bottom: 16px;
-    }
-    .export-info p {
-      font-size: 12px; color: #065f46; font-weight: 700; margin: 0 0 8px;
-    }
-    .export-cols {
-      display: flex; flex-wrap: wrap; gap: 6px;
-    }
-    .export-col-tag {
-      background: white; border: 1px solid #bbf7d0; border-radius: 20px;
-      padding: 3px 10px; font-size: 11px; font-weight: 800; color: #065f46;
-    }
-    .export-textarea {
-      width: 100%; height: 200px; padding: 12px;
-      border: 1.5px solid var(--borde); border-radius: 12px;
-      font-family: monospace; font-size: 11px; line-height: 1.6;
-      color: #1e293b; background: #f8fafc; resize: none; outline: none;
-      box-sizing: border-box;
-    }
-    .export-textarea:focus { border-color: #6ee7b7; }
-    .export-footer {
-      display: flex; gap: 8px; margin-top: 12px; align-items: center;
-    }
-    .export-count {
-      flex: 1; font-size: 12px; color: var(--gris); font-weight: 700;
-    }
-    .btn-copiar {
-      background: #065f46; color: white; border: none; border-radius: 10px;
-      padding: 12px 20px; font-family: 'Nunito', sans-serif; font-size: 14px;
-      font-weight: 800; cursor: pointer; transition: opacity 0.15s;
-      display: flex; align-items: center; gap: 6px;
-    }
+    /* ── EXPORTAR ── */
+    .export-info { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; }
+    .export-info p { font-size: 12px; color: #065f46; font-weight: 700; margin: 0 0 8px; }
+    .export-cols { display: flex; flex-wrap: wrap; gap: 6px; }
+    .export-col-tag { background: white; border: 1px solid #bbf7d0; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 800; color: #065f46; }
+    .export-textarea { width: 100%; height: 200px; padding: 12px; border: 1.5px solid var(--borde); border-radius: 12px; font-family: monospace; font-size: 11px; line-height: 1.6; color: #1e293b; background: #f8fafc; resize: none; outline: none; box-sizing: border-box; }
+    .export-footer { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+    .export-count { flex: 1; font-size: 12px; color: var(--gris); font-weight: 700; }
+    .btn-copiar { background: #065f46; color: white; border: none; border-radius: 10px; padding: 12px 20px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; transition: opacity 0.15s; display: flex; align-items: center; gap: 6px; }
     .btn-copiar:hover { opacity: 0.9; }
     .btn-copiar.copiado { background: var(--verde); }
+
+    /* ── FOTO PRODUCTO ── */
+    .foto-zona {
+      border: 2px dashed #cbd5e1; border-radius: 14px;
+      background: #f8fafc; overflow: hidden;
+    }
+    .foto-btns {
+      display: flex; gap: 10px; padding: 14px;
+    }
+    .btn-foto-label {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
+      padding: 13px 8px; border-radius: 12px; font-family: 'Nunito', sans-serif;
+      font-size: 13px; font-weight: 800; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-foto-label.camara { background: var(--azul); color: white; }
+    .btn-foto-label.galeria { background: white; color: var(--azul); border: 1.5px solid var(--azul); }
+    .btn-foto-label:active { opacity: 0.85; transform: scale(0.97); }
+
+    .foto-procesando {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 10px; padding: 28px 16px;
+    }
+    .foto-spinner {
+      width: 36px; height: 36px;
+      border: 3px solid #e2e8f0; border-top-color: var(--azul);
+      border-radius: 50%; animation: girar 0.7s linear infinite;
+    }
+    @keyframes girar { to { transform: rotate(360deg); } }
+    .foto-procesando-txt { font-size: 13px; font-weight: 700; color: var(--gris); text-align: center; }
+    .foto-procesando-sub { font-size: 11px; color: #94a3b8; font-weight: 600; text-align: center; }
+
+    .foto-preview-wrap {
+      position: relative; background: white;
+    }
+    .foto-preview-img {
+      width: 100%; max-height: 220px; object-fit: contain;
+      display: block; padding: 12px; box-sizing: border-box;
+    }
+    .foto-preview-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; border-top: 1px solid #f1f5f9; background: #fafafa;
+    }
+    .foto-ok-badge { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: #065f46; }
+    .btn-cambiar-foto {
+      background: #f1f5f9; color: #64748b; border: none; border-radius: 8px;
+      padding: 7px 12px; font-family: 'Nunito', sans-serif; font-size: 12px;
+      font-weight: 700; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-cambiar-foto:hover { background: #e2e8f0; }
   </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- SIDEBAR (desktop) -->
+  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sb-brand"><div class="sb-brand-logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div><div class="sb-brand-nombre">Olvisión</div><div class="sb-brand-sub">Inventario</div></div></div>
     <nav class="sb-nav">
@@ -159,10 +178,7 @@
     <div class="sb-footer"><div class="sb-user"><div class="sb-user-avatar" id="sb-avatar">A</div><div class="sb-user-info"><div class="sb-user-nombre" id="sb-nombre">Andrés</div><div class="sb-user-rol">Administrador</div></div><button class="sb-user-salir" onclick="salir()" title="Salir"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button></div></div>
   </aside>
 
-  <!-- CONTENIDO PRINCIPAL -->
   <div class="main-wrap" style="flex:1">
-
-    <!-- TOP NAV -->
     <nav class="topnav">
       <a class="topnav-back" href="dashboard.html">‹</a>
       <div>
@@ -172,63 +188,45 @@
     </nav>
 
     <div class="content">
-
-      <!-- STATS -->
       <div class="stats-row">
-        <div class="stat-mini">
-          <div class="stat-mini-val" id="st-total">—</div>
-          <div class="stat-mini-lab">Total</div>
-        </div>
-        <div class="stat-mini">
-          <div class="stat-mini-val" style="color:var(--rojo)" id="st-cero">—</div>
-          <div class="stat-mini-lab">Sin stock</div>
-        </div>
-        <div class="stat-mini">
-          <div class="stat-mini-val" style="color:var(--naranja)" id="st-bajo">—</div>
-          <div class="stat-mini-lab">Stock bajo</div>
-        </div>
+        <div class="stat-mini"><div class="stat-mini-val" id="st-total">—</div><div class="stat-mini-lab">Total</div></div>
+        <div class="stat-mini"><div class="stat-mini-val" style="color:var(--rojo)" id="st-cero">—</div><div class="stat-mini-lab">Sin stock</div></div>
+        <div class="stat-mini"><div class="stat-mini-val" style="color:var(--naranja)" id="st-bajo">—</div><div class="stat-mini-lab">Stock bajo</div></div>
       </div>
 
-      <!-- BOTONES ACCIÓN -->
       <button class="btn-agregar" onclick="abrirModal()">+ Agregar producto</button>
       <button class="btn-exportar" onclick="abrirExportar()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         Exportar a OptiGest
       </button>
 
-      <!-- BUSCADOR + FILTROS -->
       <div class="toolbar">
         <div class="search-wrap">
           <span class="search-icon">🔍</span>
           <input type="text" id="buscador" placeholder="Buscar por nombre, marca o código…" oninput="aplicarFiltros()" />
         </div>
         <div class="filtros" id="filtros-cat">
-          <button class="filtro-chip activo" data-cat="" onclick="setFiltroCategoria(this, '')">Todos</button>
-          <button class="filtro-chip" data-cat="armazon_receta" onclick="setFiltroCategoria(this,'armazon_receta')">🕶 Receta</button>
-          <button class="filtro-chip" data-cat="armazon_sol" onclick="setFiltroCategoria(this,'armazon_sol')">☀️ Sol</button>
-          <button class="filtro-chip" data-cat="lentes_oftalmicos" onclick="setFiltroCategoria(this,'lentes_oftalmicos')">🔬 Oftálmicos</button>
-          <button class="filtro-chip" data-cat="lentes_contacto" onclick="setFiltroCategoria(this,'lentes_contacto')">👁 Contacto</button>
-          <button class="filtro-chip" data-cat="accesorios" onclick="setFiltroCategoria(this,'accesorios')">🎀 Accesorios</button>
-          <button class="filtro-chip" data-cat="soluciones" onclick="setFiltroCategoria(this,'soluciones')">💧 Soluciones</button>
-          <button class="filtro-chip" data-cat="otro" onclick="setFiltroCategoria(this,'otro')">📦 Otro</button>
+          <button class="filtro-chip activo" onclick="setFiltroCategoria(this,'')">Todos</button>
+          <button class="filtro-chip" onclick="setFiltroCategoria(this,'armazon_receta')">🕶 Receta</button>
+          <button class="filtro-chip" onclick="setFiltroCategoria(this,'armazon_sol')">☀️ Sol</button>
+          <button class="filtro-chip" onclick="setFiltroCategoria(this,'lentes_oftalmicos')">🔬 Oftálmicos</button>
+          <button class="filtro-chip" onclick="setFiltroCategoria(this,'lentes_contacto')">👁 Contacto</button>
+          <button class="filtro-chip" onclick="setFiltroCategoria(this,'accesorios')">🎀 Accesorios</button>
+          <button class="filtro-chip" onclick="setFiltroCategoria(this,'soluciones')">💧 Soluciones</button>
+          <button class="filtro-chip" onclick="setFiltroCategoria(this,'otro')">📦 Otro</button>
         </div>
-        <div class="filtros">
-          <button class="filtro-chip activo" data-stock="" onclick="setFiltroStock(this,'')">Todo stock</button>
-          <button class="filtro-chip" data-stock="cero" onclick="setFiltroStock(this,'cero')">⚠️ Sin stock</button>
-          <button class="filtro-chip" data-stock="bajo" onclick="setFiltroStock(this,'bajo')">🟡 Stock bajo</button>
-          <button class="filtro-chip" data-stock="ok" onclick="setFiltroStock(this,'ok')">🟢 En stock</button>
+        <div class="filtros" id="filtros-stock">
+          <button class="filtro-chip activo" onclick="setFiltroStock(this,'')">Todo stock</button>
+          <button class="filtro-chip" onclick="setFiltroStock(this,'cero')">⚠️ Sin stock</button>
+          <button class="filtro-chip" onclick="setFiltroStock(this,'bajo')">🟡 Stock bajo</button>
+          <button class="filtro-chip" onclick="setFiltroStock(this,'ok')">🟢 En stock</button>
         </div>
       </div>
 
       <div class="resultado-txt" id="resultado-txt"></div>
-
-      <!-- LISTA -->
-      <div class="lista" id="lista">
-        <div class="empty"><div class="empty-icono">⏳</div>Cargando productos...</div>
-      </div>
+      <div class="lista" id="lista"><div class="empty"><div class="empty-icono">⏳</div>Cargando productos...</div></div>
     </div>
 
-    <!-- BOTTOM NAV (mobile) -->
     <nav class="bottom-nav">
       <a class="bnav-item" href="dashboard.html"><span class="bnav-icon">🏠</span>Inicio</a>
       <a class="bnav-item activo" href="productos.html"><span class="bnav-icon">📦</span>Productos</a>
@@ -236,7 +234,6 @@
       <a class="bnav-item" href="movimientos.html"><span class="bnav-icon">↕️</span>Movimientos</a>
       <a class="bnav-item" href="proveedores.html"><span class="bnav-icon">🏢</span>Proveedores</a>
     </nav>
-
   </div>
 </div>
 
@@ -245,18 +242,24 @@
   <div class="modal">
     <div class="modal-titulo" id="modal-titulo">Nuevo producto</div>
     <input type="hidden" id="f-id" />
+    <input type="hidden" id="f-photo-url" />
 
+    <!-- NOMBRE + MARCA + SKU -->
     <div class="campos-2">
-      <div class="campo" style="grid-column:1/-1"><label>Nombre (se completa automáticamente)</label><input type="text" id="f-nombre" placeholder="Se genera con Marca + Código…" style="background:#f8fafc;color:#64748b" readonly /></div>
+      <div class="campo" style="grid-column:1/-1">
+        <label>Nombre (se completa automáticamente)</label>
+        <input type="text" id="f-nombre" placeholder="Se genera con Marca + Código…" style="background:#f8fafc;color:#64748b" readonly />
+      </div>
       <div class="campo"><label>Marca</label>
         <select id="f-marca" onchange="onMarcaChange()" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none">
           <option value="">Seleccionar marca</option>
         </select>
         <input type="text" id="f-marca-otra" placeholder="Escribí la marca…" oninput="autoNombre()" style="display:none;margin-top:8px" />
       </div>
-      <div class="campo"><label>SKU / Código</label><input type="text" id="f-sku" placeholder="Ej: Palermo" oninput="autoNombre()" /></div>
+      <div class="campo"><label>SKU / Código</label><input type="text" id="f-sku" placeholder="Ej: RB2140" oninput="autoNombre()" /></div>
     </div>
 
+    <!-- CATEGORÍA + ZONA -->
     <div class="campos-2">
       <div class="campo"><label>Categoría *</label>
         <select id="f-categoria">
@@ -286,22 +289,73 @@
       </div>
     </div>
 
+    <!-- MATERIAL (dinámico desde configuración) -->
+    <div class="campo">
+      <label>Material <small style="font-weight:400;text-transform:none">(opcional)</small></label>
+      <select id="f-material" onchange="onMaterialChange()" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none">
+        <option value="">Sin especificar</option>
+      </select>
+      <input type="text" id="f-material-otro" placeholder="Escribí el material…" style="display:none;margin-top:8px" />
+    </div>
+
+    <!-- STOCK -->
     <div class="campos-2">
       <div class="campo"><label>Stock actual *</label><input type="number" id="f-stock" placeholder="0" min="0" /></div>
       <div class="campo"><label>Stock mínimo</label><input type="number" id="f-stock-min" placeholder="0" min="0" /></div>
     </div>
 
+    <!-- PRECIOS -->
     <div class="campos-2">
       <div class="campo"><label>Precio costo $</label><input type="number" id="f-costo" placeholder="0" min="0" /></div>
       <div class="campo"><label>Precio venta $</label><input type="number" id="f-venta" placeholder="0" min="0" /></div>
     </div>
 
+    <!-- SUBCATEGORÍA + NOTAS -->
     <div class="campo"><label>Subcategoría <small style="font-weight:400;text-transform:none">(opcional)</small></label>
       <input type="text" id="f-subcat" placeholder="Ej: Redondos, Progresivos, Diarios…" />
     </div>
-
     <div class="campo"><label>Notas <small style="font-weight:400;text-transform:none">(opcional)</small></label>
       <textarea id="f-notas" rows="2" placeholder="Descripción adicional…"></textarea>
+    </div>
+
+    <!-- ── FOTO DEL PRODUCTO (NUEVO) ── -->
+    <div class="campo">
+      <label>Foto del producto <small style="font-weight:400;text-transform:none">(opcional)</small></label>
+
+      <!-- Estado 1: sin foto -->
+      <div class="foto-zona" id="foto-sin">
+        <div class="foto-btns">
+          <label class="btn-foto-label camara" for="input-camara">
+            📷 Sacar foto
+            <input type="file" id="input-camara" accept="image/*" capture="environment" style="display:none" onchange="procesarFoto(this)" />
+          </label>
+          <label class="btn-foto-label galeria" for="input-galeria">
+            🖼 Galería
+            <input type="file" id="input-galeria" accept="image/*" style="display:none" onchange="procesarFoto(this)" />
+          </label>
+        </div>
+      </div>
+
+      <!-- Estado 2: procesando -->
+      <div class="foto-zona foto-procesando" id="foto-procesando" style="display:none">
+        <div class="foto-spinner"></div>
+        <div class="foto-procesando-txt">Removiendo fondo con IA…</div>
+        <div class="foto-procesando-sub" id="foto-procesando-sub">Preparando modelo…</div>
+      </div>
+
+      <!-- Estado 3: preview listo -->
+      <div class="foto-zona" id="foto-preview" style="display:none">
+        <div class="foto-preview-wrap">
+          <img id="foto-img" src="" alt="Producto" class="foto-preview-img" />
+          <div class="foto-preview-footer">
+            <div class="foto-ok-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Fondo removido ✓
+            </div>
+            <button class="btn-cambiar-foto" onclick="resetFoto()">🔄 Cambiar</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <button class="btn-guardar" id="btn-guardar-prod" onclick="guardar()">✅ Guardar producto</button>
@@ -340,28 +394,21 @@
   </div>
 </div>
 
-<!-- ══ MODAL EXPORTAR A OPTIGEST ══ -->
+<!-- ══ MODAL EXPORTAR ══ -->
 <div class="overlay" id="overlay-exportar" onclick="cerrarFuera(event,'overlay-exportar')">
   <div class="modal">
     <div class="modal-titulo">📤 Exportar a OptiGest</div>
-
     <div class="export-info">
       <p>📋 Columnas en el orden que pide OptiGest:</p>
       <div class="export-cols">
-        <span class="export-col-tag">1. Nombre</span>
-        <span class="export-col-tag">2. SKU</span>
-        <span class="export-col-tag">3. Marca</span>
-        <span class="export-col-tag">4. Categoría</span>
-        <span class="export-col-tag">5. Precio</span>
-        <span class="export-col-tag">6. Stock</span>
-        <span class="export-col-tag">7. Vencimiento</span>
-        <span class="export-col-tag">8. Detalles</span>
+        <span class="export-col-tag">1. Nombre</span><span class="export-col-tag">2. SKU</span>
+        <span class="export-col-tag">3. Marca</span><span class="export-col-tag">4. Categoría</span>
+        <span class="export-col-tag">5. Precio</span><span class="export-col-tag">6. Stock</span>
+        <span class="export-col-tag">7. Vencimiento</span><span class="export-col-tag">8. Detalles</span>
         <span class="export-col-tag">9. URL Foto</span>
       </div>
     </div>
-
-    <textarea class="export-textarea" id="export-texto" readonly placeholder="Generando datos…"></textarea>
-
+    <textarea class="export-textarea" id="export-texto" readonly></textarea>
     <div class="export-footer">
       <div class="export-count" id="export-count"></div>
       <button class="btn-cancelar" style="margin:0;padding:12px 16px" onclick="cerrarModal('overlay-exportar')">Cerrar</button>
@@ -374,16 +421,12 @@
 </div>
 
 <script>
-  // ── AUTH ─────────────────────────────────────────────────
+  // ── AUTH ──────────────────────────────────────────────────
   const userJson = localStorage.getItem('olvision_user');
   if (!userJson) { window.location.href = 'index.html'; }
   let currentUser;
   try { currentUser = JSON.parse(userJson); } catch(e) { window.location.href = 'index.html'; }
-
-  function salir() {
-    localStorage.removeItem('olvision_user');
-    window.location.href = 'index.html';
-  }
+  function salir() { localStorage.removeItem('olvision_user'); window.location.href = 'index.html'; }
 
   // ── SUPABASE ──────────────────────────────────────────────
   const { createClient } = supabase;
@@ -393,50 +436,25 @@
   );
 
   // ── ESTADO ────────────────────────────────────────────────
-  let productos = [];
-  let categoriaActiva = '';
-  let stockFiltro = '';
-  let prodAbierto = null;
+  let productos = [], categoriaActiva = '', stockFiltro = '', prodAbierto = null;
+  let fotoBlob = null; // blob de la foto procesada pendiente de subir
 
   // ── HELPERS ───────────────────────────────────────────────
-  const CAT_LABELS = {
-    armazon_receta:'Armazón receta', armazon_sol:'Armazón sol',
-    lentes_oftalmicos:'Oftálmicos', lentes_contacto:'Contacto',
-    accesorios:'Accesorios', soluciones:'Soluciones', otro:'Otro'
-  };
-  const CAT_ICONOS = {
-    armazon_receta:'🕶', armazon_sol:'☀️', lentes_oftalmicos:'🔬',
-    lentes_contacto:'👁', accesorios:'🎀', soluciones:'💧', otro:'📦'
-  };
-  const CAT_COLORES = {
-    armazon_receta:'#eff6ff', armazon_sol:'#fffbeb', lentes_oftalmicos:'#f0fdf4',
-    lentes_contacto:'#faf5ff', accesorios:'#fdf2f8', soluciones:'#ecfeff', otro:'#f8fafc'
-  };
-  const ZONA_LABELS = {
-    exhibidor_1:'🗄 Exhibidor 1', exhibidor_2:'🗄 Exhibidor 2', exhibidor_3:'🗄 Exhibidor 3',
-    vidriera_1:'🪟 Vidriera 1', vidriera_2:'🪟 Vidriera 2', vidriera_3:'🪟 Vidriera 3', vidriera_4:'🪟 Vidriera 4',
-    cajonera_1:'🗃 Cajonera 1', cajonera_2:'🗃 Cajonera 2'
-  };
+  const CAT_LABELS  = { armazon_receta:'Armazón receta', armazon_sol:'Armazón sol', lentes_oftalmicos:'Oftálmicos', lentes_contacto:'Contacto', accesorios:'Accesorios', soluciones:'Soluciones', otro:'Otro' };
+  const CAT_ICONOS  = { armazon_receta:'🕶', armazon_sol:'☀️', lentes_oftalmicos:'🔬', lentes_contacto:'👁', accesorios:'🎀', soluciones:'💧', otro:'📦' };
+  const CAT_COLORES = { armazon_receta:'#eff6ff', armazon_sol:'#fffbeb', lentes_oftalmicos:'#f0fdf4', lentes_contacto:'#faf5ff', accesorios:'#fdf2f8', soluciones:'#ecfeff', otro:'#f8fafc' };
+  const ZONA_LABELS = { exhibidor_1:'🗄 Exhibidor 1', exhibidor_2:'🗄 Exhibidor 2', exhibidor_3:'🗄 Exhibidor 3', vidriera_1:'🪟 Vidriera 1', vidriera_2:'🪟 Vidriera 2', vidriera_3:'🪟 Vidriera 3', vidriera_4:'🪟 Vidriera 4', cajonera_1:'🗃 Cajonera 1', cajonera_2:'🗃 Cajonera 2' };
 
   function getStockClase(p) {
     if (p.stock_current <= 0) return 'cero';
     if (p.stock_min > 0 && p.stock_current <= p.stock_min) return 'bajo';
     return 'ok';
   }
-
-  function fmtPesos(n) {
-    if (!n || isNaN(n)) return '—';
-    return '$' + Math.round(n).toLocaleString('es-AR');
-  }
+  function fmtPesos(n) { return (!n || isNaN(n)) ? '—' : '$' + Math.round(n).toLocaleString('es-AR'); }
 
   // ── CARGA ─────────────────────────────────────────────────
   async function cargar() {
-    const { data, error } = await sb
-      .from('products')
-      .select('*')
-      .eq('active', true)
-      .order('name');
-
+    const { data, error } = await sb.from('products').select('*').eq('active', true).order('name');
     if (error) { console.error(error); return; }
     productos = data || [];
     actualizarStats();
@@ -445,41 +463,28 @@
   }
 
   function actualizarStats() {
-    const cero = productos.filter(p => p.stock_current <= 0).length;
-    const bajo = productos.filter(p => p.stock_current > 0 && p.stock_min > 0 && p.stock_current <= p.stock_min).length;
     document.getElementById('st-total').textContent = productos.length;
-    document.getElementById('st-cero').textContent = cero;
-    document.getElementById('st-bajo').textContent = bajo;
+    document.getElementById('st-cero').textContent = productos.filter(p => p.stock_current <= 0).length;
+    document.getElementById('st-bajo').textContent = productos.filter(p => p.stock_current > 0 && p.stock_min > 0 && p.stock_current <= p.stock_min).length;
   }
 
   // ── FILTROS ───────────────────────────────────────────────
   function setFiltroCategoria(btn, cat) {
     document.querySelectorAll('#filtros-cat .filtro-chip').forEach(b => b.classList.remove('activo'));
-    btn.classList.add('activo');
-    categoriaActiva = cat;
-    aplicarFiltros();
+    btn.classList.add('activo'); categoriaActiva = cat; aplicarFiltros();
   }
-
   function setFiltroStock(btn, tipo) {
-    document.querySelectorAll('.filtros:nth-child(2) .filtro-chip').forEach(b => b.classList.remove('activo'));
-    btn.classList.add('activo');
-    stockFiltro = tipo;
-    aplicarFiltros();
+    document.querySelectorAll('#filtros-stock .filtro-chip').forEach(b => b.classList.remove('activo'));
+    btn.classList.add('activo'); stockFiltro = tipo; aplicarFiltros();
   }
-
   function aplicarFiltros() {
     const q = document.getElementById('buscador').value.trim().toLowerCase();
     let lista = productos;
     if (categoriaActiva) lista = lista.filter(p => p.category === categoriaActiva);
     if (stockFiltro === 'cero') lista = lista.filter(p => p.stock_current <= 0);
     if (stockFiltro === 'bajo') lista = lista.filter(p => p.stock_current > 0 && p.stock_min > 0 && p.stock_current <= p.stock_min);
-    if (stockFiltro === 'ok')   lista = lista.filter(p => p.stock_current > 0 && (p.stock_min === 0 || !p.stock_min || p.stock_current > p.stock_min));
-    if (q) lista = lista.filter(p =>
-      (p.name||'').toLowerCase().includes(q) ||
-      (p.brand||'').toLowerCase().includes(q) ||
-      (p.sku||'').toLowerCase().includes(q) ||
-      (p.subcategory||'').toLowerCase().includes(q)
-    );
+    if (stockFiltro === 'ok')   lista = lista.filter(p => p.stock_current > 0 && (!p.stock_min || p.stock_current > p.stock_min));
+    if (q) lista = lista.filter(p => (p.name||'').toLowerCase().includes(q) || (p.brand||'').toLowerCase().includes(q) || (p.sku||'').toLowerCase().includes(q));
     const resDiv = document.getElementById('resultado-txt');
     if (q || categoriaActiva || stockFiltro) {
       resDiv.innerHTML = `Mostrando <span>${lista.length}</span> de ${productos.length} productos`;
@@ -492,22 +497,28 @@
   function renderLista(lista) {
     if (!lista) lista = productos;
     const cont = document.getElementById('lista');
-    if (lista.length === 0) {
+    if (!lista.length) {
       cont.innerHTML = `<div class="empty"><div class="empty-icono">🔍</div>${productos.length === 0 ? 'Aún no hay productos.<br>Tocá "Agregar producto" para empezar.' : 'Sin resultados para este filtro.'}</div>`;
       return;
     }
     cont.innerHTML = lista.map(p => {
       const sc = getStockClase(p);
-      const icono = CAT_ICONOS[p.category] || '📦';
-      const iconoBg = CAT_COLORES[p.category] || '#f8fafc';
+      const icono    = CAT_ICONOS[p.category]  || '📦';
+      const iconoBg  = CAT_COLORES[p.category] || '#f8fafc';
       const nombreCompleto = [p.brand, p.name].filter(Boolean).join(' · ');
-      const subInfo = [CAT_LABELS[p.category], p.subcategory, ZONA_LABELS[p.zona]].filter(Boolean).join(' · ');
+      const subInfo = [CAT_LABELS[p.category], p.material, p.subcategory].filter(Boolean).join(' · ');
       const stockLabel = p.stock_current <= 0 ? '⚠️ Sin stock' : `${p.stock_current} u.`;
       const abierto = prodAbierto === p.id;
+
+      // Si tiene foto, mostrarla; si no, emoji de categoría
+      const iconoHtml = p.photo_url
+        ? `<div class="prod-icono" style="background:white;border:1px solid #f1f5f9"><img src="${p.photo_url}" alt="${p.name}" /></div>`
+        : `<div class="prod-icono" style="background:${iconoBg}">${icono}</div>`;
+
       return `
         <div class="prod-card ${sc}" id="card-${p.id}">
           <div class="prod-header" onclick="toggleDetalle('${p.id}')">
-            <div class="prod-icono" style="background:${iconoBg}">${icono}</div>
+            ${iconoHtml}
             <div class="prod-info">
               <div class="prod-nombre">${nombreCompleto || '(sin nombre)'}</div>
               <div class="prod-sub">${subInfo || '—'}${p.sku ? ` · <span style="font-family:monospace;font-weight:800">${p.sku}</span>` : ''}</div>
@@ -517,120 +528,94 @@
               <span style="font-size:14px;color:var(--gris);transition:transform 0.2s;display:inline-block;transform:rotate(${abierto?'180':'0'}deg)">▾</span>
             </div>
           </div>
-          <div class="prod-detalle ${abierto ? 'vis' : ''}" id="det-${p.id}">
+          <div class="prod-detalle ${abierto?'vis':''}" id="det-${p.id}">
             <div class="det-grid">
               <div class="det-item"><div class="det-lab">Stock actual</div><div class="det-val" style="color:${sc==='cero'?'var(--rojo)':sc==='bajo'?'var(--naranja)':'var(--verde)'}">${p.stock_current} unidades</div></div>
-              <div class="det-item"><div class="det-lab">Stock mínimo</div><div class="det-val">${p.stock_min || 0} unidades</div></div>
+              <div class="det-item"><div class="det-lab">Stock mínimo</div><div class="det-val">${p.stock_min||0} unidades</div></div>
               <div class="det-item"><div class="det-lab">Precio costo</div><div class="det-val">${fmtPesos(p.cost_price)}</div></div>
               <div class="det-item"><div class="det-lab">Precio venta</div><div class="det-val">${fmtPesos(p.sale_price)}</div></div>
-              <div class="det-item"><div class="det-lab">Zona</div><div class="det-val">${ZONA_LABELS[p.zona] || '—'}</div></div>
+              <div class="det-item"><div class="det-lab">Zona</div><div class="det-val">${ZONA_LABELS[p.zona]||'—'}</div></div>
+              ${p.material ? `<div class="det-item"><div class="det-lab">Material</div><div class="det-val">${p.material}</div></div>` : ''}
               ${p.notes ? `<div class="det-item" style="grid-column:1/-1"><div class="det-lab">Notas</div><div class="det-val" style="font-weight:600;color:var(--gris)">${p.notes}</div></div>` : ''}
             </div>
             <div class="det-btns">
               <button class="btn-stock" onclick="abrirAjusteStock('${p.id}','${(p.name||'').replace(/'/g,"\\'")}',${p.stock_current})">📦 Ajustar stock</button>
-              <button class="btn-edit" onclick="editarProducto('${p.id}')">✏️ Editar</button>
-              <button class="btn-del" onclick="eliminarProducto('${p.id}')">🗑️</button>
+              <button class="btn-edit"  onclick="editarProducto('${p.id}')">✏️ Editar</button>
+              <button class="btn-del"   onclick="eliminarProducto('${p.id}')">🗑️</button>
             </div>
           </div>
         </div>`;
     }).join('');
   }
 
-  function toggleDetalle(id) {
-    prodAbierto = prodAbierto === id ? null : id;
-    aplicarFiltros();
-  }
+  function toggleDetalle(id) { prodAbierto = prodAbierto === id ? null : id; aplicarFiltros(); }
 
   // ══════════════════════════════════════════════════════════
-  // ── EXPORTAR A OPTIGEST ───────────────────────────────────
+  // ── FOTO CON IA (background removal) ─────────────────────
   // ══════════════════════════════════════════════════════════
 
-  // Mapeo de categorías Olvisión → etiquetas legibles para OptiGest
-  const CAT_EXPORT = {
-    armazon_receta:   'Armazon receta',
-    armazon_sol:      'Armazon sol',
-    lentes_oftalmicos:'Lentes oftalmicos',
-    lentes_contacto:  'Lentes de contacto',
-    accesorios:       'Accesorios',
-    soluciones:       'Soluciones',
-    otro:             'Otro'
-  };
+  let _removeBackground = null;
 
-  function formatFechaOptiGest(fechaISO) {
-    if (!fechaISO) return '';
+  async function cargarLibIA() {
+    if (_removeBackground) return _removeBackground;
+    document.getElementById('foto-procesando-sub').textContent = 'Descargando modelo de IA (primera vez)…';
+    const mod = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/browser/index.mjs');
+    _removeBackground = mod.removeBackground;
+    return _removeBackground;
+  }
+
+  async function procesarFoto(input) {
+    const file = input.files[0];
+    if (!file) return;
+    input.value = ''; // reset para poder volver a seleccionar la misma foto
+
+    // Mostrar estado "procesando"
+    document.getElementById('foto-sin').style.display = 'none';
+    document.getElementById('foto-preview').style.display = 'none';
+    document.getElementById('foto-procesando').style.display = 'flex';
+    document.getElementById('foto-procesando-sub').textContent = 'Preparando modelo…';
+
     try {
-      const d = new Date(fechaISO);
-      if (isNaN(d)) return '';
-      const dd  = String(d.getDate()).padStart(2, '0');
-      const mm  = String(d.getMonth() + 1).padStart(2, '0');
-      const yyyy = d.getFullYear();
-      return `${dd}/${mm}/${yyyy}`;
-    } catch { return ''; }
-  }
-
-  function buildDetalles(p) {
-    // Genera el campo "clave:valor" que pide OptiGest
-    // Combina subcategoría, zona y notas si existen
-    const partes = [];
-    if (p.subcategory) partes.push(`Subcategoria: ${p.subcategory}`);
-    if (p.zona)        partes.push(`Zona: ${ZONA_LABELS[p.zona] || p.zona}`);
-    if (p.stock_min)   partes.push(`Stock minimo: ${p.stock_min}`);
-    if (p.cost_price)  partes.push(`Precio costo: ${Math.round(p.cost_price)}`);
-    if (p.notes)       partes.push(`Notas: ${p.notes}`);
-    return partes.join(', ');
-  }
-
-  function generarTextoExport(lista) {
-    return lista.map(p => {
-      const cols = [
-        p.name        || '',                         // 1. Nombre
-        p.sku         || '',                         // 2. SKU
-        p.brand       || '',                         // 3. Marca
-        CAT_EXPORT[p.category] || (p.category || ''), // 4. Categoría
-        p.sale_price  ? Math.round(p.sale_price) : '', // 5. Precio
-        p.stock_current ?? 0,                        // 6. Stock
-        formatFechaOptiGest(p.expiry_date),          // 7. Vencimiento
-        buildDetalles(p),                            // 8. Detalles
-        p.photo_url   || ''                          // 9. URL Foto
-      ];
-      return cols.join('\t');
-    }).join('\n');
-  }
-
-  function abrirExportar() {
-    if (productos.length === 0) {
-      alert('No hay productos cargados todavía.');
-      return;
+      const removeBg = await cargarLibIA();
+      document.getElementById('foto-procesando-sub').textContent = 'Analizando imagen…';
+      const blob = await removeBg(file, {
+        output: { format: 'image/png', quality: 0.9 }
+      });
+      fotoBlob = blob;
+      const url = URL.createObjectURL(blob);
+      document.getElementById('foto-img').src = url;
+      document.getElementById('foto-procesando').style.display = 'none';
+      document.getElementById('foto-preview').style.display = 'block';
+    } catch (err) {
+      console.error('Error removiendo fondo:', err);
+      // Si falla la IA, usar la foto original igual
+      fotoBlob = file;
+      const url = URL.createObjectURL(file);
+      document.getElementById('foto-img').src = url;
+      document.getElementById('foto-procesando').style.display = 'none';
+      document.getElementById('foto-preview').style.display = 'block';
+      document.querySelector('.foto-ok-badge').textContent = '📷 Foto cargada';
     }
-    const texto = generarTextoExport(productos);
-    document.getElementById('export-texto').value = texto;
-    document.getElementById('export-count').textContent =
-      `${productos.length} producto${productos.length !== 1 ? 's' : ''} listos para importar`;
-    // Reset botón copiar
-    const btn = document.getElementById('btn-copiar');
-    btn.classList.remove('copiado');
-    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar todo`;
-    document.getElementById('overlay-exportar').classList.add('vis');
   }
 
-  async function copiarExport() {
-    const texto = document.getElementById('export-texto').value;
-    if (!texto) return;
-    try {
-      await navigator.clipboard.writeText(texto);
-    } catch {
-      // Fallback para Safari/móvil
-      const ta = document.getElementById('export-texto');
-      ta.select();
-      document.execCommand('copy');
-    }
-    const btn = document.getElementById('btn-copiar');
-    btn.classList.add('copiado');
-    btn.innerHTML = `✅ ¡Copiado!`;
-    setTimeout(() => {
-      btn.classList.remove('copiado');
-      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar todo`;
-    }, 2500);
+  function resetFoto() {
+    fotoBlob = null;
+    document.getElementById('f-photo-url').value = '';
+    document.getElementById('foto-preview').style.display = 'none';
+    document.getElementById('foto-procesando').style.display = 'none';
+    document.getElementById('foto-sin').style.display = 'block';
+  }
+
+  async function subirFotoStorage(productoId) {
+    if (!fotoBlob) return null;
+    const ext      = 'png';
+    const fileName = `${productoId}.${ext}`;
+    const { error } = await sb.storage
+      .from('product-photos')
+      .upload(fileName, fotoBlob, { contentType: 'image/png', upsert: true });
+    if (error) { console.error('Error subiendo foto:', error); return null; }
+    const { data } = sb.storage.from('product-photos').getPublicUrl(fileName);
+    return data.publicUrl;
   }
 
   // ── MODAL FORM ────────────────────────────────────────────
@@ -638,15 +623,19 @@
     document.getElementById('modal-titulo').textContent = idEdit ? 'Editar producto' : 'Nuevo producto';
     document.getElementById('btn-guardar-prod').textContent = idEdit ? '💾 Guardar cambios' : '✅ Guardar producto';
     if (!idEdit) {
-      ['f-id','f-nombre','f-sku','f-stock','f-stock-min','f-costo','f-venta','f-subcat','f-notas'].forEach(id => {
+      ['f-id','f-nombre','f-sku','f-stock','f-stock-min','f-costo','f-venta','f-subcat','f-notas','f-photo-url'].forEach(id => {
         const el = document.getElementById(id);
-        el.value = id === 'f-stock' || id === 'f-stock-min' ? '0' : '';
+        el.value = (id === 'f-stock' || id === 'f-stock-min') ? '0' : '';
       });
       document.getElementById('f-categoria').selectedIndex = 0;
       document.getElementById('f-zona').selectedIndex = 0;
+      document.getElementById('f-material').selectedIndex = 0;
+      document.getElementById('f-material-otro').value = '';
+      document.getElementById('f-material-otro').style.display = 'none';
       document.getElementById('f-marca').selectedIndex = 0;
       document.getElementById('f-marca-otra').value = '';
       document.getElementById('f-marca-otra').style.display = 'none';
+      resetFoto();
     }
     document.getElementById('overlay-form').classList.add('vis');
     document.querySelector('#overlay-form .modal').scrollTop = 0;
@@ -657,61 +646,84 @@
     if (!p) return;
     document.getElementById('f-id').value = p.id;
     document.getElementById('f-nombre').value = p.name || '';
+    // Marca
     const marcaSel = document.getElementById('f-marca');
     const marcaOtra = document.getElementById('f-marca-otra');
     const opciones = [...marcaSel.options].map(o => o.value);
-    if (p.brand && opciones.includes(p.brand)) {
-      marcaSel.value = p.brand;
-      marcaOtra.style.display = 'none';
-    } else if (p.brand) {
-      marcaSel.value = '__otra__';
-      marcaOtra.value = p.brand;
-      marcaOtra.style.display = 'block';
-    } else {
-      marcaSel.selectedIndex = 0;
-      marcaOtra.style.display = 'none';
-    }
-    document.getElementById('f-sku').value = p.sku || '';
-    document.getElementById('f-stock').value = p.stock_current ?? 0;
-    document.getElementById('f-stock-min').value = p.stock_min ?? 0;
-    document.getElementById('f-costo').value = p.cost_price || '';
-    document.getElementById('f-venta').value = p.sale_price || '';
-    document.getElementById('f-subcat').value = p.subcategory || '';
-    document.getElementById('f-notas').value = p.notes || '';
+    if (p.brand && opciones.includes(p.brand)) { marcaSel.value = p.brand; marcaOtra.style.display = 'none'; }
+    else if (p.brand) { marcaSel.value = '__otra__'; marcaOtra.value = p.brand; marcaOtra.style.display = 'block'; }
+    else { marcaSel.selectedIndex = 0; marcaOtra.style.display = 'none'; }
+    document.getElementById('f-sku').value        = p.sku         || '';
+    document.getElementById('f-stock').value      = p.stock_current ?? 0;
+    document.getElementById('f-stock-min').value  = p.stock_min   ?? 0;
+    document.getElementById('f-costo').value      = p.cost_price  || '';
+    document.getElementById('f-venta').value      = p.sale_price  || '';
+    document.getElementById('f-subcat').value     = p.subcategory || '';
+    document.getElementById('f-notas').value      = p.notes       || '';
+    document.getElementById('f-photo-url').value  = p.photo_url   || '';
     setSelect('f-categoria', p.category);
-    setSelect('f-zona', p.zona || '');
+    setSelect('f-zona',     p.zona     || '');
+    // Material: si existe en el select usarlo, si no → "otro"
+    const matSel   = document.getElementById('f-material');
+    const matOtro  = document.getElementById('f-material-otro');
+    const matOpts  = [...matSel.options].map(o => o.value);
+    if (!p.material) {
+      matSel.selectedIndex = 0; matOtro.style.display = 'none';
+    } else if (matOpts.includes(p.material)) {
+      matSel.value = p.material; matOtro.style.display = 'none';
+    } else {
+      matSel.value = '__otro__'; matOtro.value = p.material; matOtro.style.display = 'block';
+    }
+    // Foto existente
+    fotoBlob = null;
+    if (p.photo_url) {
+      document.getElementById('foto-img').src = p.photo_url;
+      document.getElementById('foto-sin').style.display = 'none';
+      document.getElementById('foto-procesando').style.display = 'none';
+      document.getElementById('foto-preview').style.display = 'block';
+      document.querySelector('.foto-ok-badge').innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Foto guardada ✓`;
+    } else { resetFoto(); }
     abrirModal(p.id);
   }
 
   async function guardar() {
-    const id = document.getElementById('f-id').value;
+    const id     = document.getElementById('f-id').value;
     const nombre = document.getElementById('f-nombre').value.trim();
-    const cat = document.getElementById('f-categoria').value;
+    const cat    = document.getElementById('f-categoria').value;
     if (!nombre) { alert('El nombre es obligatorio'); return; }
-    if (!cat) { alert('Seleccioná una categoría'); return; }
+    if (!cat)    { alert('Seleccioná una categoría'); return; }
+
+    const btn = document.getElementById('btn-guardar-prod');
+    btn.disabled = true;
+
+    // Subir foto si hay una nueva
+    let photoUrl = document.getElementById('f-photo-url').value || null;
+    if (fotoBlob) {
+      btn.textContent = '📷 Subiendo foto…';
+      const tmpId = id || ('tmp_' + Date.now());
+      photoUrl = await subirFotoStorage(id || tmpId);
+      if (!photoUrl) btn.textContent = '⚠️ Foto no se pudo subir, guardando igual…';
+    }
+
+    btn.textContent = 'Guardando…';
 
     const payload = {
       name:          nombre,
-      brand: (() => {
-        const s = document.getElementById('f-marca');
-        if (s.value === '__otra__') return document.getElementById('f-marca-otra').value.trim() || null;
-        return s.value || null;
-      })(),
-      sku:           document.getElementById('f-sku').value.trim() || null,
+      brand: (() => { const s = document.getElementById('f-marca'); return s.value === '__otra__' ? (document.getElementById('f-marca-otra').value.trim()||null) : (s.value||null); })(),
+      sku:           document.getElementById('f-sku').value.trim()        || null,
       category:      cat,
-      zona:          document.getElementById('f-zona').value || null,
-      stock_current: parseInt(document.getElementById('f-stock').value) || 0,
-      stock_min:     parseInt(document.getElementById('f-stock-min').value) || 0,
+      zona:          document.getElementById('f-zona').value              || null,
+      material: (() => { const s = document.getElementById('f-material'); return s.value === '__otro__' ? (document.getElementById('f-material-otro').value.trim()||null) : (s.value||null); })(),
+      stock_current: parseInt(document.getElementById('f-stock').value)   || 0,
+      stock_min:     parseInt(document.getElementById('f-stock-min').value)|| 0,
       cost_price:    parseFloat(document.getElementById('f-costo').value) || null,
       sale_price:    parseFloat(document.getElementById('f-venta').value) || null,
-      subcategory:   document.getElementById('f-subcat').value.trim() || null,
-      notes:         document.getElementById('f-notas').value.trim() || null,
+      subcategory:   document.getElementById('f-subcat').value.trim()     || null,
+      notes:         document.getElementById('f-notas').value.trim()      || null,
+      photo_url:     photoUrl,
       active:        true,
       updated_at:    new Date().toISOString(),
     };
-
-    const btn = document.getElementById('btn-guardar-prod');
-    btn.textContent = 'Guardando…'; btn.disabled = true;
 
     let error;
     if (id) {
@@ -719,29 +731,35 @@
     } else {
       const { data: profile } = await sb.from('profiles').select('branch_id').eq('id', currentUser.id).maybeSingle();
       if (profile?.branch_id) payload.branch_id = profile.branch_id;
-      ({ error } = await sb.from('products').insert([payload]));
+      const { data: nuevo, error: errIns } = await sb.from('products').insert([payload]).select().single();
+      error = errIns;
+      // Si había foto con id temporal, re-subir con el id real
+      if (!error && nuevo && fotoBlob && photoUrl && photoUrl.includes('tmp_')) {
+        const urlReal = await subirFotoStorage(nuevo.id);
+        if (urlReal) await sb.from('products').update({ photo_url: urlReal }).eq('id', nuevo.id);
+      }
     }
 
-    btn.textContent = id ? '💾 Guardar cambios' : '✅ Guardar producto'; btn.disabled = false;
+    btn.textContent = id ? '💾 Guardar cambios' : '✅ Guardar producto';
+    btn.disabled = false;
     if (error) { alert('Error: ' + error.message); return; }
+    fotoBlob = null;
     cerrarModal('overlay-form');
     await cargar();
   }
 
   async function eliminarProducto(id) {
     const p = productos.find(x => x.id === id);
-    if (!confirm(`¿Eliminás "${p?.name || 'este producto'}"?\n\nEsta acción lo desactiva del inventario.`)) return;
-    const { error } = await sb.from('products').update({ active: false }).eq('id', id);
-    if (error) { alert('Error: ' + error.message); return; }
+    if (!confirm(`¿Eliminás "${p?.name||'este producto'}"?\n\nEsta acción lo desactiva del inventario.`)) return;
+    await sb.from('products').update({ active: false }).eq('id', id);
     prodAbierto = null;
     await cargar();
   }
 
   // ── AJUSTE STOCK ──────────────────────────────────────────
   let stockTemp = 0;
-
   function abrirAjusteStock(id, nombre, stockActual) {
-    stockTemp = parseInt(stockActual) || 0;
+    stockTemp = parseInt(stockActual)||0;
     document.getElementById('stock-prod-id').value = id;
     document.getElementById('stock-original').value = stockActual;
     document.getElementById('stock-prod-nombre').textContent = nombre;
@@ -751,101 +769,94 @@
     document.getElementById('stock-tipo').selectedIndex = 0;
     document.getElementById('overlay-stock').classList.add('vis');
   }
-
-  function ajustarStock(delta) {
-    stockTemp = Math.max(0, stockTemp + delta);
-    document.getElementById('stock-nuevo-val').textContent = stockTemp;
-    document.getElementById('stock-input').value = stockTemp;
-  }
-
-  function stockDesdeInput(val) {
-    stockTemp = Math.max(0, parseInt(val) || 0);
-    document.getElementById('stock-nuevo-val').textContent = stockTemp;
-  }
-
+  function ajustarStock(d) { stockTemp = Math.max(0, stockTemp+d); document.getElementById('stock-nuevo-val').textContent = stockTemp; document.getElementById('stock-input').value = stockTemp; }
+  function stockDesdeInput(v) { stockTemp = Math.max(0, parseInt(v)||0); document.getElementById('stock-nuevo-val').textContent = stockTemp; }
   async function guardarStock() {
-    const id = document.getElementById('stock-prod-id').value;
-    const original = parseInt(document.getElementById('stock-original').value) || 0;
-    const tipo = document.getElementById('stock-tipo').value;
-    const notas = document.getElementById('stock-notas').value.trim();
-    const diferencia = stockTemp - original;
-
+    const id       = document.getElementById('stock-prod-id').value;
+    const original = parseInt(document.getElementById('stock-original').value)||0;
+    const tipo     = document.getElementById('stock-tipo').value;
+    const notas    = document.getElementById('stock-notas').value.trim();
     if (stockTemp === original) { cerrarModal('overlay-stock'); return; }
-
     const btn = document.querySelector('#overlay-stock .btn-guardar');
     btn.textContent = 'Guardando…'; btn.disabled = true;
-
-    const { error: errUpd } = await sb.from('products').update({ stock_current: stockTemp, updated_at: new Date().toISOString() }).eq('id', id);
-    if (errUpd) { alert('Error: ' + errUpd.message); btn.textContent='✅ Confirmar ajuste'; btn.disabled=false; return; }
-
+    const { error } = await sb.from('products').update({ stock_current: stockTemp, updated_at: new Date().toISOString() }).eq('id', id);
+    if (error) { alert('Error: '+error.message); btn.textContent='✅ Confirmar ajuste'; btn.disabled=false; return; }
     const p = productos.find(x => x.id === id);
-    await sb.from('stock_movements').insert([{
-      product_id:     id,
-      branch_id:      p?.branch_id || null,
-      user_id:        currentUser?.id || null,
-      type:           tipo,
-      quantity:       diferencia,
-      quantity_before: original,
-      quantity_after:  stockTemp,
-      notes:          notas || `Ajuste manual desde productos`
-    }]);
+    await sb.from('stock_movements').insert([{ product_id:id, branch_id:p?.branch_id||null, user_id:currentUser?.id||null, type:tipo, quantity:stockTemp-original, quantity_before:original, quantity_after:stockTemp, notes:notas||'Ajuste manual desde productos' }]);
+    btn.textContent='✅ Confirmar ajuste'; btn.disabled=false;
+    cerrarModal('overlay-stock'); await cargar();
+  }
 
-    btn.textContent = '✅ Confirmar ajuste'; btn.disabled = false;
-    cerrarModal('overlay-stock');
-    await cargar();
+  // ── EXPORTAR OPTIGEST ─────────────────────────────────────
+  const CAT_EXPORT = { armazon_receta:'Armazon receta', armazon_sol:'Armazon sol', lentes_oftalmicos:'Lentes oftalmicos', lentes_contacto:'Lentes de contacto', accesorios:'Accesorios', soluciones:'Soluciones', otro:'Otro' };
+  function fmtFechaOG(f) { if(!f) return ''; try { const d=new Date(f); if(isNaN(d)) return ''; return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`; } catch{return '';} }
+  function buildDetalles(p) {
+    const pts=[];
+    if(p.subcategory) pts.push(`Subcategoria: ${p.subcategory}`);
+    if(p.material)    pts.push(`Material: ${p.material}`);
+    if(p.zona)        pts.push(`Zona: ${ZONA_LABELS[p.zona]||p.zona}`);
+    if(p.stock_min)   pts.push(`Stock minimo: ${p.stock_min}`);
+    if(p.cost_price)  pts.push(`Precio costo: ${Math.round(p.cost_price)}`);
+    if(p.notes)       pts.push(`Notas: ${p.notes}`);
+    return pts.join(', ');
+  }
+  function abrirExportar() {
+    if(!productos.length) { alert('No hay productos cargados todavía.'); return; }
+    document.getElementById('export-texto').value = productos.map(p => [p.name||'', p.sku||'', p.brand||'', CAT_EXPORT[p.category]||(p.category||''), p.sale_price?Math.round(p.sale_price):'', p.stock_current??0, fmtFechaOG(p.expiry_date), buildDetalles(p), p.photo_url||''].join('\t')).join('\n');
+    document.getElementById('export-count').textContent = `${productos.length} producto${productos.length!==1?'s':''} listos para importar`;
+    const btn = document.getElementById('btn-copiar');
+    btn.classList.remove('copiado');
+    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar todo`;
+    document.getElementById('overlay-exportar').classList.add('vis');
+  }
+  async function copiarExport() {
+    const txt = document.getElementById('export-texto').value; if(!txt) return;
+    try { await navigator.clipboard.writeText(txt); } catch { const ta=document.getElementById('export-texto'); ta.select(); document.execCommand('copy'); }
+    const btn=document.getElementById('btn-copiar'); btn.classList.add('copiado'); btn.innerHTML='✅ ¡Copiado!';
+    setTimeout(()=>{ btn.classList.remove('copiado'); btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar todo`; }, 2500);
   }
 
   // ── UTILIDADES ────────────────────────────────────────────
   function cerrarModal(id) { document.getElementById(id).classList.remove('vis'); }
-  function cerrarFuera(e, id) { if (e.target === document.getElementById(id)) cerrarModal(id); }
-  function setSelect(id, val) {
-    const sel = document.getElementById(id);
-    for (let i = 0; i < sel.options.length; i++) {
-      if (sel.options[i].value === val) { sel.selectedIndex = i; return; }
-    }
-    sel.selectedIndex = 0;
+  function cerrarFuera(e,id) { if(e.target===document.getElementById(id)) cerrarModal(id); }
+  function setSelect(id,val) { const s=document.getElementById(id); for(let i=0;i<s.options.length;i++) { if(s.options[i].value===val){s.selectedIndex=i;return;} } s.selectedIndex=0; }
+
+  // ── MATERIALES DESDE CONFIG ───────────────────────────────
+  async function cargarMateriales() {
+    const { data } = await sb.from('configuracion').select('valor').eq('clave','materiales').maybeSingle();
+    let mats = [];
+    if (data?.valor) { try { mats = JSON.parse(data.valor)||[]; } catch{} }
+    mats = [...mats].sort((a,b) => a.localeCompare(b,'es'));
+    const sel = document.getElementById('f-material'); if (!sel) return;
+    const valActual = sel.value;
+    sel.innerHTML = '<option value="">Sin especificar</option>';
+    mats.forEach(m => { const o = document.createElement('option'); o.value = m; o.textContent = m; sel.appendChild(o); });
+    const otro = document.createElement('option'); otro.value = '__otro__'; otro.textContent = '✏️ Otro material…'; sel.appendChild(otro);
+    if (valActual) sel.value = valActual;
+  }
+  function onMaterialChange() {
+    document.getElementById('f-material-otro').style.display =
+      document.getElementById('f-material').value === '__otro__' ? 'block' : 'none';
   }
 
-  // ── MARCAS DESDE CONFIG ───────────────────────────────────
+  // ── MARCAS ────────────────────────────────────────────────
   async function cargarMarcas() {
     const { data } = await sb.from('configuracion').select('valor').eq('clave','marcas').maybeSingle();
     let marcas = [];
-    if (data?.valor) { try { marcas = JSON.parse(data.valor) || []; } catch{} }
-    marcas = [...marcas].sort((a,b) => a.localeCompare(b,'es'));
-    const sel = document.getElementById('f-marca');
-    if (!sel) return;
+    if(data?.valor) { try { marcas=JSON.parse(data.valor)||[]; } catch{} }
+    marcas = [...marcas].sort((a,b)=>a.localeCompare(b,'es'));
+    const sel = document.getElementById('f-marca'); if(!sel) return;
     const valActual = sel.value;
     sel.innerHTML = '<option value="">Seleccionar marca</option>';
-    marcas.forEach(m => {
-      const o = document.createElement('option');
-      o.value = m; o.textContent = m;
-      sel.appendChild(o);
-    });
-    const otraOpt = document.createElement('option');
-    otraOpt.value = '__otra__'; otraOpt.textContent = '✏️ Otra marca…';
-    sel.appendChild(otraOpt);
-    if (valActual) sel.value = valActual;
+    marcas.forEach(m=>{ const o=document.createElement('option'); o.value=m; o.textContent=m; sel.appendChild(o); });
+    const otra=document.createElement('option'); otra.value='__otra__'; otra.textContent='✏️ Otra marca…'; sel.appendChild(otra);
+    if(valActual) sel.value=valActual;
   }
-
-  function onMarcaChange() {
-    const sel = document.getElementById('f-marca');
-    const otraInput = document.getElementById('f-marca-otra');
-    otraInput.style.display = sel.value === '__otra__' ? 'block' : 'none';
-    autoNombre();
-  }
-
-  // ── AUTO NOMBRE ───────────────────────────────────────────
-  function autoNombre() {
-    const sel = document.getElementById('f-marca');
-    const otraInput = document.getElementById('f-marca-otra');
-    const marca = sel.value === '__otra__' ? otraInput.value.trim() : sel.value.trim();
-    const sku   = document.getElementById('f-sku').value.trim();
-    const parts = [marca, sku].filter(Boolean);
-    document.getElementById('f-nombre').value = parts.join(' ');
-  }
+  function onMarcaChange() { document.getElementById('f-marca-otra').style.display=document.getElementById('f-marca').value==='__otra__'?'block':'none'; autoNombre(); }
+  function autoNombre() { const s=document.getElementById('f-marca'), o=document.getElementById('f-marca-otra'); const marca=s.value==='__otra__'?o.value.trim():s.value.trim(); const sku=document.getElementById('f-sku').value.trim(); document.getElementById('f-nombre').value=[marca,sku].filter(Boolean).join(' '); }
 
   // ── INIT ──────────────────────────────────────────────────
-  cargar();
-  cargarMarcas();
-</script></body>
+  cargar(); cargarMarcas(); cargarMateriales();
+</script>
+</body>
 </html>
