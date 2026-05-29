@@ -13,13 +13,8 @@
   <title>Olvisión Inventario — Productos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-/* ── LAYOUT ── */
-    
-
-    
-
     .btn-salir {
       width: 100%; background: rgba(255,255,255,0.1); border: none; border-radius: 10px;
       color: rgba(255,255,255,0.7); font-family: 'Nunito', sans-serif; font-size: 13px;
@@ -27,19 +22,6 @@
     }
     .btn-salir:hover { background: rgba(255,255,255,0.18); color: white; }
 
-    /* MAIN */
-    
-
-    /* TOP NAV */
-    
-    
-    
-    
-
-    /* CONTENT */
-    
-
-    /* BUSCADOR + FILTROS */
     .toolbar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
     .search-wrap { position: relative; }
     .search-wrap input {
@@ -51,32 +33,28 @@
     .search-wrap input:focus { border-color: var(--azul2); }
     .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 16px; pointer-events: none; }
 
-    
-    
-    
-    
-
-    /* STATS */
-    
-    
-    
-    
-
-    /* BTN AGREGAR */
     .btn-agregar {
       width: 100%; background: var(--azul); color: white; border: none;
       border-radius: var(--radio); padding: 14px; font-family: 'Nunito', sans-serif;
-      font-size: 15px; font-weight: 800; cursor: pointer; margin-bottom: 14px;
+      font-size: 15px; font-weight: 800; cursor: pointer; margin-bottom: 8px;
       transition: opacity 0.15s;
     }
     .btn-agregar:hover { opacity: 0.9; }
 
-    /* RESULTADO BUSQUEDA */
+    /* ── BOTÓN EXPORTAR ── */
+    .btn-exportar {
+      width: 100%; background: white; color: #065f46;
+      border: 2px solid #d1fae5; border-radius: var(--radio); padding: 12px;
+      font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800;
+      cursor: pointer; margin-bottom: 14px; transition: all 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-exportar:hover { background: #f0fdf4; border-color: #6ee7b7; }
+
     .resultado-txt { font-size: 12px; font-weight: 700; color: var(--gris); margin-bottom: 10px; padding: 6px 12px; background: white; border-radius: 10px; text-align: center; display: none; }
     .resultado-txt.vis { display: block; }
     .resultado-txt span { color: var(--azul); }
 
-    /* LISTA DE PRODUCTOS */
     .lista { display: flex; flex-direction: column; gap: 10px; }
 
     .prod-card {
@@ -111,38 +89,8 @@
     .btn-del  { background: #fee2e2; color: var(--rojo); border: none; border-radius: 10px; padding: 10px 14px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; }
     .btn-stock { flex: 1; background: #f0fdf4; color: #065f46; border: none; border-radius: 10px; padding: 10px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; }
 
-    
-    
-
-    /* TAG CATEGORIA */
     .cat-tag { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; }
 
-    /* BOTTOM NAV */
-    
-    
-    
-    
-
-    /* OVERLAY / MODAL */
-    
-    
-    
-
-    
-    
-
-    /* FORM */
-    
-    
-    
-    
-    
-    
-
-    
-    
-
-    /* MODAL AJUSTE STOCK */
     .stock-display { text-align: center; padding: 20px 0; }
     .stock-num { font-size: 52px; font-weight: 900; color: var(--azul); line-height: 1; }
     .stock-label { font-size: 13px; color: var(--gris); font-weight: 600; margin-top: 4px; }
@@ -151,7 +99,45 @@
     .btn-stock-num.menos { background: #fee2e2; color: var(--rojo); }
     .btn-stock-num.mas   { background: #d1fae5; color: #065f46; }
     .stock-input-directo { width: 80px; text-align: center; font-size: 20px; font-weight: 900; padding: 10px; border: 1.5px solid var(--borde); border-radius: 12px; font-family: 'Nunito', sans-serif; }
-</style>
+
+    /* ── MODAL EXPORTAR ── */
+    .export-info {
+      background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px;
+      padding: 12px 14px; margin-bottom: 16px;
+    }
+    .export-info p {
+      font-size: 12px; color: #065f46; font-weight: 700; margin: 0 0 8px;
+    }
+    .export-cols {
+      display: flex; flex-wrap: wrap; gap: 6px;
+    }
+    .export-col-tag {
+      background: white; border: 1px solid #bbf7d0; border-radius: 20px;
+      padding: 3px 10px; font-size: 11px; font-weight: 800; color: #065f46;
+    }
+    .export-textarea {
+      width: 100%; height: 200px; padding: 12px;
+      border: 1.5px solid var(--borde); border-radius: 12px;
+      font-family: monospace; font-size: 11px; line-height: 1.6;
+      color: #1e293b; background: #f8fafc; resize: none; outline: none;
+      box-sizing: border-box;
+    }
+    .export-textarea:focus { border-color: #6ee7b7; }
+    .export-footer {
+      display: flex; gap: 8px; margin-top: 12px; align-items: center;
+    }
+    .export-count {
+      flex: 1; font-size: 12px; color: var(--gris); font-weight: 700;
+    }
+    .btn-copiar {
+      background: #065f46; color: white; border: none; border-radius: 10px;
+      padding: 12px 20px; font-family: 'Nunito', sans-serif; font-size: 14px;
+      font-weight: 800; cursor: pointer; transition: opacity 0.15s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-copiar:hover { opacity: 0.9; }
+    .btn-copiar.copiado { background: var(--verde); }
+  </style>
 </head>
 <body>
 <div class="app">
@@ -203,8 +189,12 @@
         </div>
       </div>
 
-      <!-- BTN AGREGAR -->
+      <!-- BOTONES ACCIÓN -->
       <button class="btn-agregar" onclick="abrirModal()">+ Agregar producto</button>
+      <button class="btn-exportar" onclick="abrirExportar()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Exportar a OptiGest
+      </button>
 
       <!-- BUSCADOR + FILTROS -->
       <div class="toolbar">
@@ -347,6 +337,39 @@
     <input type="hidden" id="stock-original" />
     <button class="btn-guardar" onclick="guardarStock()">✅ Confirmar ajuste</button>
     <button class="btn-cancelar" onclick="cerrarModal('overlay-stock')">Cancelar</button>
+  </div>
+</div>
+
+<!-- ══ MODAL EXPORTAR A OPTIGEST ══ -->
+<div class="overlay" id="overlay-exportar" onclick="cerrarFuera(event,'overlay-exportar')">
+  <div class="modal">
+    <div class="modal-titulo">📤 Exportar a OptiGest</div>
+
+    <div class="export-info">
+      <p>📋 Columnas en el orden que pide OptiGest:</p>
+      <div class="export-cols">
+        <span class="export-col-tag">1. Nombre</span>
+        <span class="export-col-tag">2. SKU</span>
+        <span class="export-col-tag">3. Marca</span>
+        <span class="export-col-tag">4. Categoría</span>
+        <span class="export-col-tag">5. Precio</span>
+        <span class="export-col-tag">6. Stock</span>
+        <span class="export-col-tag">7. Vencimiento</span>
+        <span class="export-col-tag">8. Detalles</span>
+        <span class="export-col-tag">9. URL Foto</span>
+      </div>
+    </div>
+
+    <textarea class="export-textarea" id="export-texto" readonly placeholder="Generando datos…"></textarea>
+
+    <div class="export-footer">
+      <div class="export-count" id="export-count"></div>
+      <button class="btn-cancelar" style="margin:0;padding:12px 16px" onclick="cerrarModal('overlay-exportar')">Cerrar</button>
+      <button class="btn-copiar" id="btn-copiar" onclick="copiarExport()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copiar todo
+      </button>
+    </div>
   </div>
 </div>
 
@@ -518,6 +541,98 @@
     aplicarFiltros();
   }
 
+  // ══════════════════════════════════════════════════════════
+  // ── EXPORTAR A OPTIGEST ───────────────────────────────────
+  // ══════════════════════════════════════════════════════════
+
+  // Mapeo de categorías Olvisión → etiquetas legibles para OptiGest
+  const CAT_EXPORT = {
+    armazon_receta:   'Armazon receta',
+    armazon_sol:      'Armazon sol',
+    lentes_oftalmicos:'Lentes oftalmicos',
+    lentes_contacto:  'Lentes de contacto',
+    accesorios:       'Accesorios',
+    soluciones:       'Soluciones',
+    otro:             'Otro'
+  };
+
+  function formatFechaOptiGest(fechaISO) {
+    if (!fechaISO) return '';
+    try {
+      const d = new Date(fechaISO);
+      if (isNaN(d)) return '';
+      const dd  = String(d.getDate()).padStart(2, '0');
+      const mm  = String(d.getMonth() + 1).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    } catch { return ''; }
+  }
+
+  function buildDetalles(p) {
+    // Genera el campo "clave:valor" que pide OptiGest
+    // Combina subcategoría, zona y notas si existen
+    const partes = [];
+    if (p.subcategory) partes.push(`Subcategoria: ${p.subcategory}`);
+    if (p.zona)        partes.push(`Zona: ${ZONA_LABELS[p.zona] || p.zona}`);
+    if (p.stock_min)   partes.push(`Stock minimo: ${p.stock_min}`);
+    if (p.cost_price)  partes.push(`Precio costo: ${Math.round(p.cost_price)}`);
+    if (p.notes)       partes.push(`Notas: ${p.notes}`);
+    return partes.join(', ');
+  }
+
+  function generarTextoExport(lista) {
+    return lista.map(p => {
+      const cols = [
+        p.name        || '',                         // 1. Nombre
+        p.sku         || '',                         // 2. SKU
+        p.brand       || '',                         // 3. Marca
+        CAT_EXPORT[p.category] || (p.category || ''), // 4. Categoría
+        p.sale_price  ? Math.round(p.sale_price) : '', // 5. Precio
+        p.stock_current ?? 0,                        // 6. Stock
+        formatFechaOptiGest(p.expiry_date),          // 7. Vencimiento
+        buildDetalles(p),                            // 8. Detalles
+        p.photo_url   || ''                          // 9. URL Foto
+      ];
+      return cols.join('\t');
+    }).join('\n');
+  }
+
+  function abrirExportar() {
+    if (productos.length === 0) {
+      alert('No hay productos cargados todavía.');
+      return;
+    }
+    const texto = generarTextoExport(productos);
+    document.getElementById('export-texto').value = texto;
+    document.getElementById('export-count').textContent =
+      `${productos.length} producto${productos.length !== 1 ? 's' : ''} listos para importar`;
+    // Reset botón copiar
+    const btn = document.getElementById('btn-copiar');
+    btn.classList.remove('copiado');
+    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar todo`;
+    document.getElementById('overlay-exportar').classList.add('vis');
+  }
+
+  async function copiarExport() {
+    const texto = document.getElementById('export-texto').value;
+    if (!texto) return;
+    try {
+      await navigator.clipboard.writeText(texto);
+    } catch {
+      // Fallback para Safari/móvil
+      const ta = document.getElementById('export-texto');
+      ta.select();
+      document.execCommand('copy');
+    }
+    const btn = document.getElementById('btn-copiar');
+    btn.classList.add('copiado');
+    btn.innerHTML = `✅ ¡Copiado!`;
+    setTimeout(() => {
+      btn.classList.remove('copiado');
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar todo`;
+    }, 2500);
+  }
+
   // ── MODAL FORM ────────────────────────────────────────────
   function abrirModal(idEdit) {
     document.getElementById('modal-titulo').textContent = idEdit ? 'Editar producto' : 'Nuevo producto';
@@ -542,7 +657,6 @@
     if (!p) return;
     document.getElementById('f-id').value = p.id;
     document.getElementById('f-nombre').value = p.name || '';
-    // Marca en select
     const marcaSel = document.getElementById('f-marca');
     const marcaOtra = document.getElementById('f-marca-otra');
     const opciones = [...marcaSel.options].map(o => o.value);
@@ -603,7 +717,6 @@
     if (id) {
       ({ error } = await sb.from('products').update(payload).eq('id', id));
     } else {
-      // Intentar obtener la sucursal del usuario
       const { data: profile } = await sb.from('profiles').select('branch_id').eq('id', currentUser.id).maybeSingle();
       if (profile?.branch_id) payload.branch_id = profile.branch_id;
       ({ error } = await sb.from('products').insert([payload]));
@@ -662,11 +775,9 @@
     const btn = document.querySelector('#overlay-stock .btn-guardar');
     btn.textContent = 'Guardando…'; btn.disabled = true;
 
-    // Actualizar stock en products
     const { error: errUpd } = await sb.from('products').update({ stock_current: stockTemp, updated_at: new Date().toISOString() }).eq('id', id);
     if (errUpd) { alert('Error: ' + errUpd.message); btn.textContent='✅ Confirmar ajuste'; btn.disabled=false; return; }
 
-    // Registrar movimiento
     const p = productos.find(x => x.id === id);
     await sb.from('stock_movements').insert([{
       product_id:     id,
