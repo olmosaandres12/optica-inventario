@@ -9,12 +9,13 @@
   <meta name="apple-mobile-web-app-title" content="Inventario" />
   <meta name="theme-color" content="#034295" />
   <link rel="manifest" href="manifest.json" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Olvisión Inventario — Productos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
+    * { touch-action: manipulation; }
     .btn-salir {
       width: 100%; background: rgba(255,255,255,0.1); border: none; border-radius: 10px;
       color: rgba(255,255,255,0.7); font-family: 'Nunito', sans-serif; font-size: 13px;
@@ -248,7 +249,7 @@
     <div class="campos-2">
       <div class="campo" style="grid-column:1/-1">
         <label>Nombre (se completa automáticamente)</label>
-        <input type="text" id="f-nombre" placeholder="Se genera con Marca + Código…" style="background:#f8fafc;color:#64748b" readonly />
+        <input type="text" id="f-nombre" placeholder="Se genera con Marca + Código, o escribí directamente…" />
       </div>
       <div class="campo"><label>Marca</label>
         <select id="f-marca" onchange="onMarcaChange()" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none">
