@@ -73,26 +73,26 @@
     .dup-badge { display:inline-flex; align-items:center; gap:4px; background:#f3e8ff; color:#7c3aed; font-size:10px; font-weight:800; padding:2px 7px; border-radius:20px; margin-left:6px; }
 
     /* ── VISTA CATÁLOGO (cuando hay zona seleccionada) ── */
-    .lista.catalogo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .lista.catalogo .prod-card { border-left: none !important; border-radius: 16px; }
-    .lista.catalogo .prod-header { flex-direction: column; align-items: stretch; padding: 0; gap: 0; }
-    .lista.catalogo .prod-foto-wrap {
-      width: 100%; aspect-ratio: 1; overflow: hidden;
-      background: #f8fafc; border-radius: 16px 16px 0 0;
+    .lista.catalogo { display: flex; flex-direction: column; gap: 10px; }
+    .lista.catalogo .prod-card { border-radius: 16px; }
+    .lista.catalogo .prod-header { flex-direction: row; align-items: center; padding: 12px 14px; gap: 14px; }
+    .lista.catalogo .prod-foto-zona {
+      width: 72px; height: 72px; border-radius: 12px; overflow: hidden;
+      flex-shrink: 0; background: #f8fafc;
       display: flex; align-items: center; justify-content: center;
+      border: 1px solid #e2e8f0;
     }
-    .lista.catalogo .prod-foto-wrap img { width: 100%; height: 100%; object-fit: contain; padding: 8px; box-sizing: border-box; }
-    .lista.catalogo .prod-foto-emoji { font-size: 36px; }
-    .lista.catalogo .prod-info-cat {
-      padding: 10px 12px 12px;
-    }
-    .lista.catalogo .prod-nombre-cat { font-size: 13px; font-weight: 800; color: #1e293b; line-height: 1.3; margin-bottom: 4px; }
-    .lista.catalogo .prod-sku-cat { font-size: 11px; font-family: monospace; font-weight: 800; color: var(--gris); }
+    .lista.catalogo .prod-foto-zona img { width: 100%; height: 100%; object-fit: contain; padding: 4px; box-sizing: border-box; }
+    .lista.catalogo .prod-foto-emoji { font-size: 28px; }
+    .lista.catalogo .prod-info-cat { flex: 1; min-width: 0; }
+    .lista.catalogo .prod-nombre-cat { font-size: 14px; font-weight: 800; color: #1e293b; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lista.catalogo .prod-sub-cat { font-size: 11px; color: var(--gris); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .lista.catalogo .prod-stock-cat { margin-top: 6px; }
-    .lista.catalogo .prod-right { display: none; }
+    /* Ocultar elementos del modo lista normal en vista catálogo */
     .lista.catalogo .prod-icono { display: none; }
-    .lista.catalogo .prod-info { display: none; }
-    .lista.catalogo .prod-detalle { border-radius: 0 0 16px 16px; }
+    .lista.catalogo .prod-info  { display: none; }
+    .lista.catalogo .prod-right { display: none; }
+    .lista.catalogo .prod-right-cat { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
     .prod-info  { flex: 1; min-width: 0; }
     .prod-nombre { font-size: 15px; font-weight: 800; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .prod-sub    { font-size: 12px; color: var(--gris); margin-top: 2px; }
@@ -588,15 +588,20 @@
         ? `<div class="prod-icono" style="background:white;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.08)"><img src="${p.photo_url}" alt="${p.name}" /></div>`
         : `<div class="prod-icono" style="background:${iconoBg}">${icono}</div>`;
 
-      // Cabecera catálogo (visible solo en vista zona)
+      // Cabecera catálogo (horizontal: foto izq + info der)
       const catHeader = `
-        <div class="prod-foto-wrap" style="background:${p.photo_url?'white':iconoBg}">
-          ${p.photo_url ? `<img src="${p.photo_url}" alt="${p.name}" />` : `<span class="prod-foto-emoji">${icono}</span>`}
+        <div class="prod-foto-zona">
+          ${p.photo_url
+            ? `<img src="${p.photo_url}" alt="${p.name}" />`
+            : `<span class="prod-foto-emoji">${icono}</span>`}
         </div>
         <div class="prod-info-cat">
           <div class="prod-nombre-cat">${nombreCompleto||'(sin nombre)'}${dupBadge}</div>
-          ${p.sku ? `<div class="prod-sku-cat">${p.sku}</div>` : ''}
-          <div class="prod-stock-cat"><span class="stock-badge ${sc}" style="font-size:11px;padding:3px 8px">${stockLabel}</span></div>
+          <div class="prod-sub-cat">${[p.material, p.sku ? `#${p.sku}` : ''].filter(Boolean).join(' · ')}</div>
+          <div class="prod-stock-cat"><span class="stock-badge ${sc}" style="font-size:11px;padding:3px 9px">${stockLabel}</span></div>
+        </div>
+        <div class="prod-right-cat">
+          <span style="font-size:13px;color:var(--gris);transform:rotate(${abierto?'180':'0'}deg);display:inline-block;transition:transform 0.2s">▾</span>
         </div>`;
 
       return `
