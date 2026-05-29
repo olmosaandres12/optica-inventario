@@ -693,14 +693,31 @@
 
   async function subirFotoStorage(productoId) {
     if (!fotoBlob) return null;
-    const ext      = 'png';
-    const fileName = `${productoId}.${ext}`;
-    const { error } = await sb.storage
+    const fileName = `${productoId}.png`;
+    // Intentar subir
+    const { data: upData, error: upError } = await sb.storage
       .from('product-photos')
       .upload(fileName, fotoBlob, { contentType: 'image/png', upsert: true });
-    if (error) { console.error('Error subiendo foto:', error); return null; }
+
+    if (upError) {
+      console.error('Upload error:', upError);
+      // Si ya existe, intentar eliminar y volver a subir
+      if (upError.statusCode === '409' || upError.message?.includes('already exists')) {
+        await sb.storage.from('product-photos').remove([fileName]);
+        const { error: retry } = await sb.storage
+          .from('product-photos')
+          .upload(fileName, fotoBlob, { contentType: 'image/png' });
+        if (retry) {
+          alert('⚠️ No se pudo subir la foto: ' + retry.message + '\n\nEl producto se guardó sin foto.');
+          return null;
+        }
+      } else {
+        alert('⚠️ No se pudo subir la foto: ' + upError.message + '\n\nEl producto se guardó sin foto.');
+        return null;
+      }
+    }
     const { data } = sb.storage.from('product-photos').getPublicUrl(fileName);
-    return data.publicUrl;
+    return data.publicUrl + '?t=' + Date.now(); // cache bust
   }
 
   // ── MODAL FORM ────────────────────────────────────────────
@@ -824,16 +841,26 @@
 
     let error;
     if (id) {
+      // EDITAR: subir foto si hay nueva
+      if (fotoBlob) {
+        btn.textContent = '📷 Subiendo foto…';
+        photoUrl = await subirFotoStorage(id);
+      }
+      payload.photo_url = photoUrl;
       ({ error } = await sb.from('products').update(payload).eq('id', id));
     } else {
+      // NUEVO: insertar sin foto primero, luego subir con el ID real
+      payload.photo_url = null;
       const { data: profile } = await sb.from('profiles').select('branch_id').eq('id', currentUser.id).maybeSingle();
       if (profile?.branch_id) payload.branch_id = profile.branch_id;
       const { data: nuevo, error: errIns } = await sb.from('products').insert([payload]).select().single();
       error = errIns;
-      // Si había foto con id temporal, re-subir con el id real
-      if (!error && nuevo && fotoBlob && photoUrl && photoUrl.includes('tmp_')) {
-        const urlReal = await subirFotoStorage(nuevo.id);
-        if (urlReal) await sb.from('products').update({ photo_url: urlReal }).eq('id', nuevo.id);
+      if (!error && nuevo && fotoBlob) {
+        btn.textContent = '📷 Subiendo foto…';
+        const urlFoto = await subirFotoStorage(nuevo.id);
+        if (urlFoto) {
+          await sb.from('products').update({ photo_url: urlFoto }).eq('id', nuevo.id);
+        }
       }
     }
 
