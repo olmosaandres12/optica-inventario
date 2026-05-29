@@ -67,8 +67,32 @@
     .prod-card.cero { border-left-color: var(--rojo); }
 
     .prod-header { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; cursor: pointer; }
-    .prod-icono  { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; overflow: hidden; }
+    .prod-icono  { width: 54px; height: 54px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; overflow: hidden; }
     .prod-icono img { width: 100%; height: 100%; object-fit: contain; background: white; }
+    .prod-card.duplicado { border-left-color: #a855f7 !important; }
+    .dup-badge { display:inline-flex; align-items:center; gap:4px; background:#f3e8ff; color:#7c3aed; font-size:10px; font-weight:800; padding:2px 7px; border-radius:20px; margin-left:6px; }
+
+    /* ── VISTA CATÁLOGO (cuando hay zona seleccionada) ── */
+    .lista.catalogo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .lista.catalogo .prod-card { border-left: none !important; border-radius: 16px; }
+    .lista.catalogo .prod-header { flex-direction: column; align-items: stretch; padding: 0; gap: 0; }
+    .lista.catalogo .prod-foto-wrap {
+      width: 100%; aspect-ratio: 1; overflow: hidden;
+      background: #f8fafc; border-radius: 16px 16px 0 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lista.catalogo .prod-foto-wrap img { width: 100%; height: 100%; object-fit: contain; padding: 8px; box-sizing: border-box; }
+    .lista.catalogo .prod-foto-emoji { font-size: 36px; }
+    .lista.catalogo .prod-info-cat {
+      padding: 10px 12px 12px;
+    }
+    .lista.catalogo .prod-nombre-cat { font-size: 13px; font-weight: 800; color: #1e293b; line-height: 1.3; margin-bottom: 4px; }
+    .lista.catalogo .prod-sku-cat { font-size: 11px; font-family: monospace; font-weight: 800; color: var(--gris); }
+    .lista.catalogo .prod-stock-cat { margin-top: 6px; }
+    .lista.catalogo .prod-right { display: none; }
+    .lista.catalogo .prod-icono { display: none; }
+    .lista.catalogo .prod-info { display: none; }
+    .lista.catalogo .prod-detalle { border-radius: 0 0 16px 16px; }
     .prod-info  { flex: 1; min-width: 0; }
     .prod-nombre { font-size: 15px; font-weight: 800; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .prod-sub    { font-size: 12px; color: var(--gris); margin-top: 2px; }
@@ -221,6 +245,12 @@
           <button class="filtro-chip" onclick="setFiltroStock(this,'cero')">⚠️ Sin stock</button>
           <button class="filtro-chip" onclick="setFiltroStock(this,'bajo')">🟡 Stock bajo</button>
           <button class="filtro-chip" onclick="setFiltroStock(this,'ok')">🟢 En stock</button>
+        </div>
+        <div class="filtros" id="filtros-zona">
+          <!-- se genera dinámicamente con las zonas que tienen productos -->
+        </div>
+        <div class="filtros">
+          <button class="filtro-chip" id="chip-dup" onclick="setFiltroEspecial(this,'duplicados')">🔴 Duplicados</button>
         </div>
       </div>
 
@@ -437,8 +467,32 @@
   );
 
   // ── ESTADO ────────────────────────────────────────────────
-  let productos = [], categoriaActiva = '', stockFiltro = '', prodAbierto = null;
-  let fotoBlob = null; // blob de la foto procesada pendiente de subir
+  let productos = [], categoriaActiva = '', stockFiltro = '', zonaFiltro = '', especialFiltro = '', prodAbierto = null;
+  let fotoBlob = null;
+  let idsDuplicados = new Set();
+
+  function detectarDuplicados() {
+    idsDuplicados = new Set();
+    // Por SKU
+    const skuMap = {};
+    productos.forEach(p => { if (p.sku) { if (!skuMap[p.sku.toLowerCase()]) skuMap[p.sku.toLowerCase()] = []; skuMap[p.sku.toLowerCase()].push(p.id); } });
+    Object.values(skuMap).forEach(ids => { if (ids.length > 1) ids.forEach(id => idsDuplicados.add(id)); });
+    // Por nombre exacto
+    const nameMap = {};
+    productos.forEach(p => { if (p.name) { const k = p.name.toLowerCase().trim(); if (!nameMap[k]) nameMap[k] = []; nameMap[k].push(p.id); } });
+    Object.values(nameMap).forEach(ids => { if (ids.length > 1) ids.forEach(id => idsDuplicados.add(id)); });
+    // Actualizar badge del chip
+    const chip = document.getElementById('chip-dup');
+    if (chip) chip.textContent = `🔴 Duplicados${idsDuplicados.size ? ` (${idsDuplicados.size})` : ''}`;
+  }
+
+  function renderFiltrosZona() {
+    const zonas = [...new Set(productos.map(p => p.zona).filter(Boolean))].sort();
+    const cont = document.getElementById('filtros-zona');
+    if (!zonas.length) { cont.innerHTML = ''; return; }
+    cont.innerHTML = `<button class="filtro-chip activo" onclick="setFiltroZona(this,'')">Todas las zonas</button>` +
+      zonas.map(z => `<button class="filtro-chip" onclick="setFiltroZona(this,'${z}')">${ZONA_LABELS[z]||z}</button>`).join('');
+  }
 
   // ── HELPERS ───────────────────────────────────────────────
   const CAT_LABELS  = { armazon_receta:'Armazón receta', armazon_sol:'Armazón sol', lentes_oftalmicos:'Oftálmicos', lentes_contacto:'Contacto', accesorios:'Accesorios', soluciones:'Soluciones', otro:'Otro' };
@@ -458,6 +512,8 @@
     const { data, error } = await sb.from('products').select('*').eq('active', true).order('name');
     if (error) { console.error(error); return; }
     productos = data || [];
+    detectarDuplicados();
+    renderFiltrosZona();
     actualizarStats();
     renderLista();
     document.getElementById('nav-sub').textContent = `${productos.length} productos activos`;
@@ -478,19 +534,34 @@
     document.querySelectorAll('#filtros-stock .filtro-chip').forEach(b => b.classList.remove('activo'));
     btn.classList.add('activo'); stockFiltro = tipo; aplicarFiltros();
   }
+  function setFiltroZona(btn, zona) {
+    document.querySelectorAll('#filtros-zona .filtro-chip').forEach(b => b.classList.remove('activo'));
+    btn.classList.add('activo'); zonaFiltro = zona; aplicarFiltros();
+  }
+  function setFiltroEspecial(btn, tipo) {
+    const yaActivo = btn.classList.contains('activo');
+    document.getElementById('chip-dup')?.classList.remove('activo');
+    especialFiltro = yaActivo ? '' : tipo;
+    if (!yaActivo) btn.classList.add('activo');
+    aplicarFiltros();
+  }
   function aplicarFiltros() {
     const q = document.getElementById('buscador').value.trim().toLowerCase();
     let lista = productos;
-    if (categoriaActiva) lista = lista.filter(p => p.category === categoriaActiva);
+    if (categoriaActiva)        lista = lista.filter(p => p.category === categoriaActiva);
+    if (zonaFiltro)             lista = lista.filter(p => p.zona === zonaFiltro);
     if (stockFiltro === 'cero') lista = lista.filter(p => p.stock_current <= 0);
     if (stockFiltro === 'bajo') lista = lista.filter(p => p.stock_current > 0 && p.stock_min > 0 && p.stock_current <= p.stock_min);
     if (stockFiltro === 'ok')   lista = lista.filter(p => p.stock_current > 0 && (!p.stock_min || p.stock_current > p.stock_min));
+    if (especialFiltro === 'duplicados') lista = lista.filter(p => idsDuplicados.has(p.id));
     if (q) lista = lista.filter(p => (p.name||'').toLowerCase().includes(q) || (p.brand||'').toLowerCase().includes(q) || (p.sku||'').toLowerCase().includes(q));
     const resDiv = document.getElementById('resultado-txt');
-    if (q || categoriaActiva || stockFiltro) {
+    if (q || categoriaActiva || stockFiltro || zonaFiltro || especialFiltro) {
       resDiv.innerHTML = `Mostrando <span>${lista.length}</span> de ${productos.length} productos`;
       resDiv.classList.add('vis');
     } else { resDiv.classList.remove('vis'); }
+    // Vista catálogo cuando hay zona seleccionada
+    document.getElementById('lista').classList.toggle('catalogo', !!zonaFiltro);
     renderLista(lista);
   }
 
@@ -506,23 +577,36 @@
       const sc = getStockClase(p);
       const icono    = CAT_ICONOS[p.category]  || '📦';
       const iconoBg  = CAT_COLORES[p.category] || '#f8fafc';
+      const esDup    = idsDuplicados.has(p.id);
       const nombreCompleto = [p.brand, p.name].filter(Boolean).join(' · ');
       const subInfo = [CAT_LABELS[p.category], p.material, p.subcategory].filter(Boolean).join(' · ');
       const stockLabel = p.stock_current <= 0 ? '⚠️ Sin stock' : `${p.stock_current} u.`;
       const abierto = prodAbierto === p.id;
+      const dupBadge = esDup ? `<span class="dup-badge">⚠️ DUPLICADO</span>` : '';
 
-      // Si tiene foto, mostrarla; si no, emoji de categoría
       const iconoHtml = p.photo_url
-        ? `<div class="prod-icono" style="background:white;border:1px solid #f1f5f9"><img src="${p.photo_url}" alt="${p.name}" /></div>`
+        ? `<div class="prod-icono" style="background:white;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.08)"><img src="${p.photo_url}" alt="${p.name}" /></div>`
         : `<div class="prod-icono" style="background:${iconoBg}">${icono}</div>`;
 
+      // Cabecera catálogo (visible solo en vista zona)
+      const catHeader = `
+        <div class="prod-foto-wrap" style="background:${p.photo_url?'white':iconoBg}">
+          ${p.photo_url ? `<img src="${p.photo_url}" alt="${p.name}" />` : `<span class="prod-foto-emoji">${icono}</span>`}
+        </div>
+        <div class="prod-info-cat">
+          <div class="prod-nombre-cat">${nombreCompleto||'(sin nombre)'}${dupBadge}</div>
+          ${p.sku ? `<div class="prod-sku-cat">${p.sku}</div>` : ''}
+          <div class="prod-stock-cat"><span class="stock-badge ${sc}" style="font-size:11px;padding:3px 8px">${stockLabel}</span></div>
+        </div>`;
+
       return `
-        <div class="prod-card ${sc}" id="card-${p.id}">
+        <div class="prod-card ${sc}${esDup?' duplicado':''}" id="card-${p.id}">
           <div class="prod-header" onclick="toggleDetalle('${p.id}')">
+            ${catHeader}
             ${iconoHtml}
             <div class="prod-info">
-              <div class="prod-nombre">${nombreCompleto || '(sin nombre)'}</div>
-              <div class="prod-sub">${subInfo || '—'}${p.sku ? ` · <span style="font-family:monospace;font-weight:800">${p.sku}</span>` : ''}</div>
+              <div class="prod-nombre">${nombreCompleto || '(sin nombre)'}${dupBadge}</div>
+              <div class="prod-sub">${subInfo || '—'}${p.sku ? ` · <span style="font-family:monospace;font-weight:800">${p.sku}</span>` : ''}${p.zona ? ` · ${ZONA_LABELS[p.zona]||p.zona}` : ''}</div>
             </div>
             <div class="prod-right">
               <span class="stock-badge ${sc}">${stockLabel}</span>
@@ -697,7 +781,19 @@
     const btn = document.getElementById('btn-guardar-prod');
     btn.disabled = true;
 
-    // Subir foto si hay una nueva
+    // ── Validar duplicados ────────────────────────────────
+    const sku    = document.getElementById('f-sku').value.trim().toLowerCase();
+    const dupSKU = sku && productos.find(p => p.id !== id && p.sku && p.sku.toLowerCase() === sku);
+    if (dupSKU) {
+      alert(`⚠️ Ya existe un producto con el SKU "${sku.toUpperCase()}"\n→ ${dupSKU.name||dupSKU.brand||'(sin nombre)'}`);
+      btn.disabled = false; return;
+    }
+    const dupNombre = productos.find(p => p.id !== id && p.name && p.name.toLowerCase().trim() === nombre.toLowerCase().trim());
+    if (dupNombre) {
+      if (!confirm(`⚠️ Ya existe un producto con ese nombre:\n"${dupNombre.name}"\n\n¿Querés guardarlo igual?`)) {
+        btn.disabled = false; return;
+      }
+    }
     let photoUrl = document.getElementById('f-photo-url').value || null;
     if (fotoBlob) {
       btn.textContent = '📷 Subiendo foto…';
