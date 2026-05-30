@@ -330,7 +330,7 @@
           <option value="otro">📦 Otro</option>
         </select>
       </div>
-      <div class="campo"><label>Zona</label>
+      <div class="campo"><label>Zona *</label>
         <select id="f-zona">
           <option value="">Sin zona</option>
           <option value="exhibidor_1">🗄 Exhibidor 1</option>
@@ -540,15 +540,17 @@
     productos = data || [];
     detectarDuplicados();
     renderFiltrosZona();
-    actualizarStats();
+    actualizarStats(productos);
     renderLista();
     document.getElementById('nav-sub').textContent = `${productos.length} productos activos`;
   }
 
-  function actualizarStats() {
-    document.getElementById('st-total').textContent = productos.length;
-    document.getElementById('st-cero').textContent = productos.filter(p => p.stock_current <= 0).length;
-    document.getElementById('st-bajo').textContent = productos.filter(p => p.stock_current > 0 && p.stock_min > 0 && p.stock_current <= p.stock_min).length;
+  function actualizarStats(lista) {
+    // Si hay filtro activo, mostrar stats de la lista filtrada
+    const base = lista || productos;
+    document.getElementById('st-total').textContent = base.length;
+    document.getElementById('st-cero').textContent = base.filter(p => p.stock_current <= 0).length;
+    document.getElementById('st-bajo').textContent = base.filter(p => p.stock_current > 0 && p.stock_min > 0 && p.stock_current <= p.stock_min).length;
   }
 
   // ── FILTROS ───────────────────────────────────────────────
@@ -583,9 +585,14 @@
     if (q) lista = lista.filter(p => (p.name||'').toLowerCase().includes(q) || (p.brand||'').toLowerCase().includes(q) || (p.sku||'').toLowerCase().includes(q));
     const resDiv = document.getElementById('resultado-txt');
     if (q || categoriaActiva || stockFiltro || zonaFiltro || especialFiltro) {
-      resDiv.innerHTML = `Mostrando <span>${lista.length}</span> de ${productos.length} productos`;
+      const zonaLabel = zonaFiltro ? ` en ${ZONA_LABELS[zonaFiltro]||zonaFiltro}` : '';
+      resDiv.innerHTML = `<span>${lista.length}</span> producto${lista.length!==1?'s':''} encontrado${lista.length!==1?'s':''}${zonaLabel}`;
       resDiv.classList.add('vis');
-    } else { resDiv.classList.remove('vis'); }
+      actualizarStats(lista); // stats reflejan el filtro activo
+    } else {
+      resDiv.classList.remove('vis');
+      actualizarStats(productos); // stats globales
+    }
     // Vista catálogo cuando hay zona seleccionada
     document.getElementById('lista').classList.toggle('catalogo', !!zonaFiltro);
     renderLista(lista);
@@ -858,6 +865,8 @@
     const cat    = document.getElementById('f-categoria').value;
     if (!nombre) { alert('El nombre es obligatorio'); return; }
     if (!cat)    { alert('Seleccioná una categoría'); return; }
+    const zona = document.getElementById('f-zona').value;
+    if (!zona)   { alert('Seleccioná una zona'); return; }
 
     const btn = document.getElementById('btn-guardar-prod');
     btn.disabled = true;
