@@ -264,6 +264,7 @@
           <button class="filtro-chip" onclick="setFiltroCategoria(this,'lentes_contacto')">👁 Contacto</button>
           <button class="filtro-chip" onclick="setFiltroCategoria(this,'accesorios')">🎀 Accesorios</button>
           <button class="filtro-chip" onclick="setFiltroCategoria(this,'soluciones')">💧 Soluciones</button>
+          <button class="filtro-chip" onclick="setFiltroCategoria(this,'clipon')">🔗 Clipón</button>
           <button class="filtro-chip" onclick="setFiltroCategoria(this,'otro')">📦 Otro</button>
         </div>
         <div class="filtros" id="filtros-stock">
@@ -327,6 +328,7 @@
           <option value="lentes_contacto">👁 Lentes de contacto</option>
           <option value="accesorios">🎀 Accesorios</option>
           <option value="soluciones">💧 Soluciones</option>
+          <option value="clipon">🔗 Clipón</option>
           <option value="otro">📦 Otro</option>
         </select>
       </div>
@@ -521,14 +523,14 @@
   }
 
   // ── HELPERS ───────────────────────────────────────────────
-  const CAT_LABELS  = { armazon_receta:'Armazón receta', armazon_sol:'Armazón sol', lentes_oftalmicos:'Oftálmicos', lentes_contacto:'Contacto', accesorios:'Accesorios', soluciones:'Soluciones', otro:'Otro' };
-  const CAT_ICONOS  = { armazon_receta:'🕶', armazon_sol:'☀️', lentes_oftalmicos:'🔬', lentes_contacto:'👁', accesorios:'🎀', soluciones:'💧', otro:'📦' };
-  const CAT_COLORES = { armazon_receta:'#eff6ff', armazon_sol:'#fffbeb', lentes_oftalmicos:'#f0fdf4', lentes_contacto:'#faf5ff', accesorios:'#fdf2f8', soluciones:'#ecfeff', otro:'#f8fafc' };
+  const CAT_LABELS  = { armazon_receta:'Armazón receta', armazon_sol:'Armazón sol', lentes_oftalmicos:'Oftálmicos', lentes_contacto:'Contacto', accesorios:'Accesorios', soluciones:'Soluciones', clipon:'Clipón', otro:'Otro' };
+  const CAT_ICONOS  = { armazon_receta:'🕶', armazon_sol:'☀️', lentes_oftalmicos:'🔬', lentes_contacto:'👁', accesorios:'🎀', soluciones:'💧', clipon:'🔗', otro:'📦' };
+  const CAT_COLORES = { armazon_receta:'#eff6ff', armazon_sol:'#fffbeb', lentes_oftalmicos:'#f0fdf4', lentes_contacto:'#faf5ff', accesorios:'#fdf2f8', soluciones:'#ecfeff', clipon:'#f0f9ff', otro:'#f8fafc' };
   const ZONA_LABELS = { exhibidor_1:'🗄 Exhibidor 1', exhibidor_2:'🗄 Exhibidor 2', exhibidor_3:'🗄 Exhibidor 3', vidriera_1:'🪟 Vidriera 1', vidriera_2:'🪟 Vidriera 2', vidriera_3:'🪟 Vidriera 3', vidriera_4:'🪟 Vidriera 4', cajonera_1:'🗃 Cajonera 1', cajonera_2:'🗃 Cajonera 2' };
 
   function getStockClase(p) {
     if (p.stock_current <= 0) return 'cero';
-    if (p.stock_min > 0 && p.stock_current <= p.stock_min) return 'bajo';
+    if (p.stock_min > 0 && p.stock_current < p.stock_min) return 'bajo';
     return 'ok';
   }
   function fmtPesos(n) { return (!n || isNaN(n)) ? '—' : '$' + Math.round(n).toLocaleString('es-AR'); }
@@ -558,7 +560,7 @@
       if (totalLabel) totalLabel.textContent = 'Total';
     }
     document.getElementById('st-cero').textContent = base.filter(p => p.stock_current <= 0).length;
-    document.getElementById('st-bajo').textContent = base.filter(p => p.stock_current > 0 && p.stock_min > 0 && p.stock_current <= p.stock_min).length;
+    document.getElementById('st-bajo').textContent = base.filter(p => p.stock_current > 0 && p.stock_min > 0 && p.stock_current < p.stock_min).length;
   }
 
   // ── FILTROS ───────────────────────────────────────────────
@@ -587,7 +589,7 @@
     if (categoriaActiva)        lista = lista.filter(p => p.category === categoriaActiva);
     if (zonaFiltro)             lista = lista.filter(p => p.zona === zonaFiltro);
     if (stockFiltro === 'cero') lista = lista.filter(p => p.stock_current <= 0);
-    if (stockFiltro === 'bajo') lista = lista.filter(p => p.stock_current > 0 && p.stock_min > 0 && p.stock_current <= p.stock_min);
+    if (stockFiltro === 'bajo') lista = lista.filter(p => p.stock_current > 0 && p.stock_min > 0 && p.stock_current < p.stock_min);
     if (stockFiltro === 'ok')   lista = lista.filter(p => p.stock_current > 0 && (!p.stock_min || p.stock_current > p.stock_min));
     if (especialFiltro === 'duplicados') lista = lista.filter(p => idsDuplicados.has(p.id));
     if (q) lista = lista.filter(p => (p.name||'').toLowerCase().includes(q) || (p.brand||'').toLowerCase().includes(q) || (p.sku||'').toLowerCase().includes(q));
@@ -619,7 +621,7 @@
     }
 
     // Orden de categorías para agrupar
-    const CAT_ORDER = ['armazon_receta','armazon_sol','lentes_oftalmicos','lentes_contacto','accesorios','soluciones','otro'];
+    const CAT_ORDER = ['armazon_receta','armazon_sol','lentes_oftalmicos','lentes_contacto','accesorios','soluciones','clipon','otro'];
 
     // Mostrar headers agrupados SOLO cuando no hay ningún filtro activo
     const q2 = document.getElementById('buscador').value.trim();
@@ -996,7 +998,7 @@
   }
 
   // ── EXPORTAR OPTIGEST ─────────────────────────────────────
-  const CAT_EXPORT = { armazon_receta:'Armazon receta', armazon_sol:'Armazon sol', lentes_oftalmicos:'Lentes oftalmicos', lentes_contacto:'Lentes de contacto', accesorios:'Accesorios', soluciones:'Soluciones', otro:'Otro' };
+  const CAT_EXPORT = { armazon_receta:'Armazon receta', armazon_sol:'Armazon sol', lentes_oftalmicos:'Lentes oftalmicos', lentes_contacto:'Lentes de contacto', accesorios:'Accesorios', soluciones:'Soluciones', clipon:'Clipon', otro:'Otro' };
   function fmtFechaOG(f) { if(!f) return ''; try { const d=new Date(f); if(isNaN(d)) return ''; return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`; } catch{return '';} }
   function buildDetalles(p) {
     const pts=[];
