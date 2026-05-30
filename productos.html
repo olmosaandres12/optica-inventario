@@ -77,6 +77,27 @@
     .lista:not(.catalogo) .prod-info-cat  { display: none; }
     .lista:not(.catalogo) .prod-right-cat { display: none; }
 
+    /* ── SEPARADOR DE CATEGORÍA ── */
+    .cat-seccion-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 4px 8px; margin-top: 6px;
+    }
+    .cat-seccion-header:first-child { margin-top: 0; }
+    .cat-seccion-icono {
+      width: 30px; height: 30px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; flex-shrink: 0;
+    }
+    .cat-seccion-titulo {
+      font-size: 12px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.6px; color: var(--gris); flex: 1;
+    }
+    .cat-seccion-count {
+      font-size: 11px; font-weight: 800; color: white;
+      background: var(--azul); border-radius: 20px;
+      padding: 2px 8px;
+    }
+
     /* ── VISTA CATÁLOGO (cuando hay zona seleccionada) ── */
     .lista.catalogo { display: flex; flex-direction: column; gap: 10px; }
     .lista.catalogo .prod-card { border-radius: 16px; }
@@ -514,7 +535,7 @@
 
   // ── CARGA ─────────────────────────────────────────────────
   async function cargar() {
-    const { data, error } = await sb.from('products').select('*').eq('active', true).order('name');
+    const { data, error } = await sb.from('products').select('*').eq('active', true).order('created_at', { ascending: true });
     if (error) { console.error(error); return; }
     productos = data || [];
     detectarDuplicados();
@@ -578,11 +599,18 @@
       cont.innerHTML = `<div class="empty"><div class="empty-icono">🔍</div>${productos.length === 0 ? 'Aún no hay productos.<br>Tocá "Agregar producto" para empezar.' : 'Sin resultados para este filtro.'}</div>`;
       return;
     }
-    cont.innerHTML = lista.map(p => {
+
+    // Orden de categorías para agrupar
+    const CAT_ORDER = ['armazon_receta','armazon_sol','lentes_oftalmicos','lentes_contacto','accesorios','soluciones','otro'];
+
+    // Si hay filtro de categoría activo → sin headers, igual respeta orden de carga
+    const mostrarHeaders = !categoriaActiva && !zonaFiltro && !especialFiltro;
+
+    function renderCard(p) {
       const sc = getStockClase(p);
-      const icono    = CAT_ICONOS[p.category]  || '📦';
-      const iconoBg  = CAT_COLORES[p.category] || '#f8fafc';
-      const esDup    = idsDuplicados.has(p.id);
+      const icono   = CAT_ICONOS[p.category]  || '📦';
+      const iconoBg = CAT_COLORES[p.category] || '#f8fafc';
+      const esDup   = idsDuplicados.has(p.id);
       const nombreCompleto = [p.brand, p.name].filter(Boolean).join(' · ');
       const subInfo = [CAT_LABELS[p.category], p.material, p.subcategory].filter(Boolean).join(' · ');
       const stockLabel = p.stock_current <= 0 ? '⚠️ Sin stock' : `${p.stock_current} u.`;
@@ -593,12 +621,9 @@
         ? `<div class="prod-icono" style="background:white;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.08)"><img src="${p.photo_url}" alt="${p.name}" /></div>`
         : `<div class="prod-icono" style="background:${iconoBg}">${icono}</div>`;
 
-      // Cabecera catálogo (horizontal: foto izq + info der)
       const catHeader = `
         <div class="prod-foto-zona">
-          ${p.photo_url
-            ? `<img src="${p.photo_url}" alt="${p.name}" />`
-            : `<span class="prod-foto-emoji">${icono}</span>`}
+          ${p.photo_url ? `<img src="${p.photo_url}" alt="${p.name}" />` : `<span class="prod-foto-emoji">${icono}</span>`}
         </div>
         <div class="prod-info-cat">
           <div class="prod-nombre-cat">${nombreCompleto||'(sin nombre)'}${dupBadge}</div>
@@ -640,7 +665,35 @@
             </div>
           </div>
         </div>`;
-    }).join('');
+    }
+
+    if (mostrarHeaders) {
+      // Agrupar por categoría respetando el orden de carga dentro de cada grupo
+      const grupos = {};
+      lista.forEach(p => {
+        const cat = p.category || 'otro';
+        if (!grupos[cat]) grupos[cat] = [];
+        grupos[cat].push(p);
+      });
+
+      const html = CAT_ORDER
+        .filter(cat => grupos[cat]?.length)
+        .map(cat => {
+          const items = grupos[cat];
+          const header = `
+            <div class="cat-seccion-header">
+              <div class="cat-seccion-icono" style="background:${CAT_COLORES[cat]||'#f8fafc'}">${CAT_ICONOS[cat]||'📦'}</div>
+              <div class="cat-seccion-titulo">${CAT_LABELS[cat]||cat}</div>
+              <div class="cat-seccion-count">${items.length}</div>
+            </div>`;
+          return header + items.map(renderCard).join('');
+        }).join('');
+
+      cont.innerHTML = html;
+    } else {
+      // Con filtro activo → lista plana en orden de carga
+      cont.innerHTML = lista.map(renderCard).join('');
+    }
   }
 
   function toggleDetalle(id) { prodAbierto = prodAbierto === id ? null : id; aplicarFiltros(); }
