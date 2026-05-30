@@ -546,9 +546,17 @@
   }
 
   function actualizarStats(lista) {
-    // Si hay filtro activo, mostrar stats de la lista filtrada
     const base = lista || productos;
-    document.getElementById('st-total').textContent = base.length;
+    const totalUnidades = base.reduce((s, p) => s + (p.stock_current || 0), 0);
+    // Si hay zona activa, mostrar unidades físicas en el card TOTAL
+    const totalLabel = document.querySelector('.stat-mini:first-child .stat-mini-lab');
+    if (zonaFiltro) {
+      document.getElementById('st-total').textContent = totalUnidades;
+      if (totalLabel) totalLabel.textContent = 'Unidades';
+    } else {
+      document.getElementById('st-total').textContent = base.length;
+      if (totalLabel) totalLabel.textContent = 'Total';
+    }
     document.getElementById('st-cero').textContent = base.filter(p => p.stock_current <= 0).length;
     document.getElementById('st-bajo').textContent = base.filter(p => p.stock_current > 0 && p.stock_min > 0 && p.stock_current <= p.stock_min).length;
   }
@@ -585,13 +593,16 @@
     if (q) lista = lista.filter(p => (p.name||'').toLowerCase().includes(q) || (p.brand||'').toLowerCase().includes(q) || (p.sku||'').toLowerCase().includes(q));
     const resDiv = document.getElementById('resultado-txt');
     if (q || categoriaActiva || stockFiltro || zonaFiltro || especialFiltro) {
+      const totalUnidades = lista.reduce((s, p) => s + (p.stock_current || 0), 0);
       const zonaLabel = zonaFiltro ? ` en ${ZONA_LABELS[zonaFiltro]||zonaFiltro}` : '';
-      resDiv.innerHTML = `<span>${lista.length}</span> producto${lista.length!==1?'s':''} encontrado${lista.length!==1?'s':''}${zonaLabel}`;
+      const unidadesExtra = zonaFiltro && totalUnidades !== lista.length
+        ? ` · <strong>${totalUnidades} unidades físicas</strong>` : '';
+      resDiv.innerHTML = `<span>${lista.length}</span> producto${lista.length!==1?'s':''}${zonaLabel}${unidadesExtra}`;
       resDiv.classList.add('vis');
-      actualizarStats(lista); // stats reflejan el filtro activo
+      actualizarStats(lista);
     } else {
       resDiv.classList.remove('vis');
-      actualizarStats(productos); // stats globales
+      actualizarStats(productos);
     }
     // Vista catálogo cuando hay zona seleccionada
     document.getElementById('lista').classList.toggle('catalogo', !!zonaFiltro);
