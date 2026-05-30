@@ -603,8 +603,9 @@
     // Orden de categorías para agrupar
     const CAT_ORDER = ['armazon_receta','armazon_sol','lentes_oftalmicos','lentes_contacto','accesorios','soluciones','otro'];
 
-    // Si hay filtro de categoría activo → sin headers, igual respeta orden de carga
-    const mostrarHeaders = !categoriaActiva && !zonaFiltro && !especialFiltro;
+    // Mostrar headers agrupados SOLO cuando no hay ningún filtro activo
+    const q2 = document.getElementById('buscador').value.trim();
+    const mostrarHeaders = !categoriaActiva && !zonaFiltro && !especialFiltro && !stockFiltro && !q2;
 
     function renderCard(p) {
       const sc = getStockClase(p);
