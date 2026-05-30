@@ -72,6 +72,11 @@
     .prod-card.duplicado { border-left-color: #a855f7 !important; }
     .dup-badge { display:inline-flex; align-items:center; gap:4px; background:#f3e8ff; color:#7c3aed; font-size:10px; font-weight:800; padding:2px 7px; border-radius:20px; margin-left:6px; }
 
+    /* Ocultar elementos catálogo en vista lista normal */
+    .lista:not(.catalogo) .prod-foto-zona { display: none; }
+    .lista:not(.catalogo) .prod-info-cat  { display: none; }
+    .lista:not(.catalogo) .prod-right-cat { display: none; }
+
     /* ── VISTA CATÁLOGO (cuando hay zona seleccionada) ── */
     .lista.catalogo { display: flex; flex-direction: column; gap: 10px; }
     .lista.catalogo .prod-card { border-radius: 16px; }
