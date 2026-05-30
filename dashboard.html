@@ -438,13 +438,13 @@
       const totalUnidades = products.reduce((s, p) => s + (p.stock_current || 0), 0);
       document.getElementById('totalUnidades').textContent = `${totalUnidades} unidades en stock`;
 
-      // ── Alertas: productos con stock_current <= stock_min (y stock_min definido > 0)
-      // Misma lógica que productos.html
+      // ── Alertas: stock_current < stock_min (estrictamente menor, no igual)
+      // Tener exactamente el mínimo = OK. Stock bajo = estar POR DEBAJO del mínimo.
       const sinStock = products.filter(p => (p.stock_current || 0) <= 0);
       const stockBajo = products.filter(p => {
         const cur = p.stock_current || 0;
         const min = p.stock_min || 0;
-        return cur > 0 && min > 0 && cur <= min;
+        return cur > 0 && min > 0 && cur < min;
       });
       const alertas = [...sinStock, ...stockBajo].sort((a,b) => (a.stock_current||0) - (b.stock_current||0));
 
