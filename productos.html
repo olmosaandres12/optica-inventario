@@ -212,90 +212,6 @@
     .btn-cambiar-foto { background: #f1f5f9; color: #64748b; border: none; border-radius: 8px; padding: 7px 12px; font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
     .btn-cambiar-foto:hover { background: #e2e8f0; }
 
-    /* ── MOBILE-SAFE OVERLAY para modales lente y líquido ── */
-    #overlay-lente,
-    #overlay-liquido {
-      position: fixed !important;
-      inset: 0 !important;
-      z-index: 9999 !important;
-      background: rgba(0,0,0,0.5) !important;
-      backdrop-filter: blur(3px) !important;
-      display: none;
-      align-items: flex-end !important;
-      justify-content: center !important;
-      overflow-y: auto !important;
-      -webkit-overflow-scrolling: touch !important;
-    }
-    #overlay-lente.vis,
-    #overlay-liquido.vis {
-      display: flex !important;
-    }
-    #overlay-lente .modal,
-    #overlay-liquido .modal {
-      width: 100% !important;
-      max-width: 520px !important;
-      max-height: 92dvh !important;
-      overflow-y: auto !important;
-      -webkit-overflow-scrolling: touch !important;
-      border-radius: 28px 28px 0 0 !important;
-      background: white !important;
-      padding: 24px 20px 40px !important;
-      box-sizing: border-box !important;
-      margin: 0 !important;
-      position: relative !important;
-    }
-    @media (min-width: 600px) {
-      #overlay-lente, #overlay-liquido { align-items: center !important; }
-      #overlay-lente .modal, #overlay-liquido .modal {
-        border-radius: 24px !important; margin: 20px !important; max-height: 88dvh !important;
-      }
-    }
-
-    #overlay-lente .modal-titulo,
-    #overlay-liquido .modal-titulo {
-      font-size: 18px; font-weight: 900; color: #1e293b;
-      margin-bottom: 20px; text-align: center;
-    }
-    #overlay-lente .campo,
-    #overlay-liquido .campo { margin-bottom: 14px; }
-    #overlay-lente .campo label,
-    #overlay-liquido .campo label {
-      display: block; font-size: 11px; font-weight: 700; color: #64748b;
-      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
-    }
-    #overlay-lente .campo input,
-    #overlay-lente .campo select,
-    #overlay-lente .campo textarea,
-    #overlay-liquido .campo input,
-    #overlay-liquido .campo select,
-    #overlay-liquido .campo textarea {
-      width: 100%; padding: 12px 14px; border: 1.5px solid #f1f5f9;
-      border-radius: 14px; font-family: 'Nunito', sans-serif; font-size: 14px;
-      font-weight: 600; color: #1e293b; background: white; outline: none;
-      box-sizing: border-box; transition: border-color 0.15s;
-    }
-    #overlay-lente .campo input:focus,
-    #overlay-lente .campo select:focus,
-    #overlay-liquido .campo input:focus,
-    #overlay-liquido .campo select:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-    #overlay-lente .campos-2,
-    #overlay-liquido .campos-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    #overlay-lente .btn-guardar,
-    #overlay-liquido .btn-guardar {
-      width: 100%; padding: 15px; border: none; border-radius: 14px;
-      background: linear-gradient(135deg, #034295, #2563eb); color: white;
-      font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 900;
-      cursor: pointer; margin-bottom: 10px; transition: opacity 0.15s;
-    }
-    #overlay-lente .btn-guardar:hover,
-    #overlay-liquido .btn-guardar:hover { opacity: 0.9; }
-    #overlay-lente .btn-cancelar,
-    #overlay-liquido .btn-cancelar {
-      width: 100%; padding: 13px; border: 1.5px solid #f1f5f9; border-radius: 14px;
-      background: white; color: #64748b; font-family: 'Nunito', sans-serif;
-      font-size: 14px; font-weight: 700; cursor: pointer;
-    }
-
     /* ── BANNER DE SECCIÓN ── */
     .seccion-banner {
       border-radius: 16px; padding: 14px 16px; margin-bottom: 16px;
@@ -652,7 +568,6 @@
     <div class="campo">
       <label>Nombre del producto <small style="font-weight:400;text-transform:none">(se completa automáticamente)</small></label>
       <input type="text" id="lq-nombre" placeholder="Se genera con Marca + Presentación…" />
-    </div>
     </div>
 
     <div class="campos-2">
