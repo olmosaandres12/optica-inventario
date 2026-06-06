@@ -16,13 +16,43 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { touch-action: manipulation; }
-    .btn-salir {
-      width: 100%; background: rgba(255,255,255,0.1); border: none; border-radius: 10px;
-      color: rgba(255,255,255,0.7); font-family: 'Nunito', sans-serif; font-size: 13px;
-      font-weight: 700; padding: 9px; cursor: pointer; transition: all 0.15s;
-    }
-    .btn-salir:hover { background: rgba(255,255,255,0.18); color: white; }
 
+    /* ── SIDEBAR SUB-ITEMS ── */
+    .sb-sub-nav { padding: 0 0 4px 0; }
+    .sb-sub-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 16px 8px 42px;
+      color: rgba(255,255,255,0.65); font-size: 13px; font-weight: 700;
+      border-radius: 10px; margin: 1px 8px; cursor: pointer;
+      text-decoration: none; transition: all 0.15s;
+      border-left: 2px solid transparent;
+    }
+    .sb-sub-item:hover { background: rgba(255,255,255,0.1); color: white; }
+    .sb-sub-item.activo {
+      background: rgba(255,255,255,0.15); color: white;
+      border-left-color: #f9f4ab;
+    }
+    .sb-sub-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+    /* ── SECTION TABS (móvil) ── */
+    .section-tabs {
+      display: flex; gap: 6px; margin-bottom: 16px;
+      overflow-x: auto; padding-bottom: 2px;
+    }
+    .section-tabs::-webkit-scrollbar { display: none; }
+    .section-tab {
+      flex-shrink: 0; padding: 9px 16px; border-radius: 20px;
+      font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800;
+      border: 1.5px solid #e2e8f0; background: white; color: #64748b;
+      cursor: pointer; transition: all 0.15s; white-space: nowrap;
+    }
+    .section-tab.activo {
+      background: linear-gradient(135deg, #034295, #2563eb);
+      color: white; border-color: transparent;
+      box-shadow: 0 2px 8px rgba(3,66,149,0.3);
+    }
+
+    /* ── TOOLBAR ── */
     .toolbar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
     .search-wrap { position: relative; }
     .search-wrap input {
@@ -72,12 +102,10 @@
     .prod-card.duplicado { border-left-color: #a855f7 !important; }
     .dup-badge { display:inline-flex; align-items:center; gap:4px; background:#f3e8ff; color:#7c3aed; font-size:10px; font-weight:800; padding:2px 7px; border-radius:20px; margin-left:6px; }
 
-    /* Ocultar elementos catálogo en vista lista normal */
     .lista:not(.catalogo) .prod-foto-zona { display: none; }
     .lista:not(.catalogo) .prod-info-cat  { display: none; }
     .lista:not(.catalogo) .prod-right-cat { display: none; }
 
-    /* ── SEPARADOR DE CATEGORÍA ── */
     .cat-seccion-header {
       display: flex; align-items: center; gap: 10px;
       padding: 6px 4px 8px; margin-top: 6px;
@@ -98,7 +126,6 @@
       padding: 2px 8px;
     }
 
-    /* ── VISTA CATÁLOGO (cuando hay zona seleccionada) ── */
     .lista.catalogo { display: flex; flex-direction: column; gap: 10px; }
     .lista.catalogo .prod-card { border-radius: 16px; }
     .lista.catalogo .prod-header { flex-direction: row; align-items: center; padding: 12px 14px; gap: 14px; }
@@ -114,7 +141,6 @@
     .lista.catalogo .prod-nombre-cat { font-size: 14px; font-weight: 800; color: #1e293b; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .lista.catalogo .prod-sub-cat { font-size: 11px; color: var(--gris); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .lista.catalogo .prod-stock-cat { margin-top: 6px; }
-    /* Ocultar elementos del modo lista normal en vista catálogo */
     .lista.catalogo .prod-icono { display: none; }
     .lista.catalogo .prod-info  { display: none; }
     .lista.catalogo .prod-right { display: none; }
@@ -147,6 +173,10 @@
     .btn-stock-num.mas   { background: #d1fae5; color: #065f46; }
     .stock-input-directo { width: 80px; text-align: center; font-size: 20px; font-weight: 900; padding: 10px; border: 1.5px solid var(--borde); border-radius: 12px; font-family: 'Nunito', sans-serif; }
 
+    /* ── GRADUACIÓN CHIP ── */
+    .grad-row { display: flex; gap: 8px; }
+    .grad-row .campo { flex: 1; }
+
     /* ── EXPORTAR ── */
     .export-info { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; }
     .export-info p { font-size: 12px; color: #065f46; font-weight: 700; margin: 0 0 8px; }
@@ -160,13 +190,8 @@
     .btn-copiar.copiado { background: var(--verde); }
 
     /* ── FOTO PRODUCTO ── */
-    .foto-zona {
-      border: 2px dashed #cbd5e1; border-radius: 14px;
-      background: #f8fafc; overflow: hidden;
-    }
-    .foto-btns {
-      display: flex; gap: 10px; padding: 14px;
-    }
+    .foto-zona { border: 2px dashed #cbd5e1; border-radius: 14px; background: #f8fafc; overflow: hidden; }
+    .foto-btns { display: flex; gap: 10px; padding: 14px; }
     .btn-foto-label {
       flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
       padding: 13px 8px; border-radius: 12px; font-family: 'Nunito', sans-serif;
@@ -175,38 +200,33 @@
     .btn-foto-label.camara { background: var(--azul); color: white; }
     .btn-foto-label.galeria { background: white; color: var(--azul); border: 1.5px solid var(--azul); }
     .btn-foto-label:active { opacity: 0.85; transform: scale(0.97); }
-
-    .foto-procesando {
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; gap: 10px; padding: 28px 16px;
-    }
-    .foto-spinner {
-      width: 36px; height: 36px;
-      border: 3px solid #e2e8f0; border-top-color: var(--azul);
-      border-radius: 50%; animation: girar 0.7s linear infinite;
-    }
+    .foto-procesando { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 28px 16px; }
+    .foto-spinner { width: 36px; height: 36px; border: 3px solid #e2e8f0; border-top-color: var(--azul); border-radius: 50%; animation: girar 0.7s linear infinite; }
     @keyframes girar { to { transform: rotate(360deg); } }
     .foto-procesando-txt { font-size: 13px; font-weight: 700; color: var(--gris); text-align: center; }
     .foto-procesando-sub { font-size: 11px; color: #94a3b8; font-weight: 600; text-align: center; }
-
-    .foto-preview-wrap {
-      position: relative; background: white;
-    }
-    .foto-preview-img {
-      width: 100%; max-height: 220px; object-fit: contain;
-      display: block; padding: 12px; box-sizing: border-box;
-    }
-    .foto-preview-footer {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 14px; border-top: 1px solid #f1f5f9; background: #fafafa;
-    }
+    .foto-preview-wrap { position: relative; background: white; }
+    .foto-preview-img { width: 100%; max-height: 220px; object-fit: contain; display: block; padding: 12px; box-sizing: border-box; }
+    .foto-preview-footer { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-top: 1px solid #f1f5f9; background: #fafafa; }
     .foto-ok-badge { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: #065f46; }
-    .btn-cambiar-foto {
-      background: #f1f5f9; color: #64748b; border: none; border-radius: 8px;
-      padding: 7px 12px; font-family: 'Nunito', sans-serif; font-size: 12px;
-      font-weight: 700; cursor: pointer; transition: background 0.15s;
-    }
+    .btn-cambiar-foto { background: #f1f5f9; color: #64748b; border: none; border-radius: 8px; padding: 7px 12px; font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
     .btn-cambiar-foto:hover { background: #e2e8f0; }
+
+    /* ── BANNER DE SECCIÓN ── */
+    .seccion-banner {
+      border-radius: 16px; padding: 14px 16px; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .seccion-banner-icono { font-size: 28px; flex-shrink: 0; }
+    .seccion-banner-titulo { font-size: 15px; font-weight: 900; color: white; line-height: 1.2; }
+    .seccion-banner-sub { font-size: 12px; color: rgba(255,255,255,0.75); font-weight: 600; margin-top: 2px; }
+
+    .btn-salir {
+      width: 100%; background: rgba(255,255,255,0.1); border: none; border-radius: 10px;
+      color: rgba(255,255,255,0.7); font-family: 'Nunito', sans-serif; font-size: 13px;
+      font-weight: 700; padding: 9px; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-salir:hover { background: rgba(255,255,255,0.18); color: white; }
   </style>
 </head>
 <body>
@@ -218,7 +238,15 @@
     <nav class="sb-nav">
       <div class="sb-section-label">PRINCIPAL</div>
       <a class="sb-item" href="dashboard.html"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><span class="sb-label">Inicio</span></a>
-      <a class="sb-item activo" href="productos.html"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div><span class="sb-label">Productos</span></a>
+
+      <!-- PRODUCTOS con sub-items -->
+      <a class="sb-item activo" href="productos.html?s=armazones"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div><span class="sb-label">Productos</span></a>
+      <div class="sb-sub-nav">
+        <a class="sb-sub-item" id="sb-sub-armazones" href="productos.html?s=armazones"><span class="sb-sub-dot"></span>🕶 Armazones</a>
+        <a class="sb-sub-item" id="sb-sub-lentes"    href="productos.html?s=lentes"><span class="sb-sub-dot"></span>👁 Lentes</a>
+        <a class="sb-sub-item" id="sb-sub-liquidos"  href="productos.html?s=liquidos"><span class="sb-sub-dot"></span>💧 Líquidos</a>
+      </div>
+
       <a class="sb-item" href="inventario.html"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><span class="sb-label">Inventario</span></a>
       <a class="sb-item" href="movimientos.html"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div><span class="sb-label">Movimientos</span></a>
       <a class="sb-item" href="proveedores.html"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="sb-label">Proveedores</span></a>
@@ -233,19 +261,36 @@
     <nav class="topnav">
       <a class="topnav-back" href="dashboard.html">‹</a>
       <div>
-        <div class="topnav-titulo">📦 Productos</div>
+        <div class="topnav-titulo" id="topnav-titulo">📦 Productos</div>
         <div class="topnav-sub" id="nav-sub">Cargando...</div>
       </div>
     </nav>
 
     <div class="content">
+
+      <!-- TABS DE SECCIÓN (móvil) -->
+      <div class="section-tabs">
+        <button class="section-tab" id="tab-armazones" onclick="cambiarSeccion('armazones')">🕶 Armazones</button>
+        <button class="section-tab" id="tab-lentes"    onclick="cambiarSeccion('lentes')">👁 Lentes</button>
+        <button class="section-tab" id="tab-liquidos"  onclick="cambiarSeccion('liquidos')">💧 Líquidos</button>
+      </div>
+
+      <!-- BANNER DE SECCIÓN -->
+      <div class="seccion-banner" id="seccion-banner" style="background:linear-gradient(135deg,#034295,#2563eb)">
+        <div class="seccion-banner-icono" id="banner-icono">🕶</div>
+        <div>
+          <div class="seccion-banner-titulo" id="banner-titulo">Armazones</div>
+          <div class="seccion-banner-sub" id="banner-sub">Receta y sol</div>
+        </div>
+      </div>
+
       <div class="stats-row">
-        <div class="stat-mini"><div class="stat-mini-val" id="st-total">—</div><div class="stat-mini-lab">Total</div></div>
+        <div class="stat-mini"><div class="stat-mini-val" id="st-total">—</div><div class="stat-mini-lab" id="st-total-lab">Total</div></div>
         <div class="stat-mini"><div class="stat-mini-val" style="color:var(--rojo)" id="st-cero">—</div><div class="stat-mini-lab">Sin stock</div></div>
         <div class="stat-mini"><div class="stat-mini-val" style="color:var(--naranja)" id="st-bajo">—</div><div class="stat-mini-lab">Stock bajo</div></div>
       </div>
 
-      <button class="btn-agregar" onclick="abrirModal()">+ Agregar producto</button>
+      <button class="btn-agregar" id="btn-agregar-principal" onclick="abrirModalSegun()">+ Agregar producto</button>
       <button class="btn-exportar" onclick="abrirExportar()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         Exportar a OptiGest
@@ -256,16 +301,21 @@
           <span class="search-icon">🔍</span>
           <input type="text" id="buscador" placeholder="Buscar por nombre, marca o código…" oninput="aplicarFiltros()" />
         </div>
-        <div class="filtros" id="filtros-cat">
+        <!-- Filtros de categoría: solo en armazones -->
+        <div class="filtros" id="filtros-cat" style="display:none">
           <button class="filtro-chip activo" onclick="setFiltroCategoria(this,'')">Todos</button>
           <button class="filtro-chip" onclick="setFiltroCategoria(this,'armazon_receta')">🕶 Receta</button>
           <button class="filtro-chip" onclick="setFiltroCategoria(this,'armazon_sol')">☀️ Sol</button>
           <button class="filtro-chip" onclick="setFiltroCategoria(this,'lentes_oftalmicos')">🔬 Oftálmicos</button>
-          <button class="filtro-chip" onclick="setFiltroCategoria(this,'lentes_contacto')">👁 Contacto</button>
           <button class="filtro-chip" onclick="setFiltroCategoria(this,'accesorios')">🎀 Accesorios</button>
-          <button class="filtro-chip" onclick="setFiltroCategoria(this,'soluciones')">💧 Soluciones</button>
           <button class="filtro-chip" onclick="setFiltroCategoria(this,'clipon')">🔗 Clipón</button>
           <button class="filtro-chip" onclick="setFiltroCategoria(this,'otro')">📦 Otro</button>
+        </div>
+        <!-- Filtro de tipo de lente: solo en lentes -->
+        <div class="filtros" id="filtros-lente" style="display:none">
+          <button class="filtro-chip activo" onclick="setFiltroCategoria(this,'')">Todas</button>
+          <button class="filtro-chip" onclick="setFiltroCategoria(this,'lentes_contacto')">👁 De contacto</button>
+          <button class="filtro-chip" onclick="setFiltroCategoria(this,'lentes_cosmetica')">✨ Cosméticas</button>
         </div>
         <div class="filtros" id="filtros-stock">
           <button class="filtro-chip activo" onclick="setFiltroStock(this,'')">Todo stock</button>
@@ -273,8 +323,8 @@
           <button class="filtro-chip" onclick="setFiltroStock(this,'bajo')">🟡 Stock bajo</button>
           <button class="filtro-chip" onclick="setFiltroStock(this,'ok')">🟢 En stock</button>
         </div>
-        <div class="filtros" id="filtros-zona">
-          <!-- se genera dinámicamente con las zonas que tienen productos -->
+        <div class="filtros" id="filtros-zona" style="display:none">
+          <!-- se genera dinámicamente -->
         </div>
         <div class="filtros">
           <button class="filtro-chip" id="chip-dup" onclick="setFiltroEspecial(this,'duplicados')">🔴 Duplicados</button>
@@ -295,14 +345,13 @@
   </div>
 </div>
 
-<!-- ══ MODAL AGREGAR / EDITAR ══ -->
+<!-- ══ MODAL ARMAZONES (formulario completo original) ══ -->
 <div class="overlay" id="overlay-form" onclick="cerrarFuera(event,'overlay-form')">
   <div class="modal">
-    <div class="modal-titulo" id="modal-titulo">Nuevo producto</div>
+    <div class="modal-titulo" id="modal-titulo">Nuevo armazón</div>
     <input type="hidden" id="f-id" />
     <input type="hidden" id="f-photo-url" />
 
-    <!-- NOMBRE + MARCA + SKU -->
     <div class="campos-2">
       <div class="campo" style="grid-column:1/-1">
         <label>Nombre (se completa automáticamente)</label>
@@ -317,7 +366,6 @@
       <div class="campo"><label>SKU / Código</label><input type="text" id="f-sku" placeholder="Ej: RB2140" oninput="autoNombre()" /></div>
     </div>
 
-    <!-- CATEGORÍA + ZONA -->
     <div class="campos-2">
       <div class="campo"><label>Categoría *</label>
         <select id="f-categoria">
@@ -325,9 +373,7 @@
           <option value="armazon_receta">🕶 Armazón receta</option>
           <option value="armazon_sol">☀️ Armazón sol</option>
           <option value="lentes_oftalmicos">🔬 Lentes oftálmicos</option>
-          <option value="lentes_contacto">👁 Lentes de contacto</option>
           <option value="accesorios">🎀 Accesorios</option>
-          <option value="soluciones">💧 Soluciones</option>
           <option value="clipon">🔗 Clipón</option>
           <option value="otro">📦 Otro</option>
         </select>
@@ -348,7 +394,6 @@
       </div>
     </div>
 
-    <!-- MATERIAL (dinámico desde configuración) -->
     <div class="campo">
       <label>Material <small style="font-weight:400;text-transform:none">(opcional)</small></label>
       <select id="f-material" onchange="onMaterialChange()" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none">
@@ -357,60 +402,39 @@
       <input type="text" id="f-material-otro" placeholder="Escribí el material…" style="display:none;margin-top:8px" />
     </div>
 
-    <!-- STOCK -->
     <div class="campos-2">
       <div class="campo"><label>Stock actual *</label><input type="number" id="f-stock" placeholder="0" min="0" /></div>
       <div class="campo"><label>Stock mínimo</label><input type="number" id="f-stock-min" placeholder="0" min="0" /></div>
     </div>
-
-    <!-- PRECIOS -->
     <div class="campos-2">
       <div class="campo"><label>Precio costo $</label><input type="number" id="f-costo" placeholder="0" min="0" /></div>
       <div class="campo"><label>Precio venta $</label><input type="number" id="f-venta" placeholder="0" min="0" /></div>
     </div>
-
-    <!-- SUBCATEGORÍA + NOTAS -->
     <div class="campo"><label>Subcategoría <small style="font-weight:400;text-transform:none">(opcional)</small></label>
-      <input type="text" id="f-subcat" placeholder="Ej: Redondos, Progresivos, Diarios…" />
+      <input type="text" id="f-subcat" placeholder="Ej: Redondos, Progresivos…" />
     </div>
     <div class="campo"><label>Notas <small style="font-weight:400;text-transform:none">(opcional)</small></label>
       <textarea id="f-notas" rows="2" placeholder="Descripción adicional…"></textarea>
     </div>
 
-    <!-- ── FOTO DEL PRODUCTO (NUEVO) ── -->
     <div class="campo">
       <label>Foto del producto <small style="font-weight:400;text-transform:none">(opcional)</small></label>
-
-      <!-- Estado 1: sin foto -->
       <div class="foto-zona" id="foto-sin">
         <div class="foto-btns">
-          <label class="btn-foto-label camara" for="input-camara">
-            📷 Sacar foto
-            <input type="file" id="input-camara" accept="image/*" capture="environment" style="display:none" onchange="procesarFoto(this)" />
-          </label>
-          <label class="btn-foto-label galeria" for="input-galeria">
-            🖼 Galería
-            <input type="file" id="input-galeria" accept="image/*" style="display:none" onchange="procesarFoto(this)" />
-          </label>
+          <label class="btn-foto-label camara" for="input-camara">📷 Sacar foto<input type="file" id="input-camara" accept="image/*" capture="environment" style="display:none" onchange="procesarFoto(this)" /></label>
+          <label class="btn-foto-label galeria" for="input-galeria">🖼 Galería<input type="file" id="input-galeria" accept="image/*" style="display:none" onchange="procesarFoto(this)" /></label>
         </div>
       </div>
-
-      <!-- Estado 2: procesando -->
       <div class="foto-zona foto-procesando" id="foto-procesando" style="display:none">
         <div class="foto-spinner"></div>
         <div class="foto-procesando-txt">Removiendo fondo con IA…</div>
         <div class="foto-procesando-sub" id="foto-procesando-sub">Preparando modelo…</div>
       </div>
-
-      <!-- Estado 3: preview listo -->
       <div class="foto-zona" id="foto-preview" style="display:none">
         <div class="foto-preview-wrap">
           <img id="foto-img" src="" alt="Producto" class="foto-preview-img" />
           <div class="foto-preview-footer">
-            <div class="foto-ok-badge">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              Fondo removido ✓
-            </div>
+            <div class="foto-ok-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Fondo removido ✓</div>
             <button class="btn-cambiar-foto" onclick="resetFoto()">🔄 Cambiar</button>
           </div>
         </div>
@@ -419,6 +443,134 @@
 
     <button class="btn-guardar" id="btn-guardar-prod" onclick="guardar()">✅ Guardar producto</button>
     <button class="btn-cancelar" onclick="cerrarModal('overlay-form')">Cancelar</button>
+  </div>
+</div>
+
+<!-- ══ MODAL LENTES (contacto / cosméticas) ══ -->
+<div class="overlay" id="overlay-lente" onclick="cerrarFuera(event,'overlay-lente')">
+  <div class="modal">
+    <div class="modal-titulo" id="modal-lente-titulo">Nueva lente</div>
+    <input type="hidden" id="l-id" />
+
+    <div class="campos-2">
+      <div class="campo" style="grid-column:1/-1">
+        <label>Nombre del producto *</label>
+        <input type="text" id="l-nombre" placeholder="Ej: Acuvue Oasys, FreshLook Colorblends…" />
+      </div>
+      <div class="campo"><label>Marca</label>
+        <select id="l-marca" onchange="onMarcaLenteChange()" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none">
+          <option value="">Seleccionar marca</option>
+          <option value="Acuvue 2">Acuvue 2</option>
+          <option value="Acuvue Oasys">Acuvue Oasys</option>
+          <option value="Acuvue Vita">Acuvue Vita</option>
+          <option value="Softles 59">Softles 59</option>
+          <option value="B+L Ultra">B+L Ultra</option>
+          <option value="Vanguard">Vanguard</option>
+          <option value="Lunare">Lunare</option>
+          <option value="Freshlook">Freshlook</option>
+          <option value="__otra__">✏️ Otra marca…</option>
+        </select>
+        <input type="text" id="l-marca-otra" placeholder="Escribí la marca…" style="display:none;margin-top:8px" />
+      </div>
+      <div class="campo"><label>Tipo *</label>
+        <select id="l-tipo" onchange="onTipoLenteChange()">
+          <option value="lentes_contacto">👁 De contacto</option>
+          <option value="lentes_cosmetica">✨ Cosméticas</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- GRADUACIÓN -->
+    <div class="campo">
+      <label>Graduación <small style="font-weight:400;text-transform:none">(opcional)</small></label>
+      <div class="grad-row">
+        <div class="campo" style="margin-bottom:0">
+          <label style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:0.4px;font-weight:700">Esfera</label>
+          <input type="text" inputmode="decimal" id="l-esfera" placeholder="Ej: -1.50" />
+        </div>
+        <div class="campo" style="margin-bottom:0">
+          <label style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:0.4px;font-weight:700">Cilindro</label>
+          <input type="text" inputmode="decimal" id="l-cilindro" placeholder="Ej: -0.75" />
+        </div>
+        <div class="campo" style="margin-bottom:0">
+          <label style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:0.4px;font-weight:700">Eje</label>
+          <input type="text" inputmode="numeric" id="l-eje" placeholder="Ej: 180" />
+        </div>
+      </div>
+    </div>
+
+    <!-- COLOR (solo cosméticas) -->
+    <div class="campo" id="campo-color-lente" style="display:none">
+      <label>Color <small style="font-weight:400;text-transform:none">(opcional)</small></label>
+      <input type="text" id="l-color" placeholder="Ej: Verde, Gris, Avellana, Blue Topaz…" />
+    </div>
+
+    <div class="campos-2">
+      <div class="campo"><label>Cantidad en stock *</label><input type="number" id="l-stock" placeholder="0" min="0" /></div>
+      <div class="campo"><label>Stock mínimo</label><input type="number" id="l-stock-min" placeholder="0" min="0" /></div>
+    </div>
+
+    <div class="campos-2">
+      <div class="campo"><label>Precio venta $</label><input type="number" id="l-venta" placeholder="0" min="0" /></div>
+      <div class="campo"><label>SKU / Código <small style="font-weight:400;text-transform:none">(opcional)</small></label><input type="text" id="l-sku" placeholder="Ej: ACV-OASYS-M" /></div>
+    </div>
+
+    <div class="campo"><label>Notas <small style="font-weight:400;text-transform:none">(opcional)</small></label>
+      <textarea id="l-notas" rows="2" placeholder="Ej: Diarias, mensuales, color específico…"></textarea>
+    </div>
+
+    <button class="btn-guardar" id="btn-guardar-lente" onclick="guardarLente()">✅ Guardar lente</button>
+    <button class="btn-cancelar" onclick="cerrarModal('overlay-lente')">Cancelar</button>
+  </div>
+</div>
+
+<!-- ══ MODAL LÍQUIDOS (soluciones) ══ -->
+<div class="overlay" id="overlay-liquido" onclick="cerrarFuera(event,'overlay-liquido')">
+  <div class="modal">
+    <div class="modal-titulo" id="modal-liquido-titulo">Nuevo líquido</div>
+    <input type="hidden" id="lq-id" />
+
+    <div class="campos-2">
+      <div class="campo" style="grid-column:1/-1">
+        <label>Nombre del producto *</label>
+        <input type="text" id="lq-nombre" placeholder="Ej: Renu Fresh 360ml, Opti-Free 300ml…" />
+      </div>
+      <div class="campo"><label>Marca</label>
+        <select id="lq-marca" onchange="onMarcaLiquidoChange()" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none">
+          <option value="">Seleccionar marca</option>
+          <option value="Arlyt Express">Arlyt Express</option>
+          <option value="Arlyt Premium">Arlyt Premium</option>
+          <option value="Arlyt RGP">Arlyt RGP</option>
+          <option value="Arlyt Fresh">Arlyt Fresh</option>
+          <option value="Arlyt Lub">Arlyt Lub</option>
+          <option value="Bausch+Lomb">Bausch+Lomb</option>
+          <option value="Natura Express">Natura Express</option>
+          <option value="Sol. Sal.">Sol. Sal.</option>
+          <option value="__otra__">✏️ Otra marca…</option>
+        </select>
+        <input type="text" id="lq-marca-otra" placeholder="Escribí la marca…" style="display:none;margin-top:8px" />
+      </div>
+      <div class="campo"><label>Presentación <small style="font-weight:400;text-transform:none">(opcional)</small></label>
+        <input type="text" id="lq-presentacion" placeholder="Ej: 360ml, 500ml, Kit…" />
+      </div>
+    </div>
+
+    <div class="campos-2">
+      <div class="campo"><label>Cantidad en stock *</label><input type="number" id="lq-stock" placeholder="0" min="0" /></div>
+      <div class="campo"><label>Stock mínimo</label><input type="number" id="lq-stock-min" placeholder="0" min="0" /></div>
+    </div>
+
+    <div class="campos-2">
+      <div class="campo"><label>Precio venta $</label><input type="number" id="lq-venta" placeholder="0" min="0" /></div>
+      <div class="campo"><label>SKU / Código <small style="font-weight:400;text-transform:none">(opcional)</small></label><input type="text" id="lq-sku" placeholder="Ej: RENU-360" /></div>
+    </div>
+
+    <div class="campo"><label>Notas <small style="font-weight:400;text-transform:none">(opcional)</small></label>
+      <textarea id="lq-notas" rows="2" placeholder="Ej: Multipropósito, para lentes blandas…"></textarea>
+    </div>
+
+    <button class="btn-guardar" id="btn-guardar-liquido" onclick="guardarLiquido()">✅ Guardar líquido</button>
+    <button class="btn-cancelar" onclick="cerrarModal('overlay-liquido')">Cancelar</button>
   </div>
 </div>
 
@@ -494,38 +646,76 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ybWpsZnBidGpxeXZ0cGRleGVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NjM0MTcsImV4cCI6MjA5MjUzOTQxN30.cg36SF1XXpFbg3hRl2Xl7Tof_OhNJRa9B1BIUcNLpoQ'
   );
 
-  // ── ESTADO ────────────────────────────────────────────────
+  // ── SECCIÓN ACTIVA ────────────────────────────────────────
+  // Secciones: 'armazones' | 'lentes' | 'liquidos'
+  // Categorías de cada sección:
+  const SECCION_CATS = {
+    armazones: ['armazon_receta','armazon_sol','lentes_oftalmicos','accesorios','clipon','otro'],
+    lentes:    ['lentes_contacto','lentes_cosmetica'],
+    liquidos:  ['soluciones']
+  };
+  const SECCION_CONFIG = {
+    armazones: { icono:'🕶', titulo:'Armazones', sub:'Receta y sol', color:'linear-gradient(135deg,#034295,#2563eb)', btnLabel:'+ Agregar armazón' },
+    lentes:    { icono:'👁', titulo:'Lentes',    sub:'Contacto y cosméticas', color:'linear-gradient(135deg,#5b21b6,#7c3aed)', btnLabel:'+ Agregar lente' },
+    liquidos:  { icono:'💧', titulo:'Líquidos',  sub:'Soluciones y limpiadores', color:'linear-gradient(135deg,#0e7490,#0891b2)', btnLabel:'+ Agregar líquido' }
+  };
+
+  let seccionActiva = 'armazones';
   let productos = [], categoriaActiva = '', stockFiltro = '', zonaFiltro = '', especialFiltro = '', prodAbierto = null;
   let fotoBlob = null;
   let idsDuplicados = new Set();
 
-  function detectarDuplicados() {
-    idsDuplicados = new Set();
-    // Por SKU
-    const skuMap = {};
-    productos.forEach(p => { if (p.sku) { if (!skuMap[p.sku.toLowerCase()]) skuMap[p.sku.toLowerCase()] = []; skuMap[p.sku.toLowerCase()].push(p.id); } });
-    Object.values(skuMap).forEach(ids => { if (ids.length > 1) ids.forEach(id => idsDuplicados.add(id)); });
-    // Por nombre exacto
-    const nameMap = {};
-    productos.forEach(p => { if (p.name) { const k = p.name.toLowerCase().trim(); if (!nameMap[k]) nameMap[k] = []; nameMap[k].push(p.id); } });
-    Object.values(nameMap).forEach(ids => { if (ids.length > 1) ids.forEach(id => idsDuplicados.add(id)); });
-    // Actualizar badge del chip
-    const chip = document.getElementById('chip-dup');
-    if (chip) chip.textContent = `🔴 Duplicados${idsDuplicados.size ? ` (${idsDuplicados.size})` : ''}`;
+  // ── LEER SECCIÓN DESDE URL ────────────────────────────────
+  function leerSeccionURL() {
+    const params = new URLSearchParams(window.location.search);
+    const s = params.get('s');
+    if (s && SECCION_CONFIG[s]) return s;
+    return 'armazones';
   }
 
-  function renderFiltrosZona() {
-    const zonas = [...new Set(productos.map(p => p.zona).filter(Boolean))].sort();
-    const cont = document.getElementById('filtros-zona');
-    if (!zonas.length) { cont.innerHTML = ''; return; }
-    cont.innerHTML = `<button class="filtro-chip activo" onclick="setFiltroZona(this,'')">Todas las zonas</button>` +
-      zonas.map(z => `<button class="filtro-chip" onclick="setFiltroZona(this,'${z}')">${ZONA_LABELS[z]||z}</button>`).join('');
+  function cambiarSeccion(sec) {
+    seccionActiva = sec;
+    // Actualizar URL sin recargar
+    const url = new URL(window.location);
+    url.searchParams.set('s', sec);
+    window.history.replaceState({}, '', url);
+    // Actualizar UI
+    actualizarUISeccion();
+    // Resetear filtros de categoría
+    categoriaActiva = '';
+    document.querySelectorAll('#filtros-cat .filtro-chip, #filtros-lente .filtro-chip').forEach(b => b.classList.remove('activo'));
+    const primerChip = document.querySelector('#filtros-cat .filtro-chip, #filtros-lente .filtro-chip');
+    if (primerChip) primerChip.classList.add('activo');
+    aplicarFiltros();
+  }
+
+  function actualizarUISeccion() {
+    const cfg = SECCION_CONFIG[seccionActiva];
+    // Tabs
+    document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('activo'));
+    document.getElementById('tab-' + seccionActiva)?.classList.add('activo');
+    // Sidebar sub-items
+    document.querySelectorAll('.sb-sub-item').forEach(i => i.classList.remove('activo'));
+    document.getElementById('sb-sub-' + seccionActiva)?.classList.add('activo');
+    // Banner
+    document.getElementById('seccion-banner').style.background = cfg.color;
+    document.getElementById('banner-icono').textContent = cfg.icono;
+    document.getElementById('banner-titulo').textContent = cfg.titulo;
+    document.getElementById('banner-sub').textContent = cfg.sub;
+    // Topnav
+    document.getElementById('topnav-titulo').textContent = cfg.icono + ' ' + cfg.titulo;
+    // Botón agregar
+    document.getElementById('btn-agregar-principal').textContent = cfg.btnLabel;
+    // Filtros visibles
+    document.getElementById('filtros-cat').style.display   = seccionActiva === 'armazones' ? '' : 'none';
+    document.getElementById('filtros-lente').style.display = seccionActiva === 'lentes'    ? '' : 'none';
+    document.getElementById('filtros-zona').style.display  = seccionActiva === 'armazones' ? '' : 'none';
   }
 
   // ── HELPERS ───────────────────────────────────────────────
-  const CAT_LABELS  = { armazon_receta:'Armazón receta', armazon_sol:'Armazón sol', lentes_oftalmicos:'Oftálmicos', lentes_contacto:'Contacto', accesorios:'Accesorios', soluciones:'Soluciones', clipon:'Clipón', otro:'Otro' };
-  const CAT_ICONOS  = { armazon_receta:'🕶', armazon_sol:'☀️', lentes_oftalmicos:'🔬', lentes_contacto:'👁', accesorios:'🎀', soluciones:'💧', clipon:'🔗', otro:'📦' };
-  const CAT_COLORES = { armazon_receta:'#eff6ff', armazon_sol:'#fffbeb', lentes_oftalmicos:'#f0fdf4', lentes_contacto:'#faf5ff', accesorios:'#fdf2f8', soluciones:'#ecfeff', clipon:'#f0f9ff', otro:'#f8fafc' };
+  const CAT_LABELS  = { armazon_receta:'Armazón receta', armazon_sol:'Armazón sol', lentes_oftalmicos:'Oftálmicos', lentes_contacto:'Contacto', lentes_cosmetica:'Cosméticas', accesorios:'Accesorios', soluciones:'Soluciones', clipon:'Clipón', otro:'Otro' };
+  const CAT_ICONOS  = { armazon_receta:'🕶', armazon_sol:'☀️', lentes_oftalmicos:'🔬', lentes_contacto:'👁', lentes_cosmetica:'✨', accesorios:'🎀', soluciones:'💧', clipon:'🔗', otro:'📦' };
+  const CAT_COLORES = { armazon_receta:'#eff6ff', armazon_sol:'#fffbeb', lentes_oftalmicos:'#f0fdf4', lentes_contacto:'#faf5ff', lentes_cosmetica:'#fdf4ff', accesorios:'#fdf2f8', soluciones:'#ecfeff', clipon:'#f0f9ff', otro:'#f8fafc' };
   const ZONA_LABELS = { exhibidor_1:'🗄 Exhibidor 1', exhibidor_2:'🗄 Exhibidor 2', exhibidor_3:'🗄 Exhibidor 3', vidriera_1:'🪟 Vidriera 1', vidriera_2:'🪟 Vidriera 2', vidriera_3:'🪟 Vidriera 3', vidriera_4:'🪟 Vidriera 4', cajonera_1:'🗃 Cajonera 1', cajonera_2:'🗃 Cajonera 2' };
 
   function getStockClase(p) {
@@ -535,6 +725,26 @@
   }
   function fmtPesos(n) { return (!n || isNaN(n)) ? '—' : '$' + Math.round(n).toLocaleString('es-AR'); }
 
+  function detectarDuplicados() {
+    idsDuplicados = new Set();
+    const skuMap = {};
+    productos.forEach(p => { if (p.sku) { if (!skuMap[p.sku.toLowerCase()]) skuMap[p.sku.toLowerCase()] = []; skuMap[p.sku.toLowerCase()].push(p.id); } });
+    Object.values(skuMap).forEach(ids => { if (ids.length > 1) ids.forEach(id => idsDuplicados.add(id)); });
+    const nameMap = {};
+    productos.forEach(p => { if (p.name) { const k = p.name.toLowerCase().trim(); if (!nameMap[k]) nameMap[k] = []; nameMap[k].push(p.id); } });
+    Object.values(nameMap).forEach(ids => { if (ids.length > 1) ids.forEach(id => idsDuplicados.add(id)); });
+    const chip = document.getElementById('chip-dup');
+    if (chip) chip.textContent = `🔴 Duplicados${idsDuplicados.size ? ` (${idsDuplicados.size})` : ''}`;
+  }
+
+  function renderFiltrosZona() {
+    const zonas = [...new Set(productos.filter(p => SECCION_CATS.armazones.includes(p.category)).map(p => p.zona).filter(Boolean))].sort();
+    const cont = document.getElementById('filtros-zona');
+    if (!zonas.length) { cont.innerHTML = ''; return; }
+    cont.innerHTML = `<button class="filtro-chip activo" onclick="setFiltroZona(this,'')">Todas las zonas</button>` +
+      zonas.map(z => `<button class="filtro-chip" onclick="setFiltroZona(this,'${z}')">${ZONA_LABELS[z]||z}</button>`).join('');
+  }
+
   // ── CARGA ─────────────────────────────────────────────────
   async function cargar() {
     const { data, error } = await sb.from('products').select('*').eq('active', true).order('created_at', { ascending: true });
@@ -542,22 +752,27 @@
     productos = data || [];
     detectarDuplicados();
     renderFiltrosZona();
-    actualizarStats(productos);
-    renderLista();
-    document.getElementById('nav-sub').textContent = `${productos.length} productos activos`;
+    actualizarStats();
+    aplicarFiltros();
+    const total = productos.length;
+    document.getElementById('nav-sub').textContent = `${total} productos activos`;
+  }
+
+  function productosDeSección() {
+    const cats = SECCION_CATS[seccionActiva];
+    return productos.filter(p => cats.includes(p.category));
   }
 
   function actualizarStats(lista) {
-    const base = lista || productos;
+    const base = lista !== undefined ? lista : productosDeSección();
     const totalUnidades = base.reduce((s, p) => s + (p.stock_current || 0), 0);
-    // Si hay zona activa, mostrar unidades físicas en el card TOTAL
-    const totalLabel = document.querySelector('.stat-mini:first-child .stat-mini-lab');
-    if (zonaFiltro) {
+    const lab = document.getElementById('st-total-lab');
+    if (zonaFiltro && seccionActiva === 'armazones') {
       document.getElementById('st-total').textContent = totalUnidades;
-      if (totalLabel) totalLabel.textContent = 'Unidades';
+      if (lab) lab.textContent = 'Unidades';
     } else {
       document.getElementById('st-total').textContent = base.length;
-      if (totalLabel) totalLabel.textContent = 'Total';
+      if (lab) lab.textContent = 'Total';
     }
     document.getElementById('st-cero').textContent = base.filter(p => p.stock_current <= 0).length;
     document.getElementById('st-bajo').textContent = base.filter(p => p.stock_current > 0 && p.stock_min > 0 && p.stock_current < p.stock_min).length;
@@ -565,7 +780,8 @@
 
   // ── FILTROS ───────────────────────────────────────────────
   function setFiltroCategoria(btn, cat) {
-    document.querySelectorAll('#filtros-cat .filtro-chip').forEach(b => b.classList.remove('activo'));
+    const row = seccionActiva === 'lentes' ? '#filtros-lente' : '#filtros-cat';
+    document.querySelectorAll(row + ' .filtro-chip').forEach(b => b.classList.remove('activo'));
     btn.classList.add('activo'); categoriaActiva = cat; aplicarFiltros();
   }
   function setFiltroStock(btn, tipo) {
@@ -583,47 +799,49 @@
     if (!yaActivo) btn.classList.add('activo');
     aplicarFiltros();
   }
+
   function aplicarFiltros() {
     const q = document.getElementById('buscador').value.trim().toLowerCase();
-    let lista = productos;
+    // Partir de los productos de la sección activa
+    let lista = productosDeSección();
     if (categoriaActiva)        lista = lista.filter(p => p.category === categoriaActiva);
-    if (zonaFiltro)             lista = lista.filter(p => p.zona === zonaFiltro);
+    if (zonaFiltro && seccionActiva === 'armazones') lista = lista.filter(p => p.zona === zonaFiltro);
     if (stockFiltro === 'cero') lista = lista.filter(p => p.stock_current <= 0);
     if (stockFiltro === 'bajo') lista = lista.filter(p => p.stock_current > 0 && p.stock_min > 0 && p.stock_current < p.stock_min);
-    if (stockFiltro === 'ok')   lista = lista.filter(p => p.stock_current > 0 && (!p.stock_min || p.stock_current > p.stock_min));
+    if (stockFiltro === 'ok')   lista = lista.filter(p => p.stock_current > 0 && (!p.stock_min || p.stock_current >= p.stock_min));
     if (especialFiltro === 'duplicados') lista = lista.filter(p => idsDuplicados.has(p.id));
     if (q) lista = lista.filter(p => (p.name||'').toLowerCase().includes(q) || (p.brand||'').toLowerCase().includes(q) || (p.sku||'').toLowerCase().includes(q));
     const resDiv = document.getElementById('resultado-txt');
     if (q || categoriaActiva || stockFiltro || zonaFiltro || especialFiltro) {
       const totalUnidades = lista.reduce((s, p) => s + (p.stock_current || 0), 0);
       const zonaLabel = zonaFiltro ? ` en ${ZONA_LABELS[zonaFiltro]||zonaFiltro}` : '';
-      const unidadesExtra = zonaFiltro && totalUnidades !== lista.length
-        ? ` · <strong>${totalUnidades} unidades físicas</strong>` : '';
+      const unidadesExtra = zonaFiltro && totalUnidades !== lista.length ? ` · <strong>${totalUnidades} unidades físicas</strong>` : '';
       resDiv.innerHTML = `<span>${lista.length}</span> producto${lista.length!==1?'s':''}${zonaLabel}${unidadesExtra}`;
       resDiv.classList.add('vis');
       actualizarStats(lista);
     } else {
       resDiv.classList.remove('vis');
-      actualizarStats(productos);
+      actualizarStats();
     }
-    // Vista catálogo cuando hay zona seleccionada
-    document.getElementById('lista').classList.toggle('catalogo', !!zonaFiltro);
+    // Vista catálogo solo en armazones con zona seleccionada
+    document.getElementById('lista').classList.toggle('catalogo', !!zonaFiltro && seccionActiva === 'armazones');
     renderLista(lista);
   }
 
   // ── RENDER ────────────────────────────────────────────────
   function renderLista(lista) {
-    if (!lista) lista = productos;
+    if (!lista) lista = productosDeSección();
     const cont = document.getElementById('lista');
     if (!lista.length) {
-      cont.innerHTML = `<div class="empty"><div class="empty-icono">🔍</div>${productos.length === 0 ? 'Aún no hay productos.<br>Tocá "Agregar producto" para empezar.' : 'Sin resultados para este filtro.'}</div>`;
+      cont.innerHTML = `<div class="empty"><div class="empty-icono">🔍</div>${productosDeSección().length === 0 ? 'Aún no hay productos en esta sección.<br>Tocá el botón para agregar.' : 'Sin resultados para este filtro.'}</div>`;
       return;
     }
 
-    // Orden de categorías para agrupar
-    const CAT_ORDER = ['armazon_receta','armazon_sol','lentes_oftalmicos','lentes_contacto','accesorios','soluciones','clipon','otro'];
+    const CAT_ORDER_ARMAZONES = ['armazon_receta','armazon_sol','lentes_oftalmicos','accesorios','clipon','otro'];
+    const CAT_ORDER_LENTES    = ['lentes_contacto','lentes_cosmetica'];
+    const CAT_ORDER_LIQUIDOS  = ['soluciones'];
+    const CAT_ORDER = seccionActiva === 'lentes' ? CAT_ORDER_LENTES : seccionActiva === 'liquidos' ? CAT_ORDER_LIQUIDOS : CAT_ORDER_ARMAZONES;
 
-    // Mostrar headers agrupados SOLO cuando no hay ningún filtro activo
     const q2 = document.getElementById('buscador').value.trim();
     const mostrarHeaders = !categoriaActiva && !zonaFiltro && !especialFiltro && !stockFiltro && !q2;
 
@@ -632,11 +850,24 @@
       const icono   = CAT_ICONOS[p.category]  || '📦';
       const iconoBg = CAT_COLORES[p.category] || '#f8fafc';
       const esDup   = idsDuplicados.has(p.id);
-      const nombreCompleto = [p.brand, p.name].filter(Boolean).join(' · ');
-      const subInfo = [CAT_LABELS[p.category], p.material, p.subcategory].filter(Boolean).join(' · ');
-      const stockLabel = p.stock_current <= 0 ? '⚠️ Sin stock' : `${p.stock_current} u.`;
       const abierto = prodAbierto === p.id;
       const dupBadge = esDup ? `<span class="dup-badge">⚠️ DUPLICADO</span>` : '';
+
+      // Línea de info según sección
+      let subInfo = '';
+      if (seccionActiva === 'lentes') {
+        const grad = [p.notes_grad_esfera, p.notes_grad_cilindro, p.notes_grad_eje].filter(Boolean).join(' / ');
+        subInfo = [CAT_LABELS[p.category], grad, p.sku ? `#${p.sku}` : ''].filter(Boolean).join(' · ');
+      } else if (seccionActiva === 'liquidos') {
+        subInfo = [p.brand, p.subcategory, p.sku ? `#${p.sku}` : ''].filter(Boolean).join(' · ');
+      } else {
+        subInfo = [CAT_LABELS[p.category], p.material, p.subcategory].filter(Boolean).join(' · ');
+        if (p.sku) subInfo += (subInfo ? ' · ' : '') + `<span style="font-family:monospace;font-weight:800">${p.sku}</span>`;
+        if (p.zona) subInfo += (subInfo ? ' · ' : '') + (ZONA_LABELS[p.zona]||p.zona);
+      }
+
+      const stockLabel = p.stock_current <= 0 ? '⚠️ Sin stock' : `${p.stock_current} u.`;
+      const nombreCompleto = [p.brand, p.name].filter(Boolean).join(' · ');
 
       const iconoHtml = p.photo_url
         ? `<div class="prod-icono" style="background:white;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.08)"><img src="${p.photo_url}" alt="${p.name}" /></div>`
@@ -655,6 +886,20 @@
           <span style="font-size:13px;color:var(--gris);transform:rotate(${abierto?'180':'0'}deg);display:inline-block;transition:transform 0.2s">▾</span>
         </div>`;
 
+      // Detalle según sección
+      let detExtra = '';
+      if (seccionActiva === 'lentes') {
+        const esfera   = p.notes ? (p.notes.match(/Esfera: ([^\|]+)/)||[])[1]?.trim() : '';
+        const cilindro = p.notes ? (p.notes.match(/Cilindro: ([^\|]+)/)||[])[1]?.trim() : '';
+        const eje      = p.notes ? (p.notes.match(/Eje: ([^\|]+)/)||[])[1]?.trim() : '';
+        if (esfera || cilindro || eje) {
+          detExtra = `
+            <div class="det-item"><div class="det-lab">Esfera</div><div class="det-val">${esfera||'—'}</div></div>
+            <div class="det-item"><div class="det-lab">Cilindro</div><div class="det-val">${cilindro||'—'}</div></div>
+            <div class="det-item"><div class="det-lab">Eje</div><div class="det-val">${eje||'—'}</div></div>`;
+        }
+      }
+
       return `
         <div class="prod-card ${sc}${esDup?' duplicado':''}" id="card-${p.id}">
           <div class="prod-header" onclick="toggleDetalle('${p.id}')">
@@ -662,7 +907,7 @@
             ${iconoHtml}
             <div class="prod-info">
               <div class="prod-nombre">${nombreCompleto || '(sin nombre)'}${dupBadge}</div>
-              <div class="prod-sub">${subInfo || '—'}${p.sku ? ` · <span style="font-family:monospace;font-weight:800">${p.sku}</span>` : ''}${p.zona ? ` · ${ZONA_LABELS[p.zona]||p.zona}` : ''}</div>
+              <div class="prod-sub">${subInfo || '—'}</div>
             </div>
             <div class="prod-right">
               <span class="stock-badge ${sc}">${stockLabel}</span>
@@ -673,9 +918,10 @@
             <div class="det-grid">
               <div class="det-item"><div class="det-lab">Stock actual</div><div class="det-val" style="color:${sc==='cero'?'var(--rojo)':sc==='bajo'?'var(--naranja)':'var(--verde)'}">${p.stock_current} unidades</div></div>
               <div class="det-item"><div class="det-lab">Stock mínimo</div><div class="det-val">${p.stock_min||0} unidades</div></div>
-              <div class="det-item"><div class="det-lab">Precio costo</div><div class="det-val">${fmtPesos(p.cost_price)}</div></div>
+              ${detExtra}
               <div class="det-item"><div class="det-lab">Precio venta</div><div class="det-val">${fmtPesos(p.sale_price)}</div></div>
-              <div class="det-item"><div class="det-lab">Zona</div><div class="det-val">${ZONA_LABELS[p.zona]||'—'}</div></div>
+              ${seccionActiva === 'armazones' ? `<div class="det-item"><div class="det-lab">Precio costo</div><div class="det-val">${fmtPesos(p.cost_price)}</div></div>` : ''}
+              ${seccionActiva === 'armazones' ? `<div class="det-item"><div class="det-lab">Zona</div><div class="det-val">${ZONA_LABELS[p.zona]||'—'}</div></div>` : ''}
               ${p.material ? `<div class="det-item"><div class="det-lab">Material</div><div class="det-val">${p.material}</div></div>` : ''}
               ${p.notes ? `<div class="det-item" style="grid-column:1/-1"><div class="det-lab">Notas</div><div class="det-val" style="font-weight:600;color:var(--gris)">${p.notes}</div></div>` : ''}
             </div>
@@ -689,124 +935,89 @@
     }
 
     if (mostrarHeaders) {
-      // Agrupar por categoría respetando el orden de carga dentro de cada grupo
       const grupos = {};
-      lista.forEach(p => {
-        const cat = p.category || 'otro';
-        if (!grupos[cat]) grupos[cat] = [];
-        grupos[cat].push(p);
-      });
-
-      const html = CAT_ORDER
-        .filter(cat => grupos[cat]?.length)
-        .map(cat => {
-          const items = grupos[cat];
-          const header = `
-            <div class="cat-seccion-header">
-              <div class="cat-seccion-icono" style="background:${CAT_COLORES[cat]||'#f8fafc'}">${CAT_ICONOS[cat]||'📦'}</div>
-              <div class="cat-seccion-titulo">${CAT_LABELS[cat]||cat}</div>
-              <div class="cat-seccion-count">${items.length}</div>
-            </div>`;
-          return header + items.map(renderCard).join('');
-        }).join('');
-
+      lista.forEach(p => { const cat = p.category || 'otro'; if (!grupos[cat]) grupos[cat] = []; grupos[cat].push(p); });
+      const html = CAT_ORDER.filter(cat => grupos[cat]?.length).map(cat => {
+        const items = grupos[cat];
+        const header = `
+          <div class="cat-seccion-header">
+            <div class="cat-seccion-icono" style="background:${CAT_COLORES[cat]||'#f8fafc'}">${CAT_ICONOS[cat]||'📦'}</div>
+            <div class="cat-seccion-titulo">${CAT_LABELS[cat]||cat}</div>
+            <div class="cat-seccion-count">${items.length}</div>
+          </div>`;
+        return header + items.map(renderCard).join('');
+      }).join('');
       cont.innerHTML = html;
     } else {
-      // Con filtro activo → lista plana en orden de carga
       cont.innerHTML = lista.map(renderCard).join('');
     }
   }
 
   function toggleDetalle(id) { prodAbierto = prodAbierto === id ? null : id; aplicarFiltros(); }
 
-  // ══════════════════════════════════════════════════════════
-  // ── FOTO CON IA (background removal) ─────────────────────
-  // ══════════════════════════════════════════════════════════
-
-  let _removeBackground = null;
-
-  async function cargarLibIA() {
-    if (_removeBackground) return _removeBackground;
-    document.getElementById('foto-procesando-sub').textContent = 'Descargando modelo de IA (primera vez)…';
-    const mod = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/browser/index.mjs');
-    _removeBackground = mod.removeBackground;
-    return _removeBackground;
-  }
-
-  async function procesarFoto(input) {
-    const file = input.files[0];
-    if (!file) return;
-    input.value = ''; // reset para poder volver a seleccionar la misma foto
-
-    // Mostrar estado "procesando"
-    document.getElementById('foto-sin').style.display = 'none';
-    document.getElementById('foto-preview').style.display = 'none';
-    document.getElementById('foto-procesando').style.display = 'flex';
-    document.getElementById('foto-procesando-sub').textContent = 'Preparando modelo…';
-
-    try {
-      const removeBg = await cargarLibIA();
-      document.getElementById('foto-procesando-sub').textContent = 'Analizando imagen…';
-      const blob = await removeBg(file, {
-        output: { format: 'image/png', quality: 0.9 }
-      });
-      fotoBlob = blob;
-      const url = URL.createObjectURL(blob);
-      document.getElementById('foto-img').src = url;
-      document.getElementById('foto-procesando').style.display = 'none';
-      document.getElementById('foto-preview').style.display = 'block';
-    } catch (err) {
-      console.error('Error removiendo fondo:', err);
-      // Si falla la IA, usar la foto original igual
-      fotoBlob = file;
-      const url = URL.createObjectURL(file);
-      document.getElementById('foto-img').src = url;
-      document.getElementById('foto-procesando').style.display = 'none';
-      document.getElementById('foto-preview').style.display = 'block';
-      document.querySelector('.foto-ok-badge').textContent = '📷 Foto cargada';
+  // ── ABRIR MODAL SEGÚN SECCIÓN ─────────────────────────────
+  function abrirModalSegun(idEdit) {
+    if (seccionActiva === 'lentes') {
+      abrirModalLente(idEdit);
+    } else if (seccionActiva === 'liquidos') {
+      abrirModalLiquido(idEdit);
+    } else {
+      abrirModal(idEdit);
     }
   }
 
-  function resetFoto() {
+  // ── DETECTAR SECCIÓN SEGÚN CATEGORÍA ─────────────────────
+  function seccionDeCategoria(cat) {
+    if (SECCION_CATS.lentes.includes(cat)) return 'lentes';
+    if (SECCION_CATS.liquidos.includes(cat)) return 'liquidos';
+    return 'armazones';
+  }
+
+  function editarProducto(id) {
+    const p = productos.find(x => x.id === id);
+    if (!p) return;
+    const sec = seccionDeCategoria(p.category);
+    if (sec === 'lentes') { abrirModalLente(id); return; }
+    if (sec === 'liquidos') { abrirModalLiquido(id); return; }
+    // Armazones (modal original)
+    document.getElementById('f-id').value = p.id;
+    document.getElementById('f-nombre').value = p.name || '';
+    const marcaSel = document.getElementById('f-marca');
+    const marcaOtra = document.getElementById('f-marca-otra');
+    const opciones = [...marcaSel.options].map(o => o.value);
+    if (p.brand && opciones.includes(p.brand)) { marcaSel.value = p.brand; marcaOtra.style.display = 'none'; }
+    else if (p.brand) { marcaSel.value = '__otra__'; marcaOtra.value = p.brand; marcaOtra.style.display = 'block'; }
+    else { marcaSel.selectedIndex = 0; marcaOtra.style.display = 'none'; }
+    document.getElementById('f-sku').value        = p.sku         || '';
+    document.getElementById('f-stock').value      = p.stock_current ?? 0;
+    document.getElementById('f-stock-min').value  = p.stock_min   ?? 0;
+    document.getElementById('f-costo').value      = p.cost_price  || '';
+    document.getElementById('f-venta').value      = p.sale_price  || '';
+    document.getElementById('f-subcat').value     = p.subcategory || '';
+    document.getElementById('f-notas').value      = p.notes       || '';
+    document.getElementById('f-photo-url').value  = p.photo_url   || '';
+    setSelect('f-categoria', p.category);
+    setSelect('f-zona', p.zona || '');
+    const matSel = document.getElementById('f-material');
+    const matOtro = document.getElementById('f-material-otro');
+    const matOpts = [...matSel.options].map(o => o.value);
+    if (!p.material) { matSel.selectedIndex = 0; matOtro.style.display = 'none'; }
+    else if (matOpts.includes(p.material)) { matSel.value = p.material; matOtro.style.display = 'none'; }
+    else { matSel.value = '__otro__'; matOtro.value = p.material; matOtro.style.display = 'block'; }
     fotoBlob = null;
-    document.getElementById('f-photo-url').value = '';
-    document.getElementById('foto-preview').style.display = 'none';
-    document.getElementById('foto-procesando').style.display = 'none';
-    document.getElementById('foto-sin').style.display = 'block';
+    if (p.photo_url) {
+      document.getElementById('foto-img').src = p.photo_url;
+      document.getElementById('foto-sin').style.display = 'none';
+      document.getElementById('foto-procesando').style.display = 'none';
+      document.getElementById('foto-preview').style.display = 'block';
+      document.querySelector('.foto-ok-badge').innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Foto guardada ✓`;
+    } else { resetFoto(); }
+    abrirModal(p.id);
   }
 
-  async function subirFotoStorage(productoId) {
-    if (!fotoBlob) return null;
-    const fileName = `${productoId}.png`;
-    // Intentar subir
-    const { data: upData, error: upError } = await sb.storage
-      .from('product-photos')
-      .upload(fileName, fotoBlob, { contentType: 'image/png', upsert: true });
-
-    if (upError) {
-      console.error('Upload error:', upError);
-      // Si ya existe, intentar eliminar y volver a subir
-      if (upError.statusCode === '409' || upError.message?.includes('already exists')) {
-        await sb.storage.from('product-photos').remove([fileName]);
-        const { error: retry } = await sb.storage
-          .from('product-photos')
-          .upload(fileName, fotoBlob, { contentType: 'image/png' });
-        if (retry) {
-          alert('⚠️ No se pudo subir la foto: ' + retry.message + '\n\nEl producto se guardó sin foto.');
-          return null;
-        }
-      } else {
-        alert('⚠️ No se pudo subir la foto: ' + upError.message + '\n\nEl producto se guardó sin foto.');
-        return null;
-      }
-    }
-    const { data } = sb.storage.from('product-photos').getPublicUrl(fileName);
-    return data.publicUrl + '?t=' + Date.now(); // cache bust
-  }
-
-  // ── MODAL FORM ────────────────────────────────────────────
+  // ── MODAL ARMAZONES ───────────────────────────────────────
   function abrirModal(idEdit) {
-    document.getElementById('modal-titulo').textContent = idEdit ? 'Editar producto' : 'Nuevo producto';
+    document.getElementById('modal-titulo').textContent = idEdit ? 'Editar armazón' : 'Nuevo armazón';
     document.getElementById('btn-guardar-prod').textContent = idEdit ? '💾 Guardar cambios' : '✅ Guardar producto';
     if (!idEdit) {
       ['f-id','f-nombre','f-sku','f-stock','f-stock-min','f-costo','f-venta','f-subcat','f-notas','f-photo-url'].forEach(id => {
@@ -827,51 +1038,6 @@
     document.querySelector('#overlay-form .modal').scrollTop = 0;
   }
 
-  function editarProducto(id) {
-    const p = productos.find(x => x.id === id);
-    if (!p) return;
-    document.getElementById('f-id').value = p.id;
-    document.getElementById('f-nombre').value = p.name || '';
-    // Marca
-    const marcaSel = document.getElementById('f-marca');
-    const marcaOtra = document.getElementById('f-marca-otra');
-    const opciones = [...marcaSel.options].map(o => o.value);
-    if (p.brand && opciones.includes(p.brand)) { marcaSel.value = p.brand; marcaOtra.style.display = 'none'; }
-    else if (p.brand) { marcaSel.value = '__otra__'; marcaOtra.value = p.brand; marcaOtra.style.display = 'block'; }
-    else { marcaSel.selectedIndex = 0; marcaOtra.style.display = 'none'; }
-    document.getElementById('f-sku').value        = p.sku         || '';
-    document.getElementById('f-stock').value      = p.stock_current ?? 0;
-    document.getElementById('f-stock-min').value  = p.stock_min   ?? 0;
-    document.getElementById('f-costo').value      = p.cost_price  || '';
-    document.getElementById('f-venta').value      = p.sale_price  || '';
-    document.getElementById('f-subcat').value     = p.subcategory || '';
-    document.getElementById('f-notas').value      = p.notes       || '';
-    document.getElementById('f-photo-url').value  = p.photo_url   || '';
-    setSelect('f-categoria', p.category);
-    setSelect('f-zona',     p.zona     || '');
-    // Material: si existe en el select usarlo, si no → "otro"
-    const matSel   = document.getElementById('f-material');
-    const matOtro  = document.getElementById('f-material-otro');
-    const matOpts  = [...matSel.options].map(o => o.value);
-    if (!p.material) {
-      matSel.selectedIndex = 0; matOtro.style.display = 'none';
-    } else if (matOpts.includes(p.material)) {
-      matSel.value = p.material; matOtro.style.display = 'none';
-    } else {
-      matSel.value = '__otro__'; matOtro.value = p.material; matOtro.style.display = 'block';
-    }
-    // Foto existente
-    fotoBlob = null;
-    if (p.photo_url) {
-      document.getElementById('foto-img').src = p.photo_url;
-      document.getElementById('foto-sin').style.display = 'none';
-      document.getElementById('foto-procesando').style.display = 'none';
-      document.getElementById('foto-preview').style.display = 'block';
-      document.querySelector('.foto-ok-badge').innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Foto guardada ✓`;
-    } else { resetFoto(); }
-    abrirModal(p.id);
-  }
-
   async function guardar() {
     const id     = document.getElementById('f-id').value;
     const nombre = document.getElementById('f-nombre').value.trim();
@@ -880,62 +1046,39 @@
     if (!cat)    { alert('Seleccioná una categoría'); return; }
     const zona = document.getElementById('f-zona').value;
     if (!zona)   { alert('Seleccioná una zona'); return; }
-
     const btn = document.getElementById('btn-guardar-prod');
     btn.disabled = true;
-
-    // ── Validar duplicados ────────────────────────────────
-    const sku    = document.getElementById('f-sku').value.trim().toLowerCase();
+    const sku = document.getElementById('f-sku').value.trim().toLowerCase();
     const dupSKU = sku && productos.find(p => p.id !== id && p.sku && p.sku.toLowerCase() === sku);
-    if (dupSKU) {
-      alert(`⚠️ Ya existe un producto con el SKU "${sku.toUpperCase()}"\n→ ${dupSKU.name||dupSKU.brand||'(sin nombre)'}`);
-      btn.disabled = false; return;
-    }
+    if (dupSKU) { alert(`⚠️ Ya existe un producto con el SKU "${sku.toUpperCase()}"\n→ ${dupSKU.name||dupSKU.brand||'(sin nombre)'}`); btn.disabled = false; return; }
     const dupNombre = productos.find(p => p.id !== id && p.name && p.name.toLowerCase().trim() === nombre.toLowerCase().trim());
-    if (dupNombre) {
-      if (!confirm(`⚠️ Ya existe un producto con ese nombre:\n"${dupNombre.name}"\n\n¿Querés guardarlo igual?`)) {
-        btn.disabled = false; return;
-      }
-    }
+    if (dupNombre) { if (!confirm(`⚠️ Ya existe un producto con ese nombre:\n"${dupNombre.name}"\n\n¿Querés guardarlo igual?`)) { btn.disabled = false; return; } }
     let photoUrl = document.getElementById('f-photo-url').value || null;
-    if (fotoBlob) {
-      btn.textContent = '📷 Subiendo foto…';
-      const tmpId = id || ('tmp_' + Date.now());
-      photoUrl = await subirFotoStorage(id || tmpId);
-      if (!photoUrl) btn.textContent = '⚠️ Foto no se pudo subir, guardando igual…';
-    }
-
+    if (fotoBlob) { btn.textContent = '📷 Subiendo foto…'; const tmpId = id || ('tmp_' + Date.now()); photoUrl = await subirFotoStorage(id || tmpId); }
     btn.textContent = 'Guardando…';
-
     const payload = {
-      name:          nombre,
+      name: nombre,
       brand: (() => { const s = document.getElementById('f-marca'); return s.value === '__otra__' ? (document.getElementById('f-marca-otra').value.trim()||null) : (s.value||null); })(),
-      sku:           document.getElementById('f-sku').value.trim()        || null,
-      category:      cat,
-      zona:          document.getElementById('f-zona').value              || null,
+      sku: document.getElementById('f-sku').value.trim() || null,
+      category: cat,
+      zona: document.getElementById('f-zona').value || null,
       material: (() => { const s = document.getElementById('f-material'); return s.value === '__otro__' ? (document.getElementById('f-material-otro').value.trim()||null) : (s.value||null); })(),
-      stock_current: parseInt(document.getElementById('f-stock').value)   || 0,
-      stock_min:     parseInt(document.getElementById('f-stock-min').value)|| 0,
-      cost_price:    parseFloat(document.getElementById('f-costo').value) || null,
-      sale_price:    parseFloat(document.getElementById('f-venta').value) || null,
-      subcategory:   document.getElementById('f-subcat').value.trim()     || null,
-      notes:         document.getElementById('f-notas').value.trim()      || null,
-      photo_url:     photoUrl,
-      active:        true,
-      updated_at:    new Date().toISOString(),
+      stock_current: parseInt(document.getElementById('f-stock').value) || 0,
+      stock_min: parseInt(document.getElementById('f-stock-min').value) || 0,
+      cost_price: parseFloat(document.getElementById('f-costo').value) || null,
+      sale_price: parseFloat(document.getElementById('f-venta').value) || null,
+      subcategory: document.getElementById('f-subcat').value.trim() || null,
+      notes: document.getElementById('f-notas').value.trim() || null,
+      photo_url: photoUrl,
+      active: true,
+      updated_at: new Date().toISOString(),
     };
-
     let error;
     if (id) {
-      // EDITAR: subir foto si hay nueva
-      if (fotoBlob) {
-        btn.textContent = '📷 Subiendo foto…';
-        photoUrl = await subirFotoStorage(id);
-      }
+      if (fotoBlob) { btn.textContent = '📷 Subiendo foto…'; photoUrl = await subirFotoStorage(id); }
       payload.photo_url = photoUrl;
       ({ error } = await sb.from('products').update(payload).eq('id', id));
     } else {
-      // NUEVO: insertar sin foto primero, luego subir con el ID real
       payload.photo_url = null;
       const { data: profile } = await sb.from('profiles').select('branch_id').eq('id', currentUser.id).maybeSingle();
       if (profile?.branch_id) payload.branch_id = profile.branch_id;
@@ -944,12 +1087,9 @@
       if (!error && nuevo && fotoBlob) {
         btn.textContent = '📷 Subiendo foto…';
         const urlFoto = await subirFotoStorage(nuevo.id);
-        if (urlFoto) {
-          await sb.from('products').update({ photo_url: urlFoto }).eq('id', nuevo.id);
-        }
+        if (urlFoto) await sb.from('products').update({ photo_url: urlFoto }).eq('id', nuevo.id);
       }
     }
-
     btn.textContent = id ? '💾 Guardar cambios' : '✅ Guardar producto';
     btn.disabled = false;
     if (error) { alert('Error: ' + error.message); return; }
@@ -958,6 +1098,182 @@
     await cargar();
   }
 
+  // ── MODAL LENTES ──────────────────────────────────────────
+  function abrirModalLente(idEdit) {
+    const p = idEdit ? productos.find(x => x.id === idEdit) : null;
+    document.getElementById('modal-lente-titulo').textContent = p ? 'Editar lente' : 'Nueva lente';
+    document.getElementById('btn-guardar-lente').textContent = p ? '💾 Guardar cambios' : '✅ Guardar lente';
+    document.getElementById('l-id').value = p?.id || '';
+    document.getElementById('l-nombre').value = p?.name || '';
+    document.getElementById('l-sku').value = p?.sku || '';
+    document.getElementById('l-stock').value = p?.stock_current ?? 0;
+    document.getElementById('l-stock-min').value = p?.stock_min ?? 0;
+    document.getElementById('l-venta').value = p?.sale_price || '';
+    document.getElementById('l-notas').value = '';
+    // Marca
+    const marcaSel = document.getElementById('l-marca');
+    const marcaOtra = document.getElementById('l-marca-otra');
+    if (p?.brand) {
+      const opts = [...marcaSel.options].map(o => o.value);
+      if (opts.includes(p.brand)) { marcaSel.value = p.brand; marcaOtra.style.display = 'none'; }
+      else { marcaSel.value = '__otra__'; marcaOtra.value = p.brand; marcaOtra.style.display = 'block'; }
+    } else { marcaSel.selectedIndex = 0; marcaOtra.style.display = 'none'; }
+    // Tipo + color
+    setSelect('l-tipo', p?.category || 'lentes_contacto');
+    const esCosmetica = (p?.category === 'lentes_cosmetica');
+    document.getElementById('campo-color-lente').style.display = esCosmetica ? 'block' : 'none';
+    // Color (guardado en notas como "Color: X | ...")
+    if (p?.notes) {
+      document.getElementById('l-color').value = (p.notes.match(/Color: ([^|]+)/)||[])[1]?.trim() || '';
+    } else {
+      document.getElementById('l-color').value = '';
+    }
+    // Graduación (guardada en notas con formato "Esfera: X | Cilindro: X | Eje: X | ...")
+    if (p?.notes) {
+      document.getElementById('l-esfera').value   = (p.notes.match(/Esfera: ([^|]+)/)||[])[1]?.trim() || '';
+      document.getElementById('l-cilindro').value = (p.notes.match(/Cilindro: ([^|]+)/)||[])[1]?.trim() || '';
+      document.getElementById('l-eje').value      = (p.notes.match(/Eje: ([^|]+)/)||[])[1]?.trim() || '';
+      // Notas sin graduación ni color
+      const notasLimpias = p.notes.replace(/Esfera: [^|]+\|?\s?/g,'').replace(/Cilindro: [^|]+\|?\s?/g,'').replace(/Eje: [^|]+\|?\s?/g,'').replace(/Color: [^|]+\|?\s?/g,'').trim().replace(/^\||\|$/g,'').trim();
+      document.getElementById('l-notas').value = notasLimpias;
+    } else {
+      document.getElementById('l-esfera').value = '';
+      document.getElementById('l-cilindro').value = '';
+      document.getElementById('l-eje').value = '';
+    }
+    document.getElementById('overlay-lente').classList.add('vis');
+    document.querySelector('#overlay-lente .modal').scrollTop = 0;
+  }
+
+  async function guardarLente() {
+    const id     = document.getElementById('l-id').value;
+    const nombre = document.getElementById('l-nombre').value.trim();
+    if (!nombre) { alert('El nombre es obligatorio'); return; }
+    const btn = document.getElementById('btn-guardar-lente');
+    btn.disabled = true; btn.textContent = 'Guardando…';
+
+    // Construir notas con graduación
+    const esfera   = document.getElementById('l-esfera').value.trim();
+    const cilindro = document.getElementById('l-cilindro').value.trim();
+    const eje      = document.getElementById('l-eje').value.trim();
+    const color    = document.getElementById('l-color').value.trim();
+    const notasBase = document.getElementById('l-notas').value.trim();
+    const partesGrad = [];
+    if (esfera)   partesGrad.push(`Esfera: ${esfera}`);
+    if (cilindro) partesGrad.push(`Cilindro: ${cilindro}`);
+    if (eje)      partesGrad.push(`Eje: ${eje}`);
+    if (color)    partesGrad.push(`Color: ${color}`);
+    const notasFinal = [...partesGrad, notasBase].filter(Boolean).join(' | ');
+
+    const marcaSel = document.getElementById('l-marca');
+    const brand = marcaSel.value === '__otra__' ? document.getElementById('l-marca-otra').value.trim()||null : marcaSel.value||null;
+
+    const payload = {
+      name: nombre,
+      brand,
+      sku: document.getElementById('l-sku').value.trim() || null,
+      category: document.getElementById('l-tipo').value,
+      zona: null,
+      stock_current: parseInt(document.getElementById('l-stock').value) || 0,
+      stock_min: parseInt(document.getElementById('l-stock-min').value) || 0,
+      sale_price: parseFloat(document.getElementById('l-venta').value) || null,
+      notes: notasFinal || null,
+      active: true,
+      updated_at: new Date().toISOString(),
+    };
+
+    let error;
+    if (id) {
+      ({ error } = await sb.from('products').update(payload).eq('id', id));
+    } else {
+      const { data: profile } = await sb.from('profiles').select('branch_id').eq('id', currentUser.id).maybeSingle();
+      if (profile?.branch_id) payload.branch_id = profile.branch_id;
+      ({ error } = await sb.from('products').insert([payload]));
+    }
+
+    btn.textContent = id ? '💾 Guardar cambios' : '✅ Guardar lente';
+    btn.disabled = false;
+    if (error) { alert('Error: ' + error.message); return; }
+    cerrarModal('overlay-lente');
+    await cargar();
+  }
+
+  function onTipoLenteChange() {
+    const esCosmetica = document.getElementById('l-tipo').value === 'lentes_cosmetica';
+    document.getElementById('campo-color-lente').style.display = esCosmetica ? 'block' : 'none';
+  }
+
+  function onMarcaLenteChange() {
+    document.getElementById('l-marca-otra').style.display = document.getElementById('l-marca').value === '__otra__' ? 'block' : 'none';
+  }
+
+  // ── MODAL LÍQUIDOS ────────────────────────────────────────
+  function abrirModalLiquido(idEdit) {
+    const p = idEdit ? productos.find(x => x.id === idEdit) : null;
+    document.getElementById('modal-liquido-titulo').textContent = p ? 'Editar líquido' : 'Nuevo líquido';
+    document.getElementById('btn-guardar-liquido').textContent = p ? '💾 Guardar cambios' : '✅ Guardar líquido';
+    document.getElementById('lq-id').value = p?.id || '';
+    document.getElementById('lq-nombre').value = p?.name || '';
+    document.getElementById('lq-sku').value = p?.sku || '';
+    document.getElementById('lq-stock').value = p?.stock_current ?? 0;
+    document.getElementById('lq-stock-min').value = p?.stock_min ?? 0;
+    document.getElementById('lq-venta').value = p?.sale_price || '';
+    document.getElementById('lq-presentacion').value = p?.subcategory || '';
+    document.getElementById('lq-notas').value = p?.notes || '';
+    // Marca
+    const marcaSel = document.getElementById('lq-marca');
+    const marcaOtra = document.getElementById('lq-marca-otra');
+    if (p?.brand) {
+      const opts = [...marcaSel.options].map(o => o.value);
+      if (opts.includes(p.brand)) { marcaSel.value = p.brand; marcaOtra.style.display = 'none'; }
+      else { marcaSel.value = '__otra__'; marcaOtra.value = p.brand; marcaOtra.style.display = 'block'; }
+    } else { marcaSel.selectedIndex = 0; marcaOtra.style.display = 'none'; }
+    document.getElementById('overlay-liquido').classList.add('vis');
+    document.querySelector('#overlay-liquido .modal').scrollTop = 0;
+  }
+
+  async function guardarLiquido() {
+    const id     = document.getElementById('lq-id').value;
+    const nombre = document.getElementById('lq-nombre').value.trim();
+    if (!nombre) { alert('El nombre es obligatorio'); return; }
+    const btn = document.getElementById('btn-guardar-liquido');
+    btn.disabled = true; btn.textContent = 'Guardando…';
+    const marcaSel = document.getElementById('lq-marca');
+    const brand = marcaSel.value === '__otra__' ? document.getElementById('lq-marca-otra').value.trim()||null : marcaSel.value||null;
+    const payload = {
+      name: nombre,
+      brand,
+      sku: document.getElementById('lq-sku').value.trim() || null,
+      category: 'soluciones',
+      zona: null,
+      subcategory: document.getElementById('lq-presentacion').value.trim() || null,
+      stock_current: parseInt(document.getElementById('lq-stock').value) || 0,
+      stock_min: parseInt(document.getElementById('lq-stock-min').value) || 0,
+      sale_price: parseFloat(document.getElementById('lq-venta').value) || null,
+      notes: document.getElementById('lq-notas').value.trim() || null,
+      active: true,
+      updated_at: new Date().toISOString(),
+    };
+    let error;
+    if (id) {
+      ({ error } = await sb.from('products').update(payload).eq('id', id));
+    } else {
+      const { data: profile } = await sb.from('profiles').select('branch_id').eq('id', currentUser.id).maybeSingle();
+      if (profile?.branch_id) payload.branch_id = profile.branch_id;
+      ({ error } = await sb.from('products').insert([payload]));
+    }
+    btn.textContent = id ? '💾 Guardar cambios' : '✅ Guardar líquido';
+    btn.disabled = false;
+    if (error) { alert('Error: ' + error.message); return; }
+    cerrarModal('overlay-liquido');
+    await cargar();
+  }
+
+  function onMarcaLiquidoChange() {
+    document.getElementById('lq-marca-otra').style.display = document.getElementById('lq-marca').value === '__otra__' ? 'block' : 'none';
+  }
+
+  // ── ELIMINAR ──────────────────────────────────────────────
   async function eliminarProducto(id) {
     const p = productos.find(x => x.id === id);
     if (!confirm(`¿Eliminás "${p?.name||'este producto'}"?\n\nEsta acción lo desactiva del inventario.`)) return;
@@ -997,8 +1313,62 @@
     cerrarModal('overlay-stock'); await cargar();
   }
 
-  // ── EXPORTAR OPTIGEST ─────────────────────────────────────
-  const CAT_EXPORT = { armazon_receta:'Armazon receta', armazon_sol:'Armazon sol', lentes_oftalmicos:'Lentes oftalmicos', lentes_contacto:'Lentes de contacto', accesorios:'Accesorios', soluciones:'Soluciones', clipon:'Clipon', otro:'Otro' };
+  // ── FOTO IA ───────────────────────────────────────────────
+  let _removeBackground = null;
+  async function cargarLibIA() {
+    if (_removeBackground) return _removeBackground;
+    document.getElementById('foto-procesando-sub').textContent = 'Descargando modelo de IA (primera vez)…';
+    const mod = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/browser/index.mjs');
+    _removeBackground = mod.removeBackground;
+    return _removeBackground;
+  }
+  async function procesarFoto(input) {
+    const file = input.files[0]; if (!file) return;
+    input.value = '';
+    document.getElementById('foto-sin').style.display = 'none';
+    document.getElementById('foto-preview').style.display = 'none';
+    document.getElementById('foto-procesando').style.display = 'flex';
+    document.getElementById('foto-procesando-sub').textContent = 'Preparando modelo…';
+    try {
+      const removeBg = await cargarLibIA();
+      document.getElementById('foto-procesando-sub').textContent = 'Analizando imagen…';
+      const blob = await removeBg(file, { output: { format: 'image/png', quality: 0.9 } });
+      fotoBlob = blob;
+      document.getElementById('foto-img').src = URL.createObjectURL(blob);
+      document.getElementById('foto-procesando').style.display = 'none';
+      document.getElementById('foto-preview').style.display = 'block';
+    } catch (err) {
+      fotoBlob = file;
+      document.getElementById('foto-img').src = URL.createObjectURL(file);
+      document.getElementById('foto-procesando').style.display = 'none';
+      document.getElementById('foto-preview').style.display = 'block';
+      document.querySelector('.foto-ok-badge').textContent = '📷 Foto cargada';
+    }
+  }
+  function resetFoto() {
+    fotoBlob = null;
+    document.getElementById('f-photo-url').value = '';
+    document.getElementById('foto-preview').style.display = 'none';
+    document.getElementById('foto-procesando').style.display = 'none';
+    document.getElementById('foto-sin').style.display = 'block';
+  }
+  async function subirFotoStorage(productoId) {
+    if (!fotoBlob) return null;
+    const fileName = `${productoId}.png`;
+    const { error: upError } = await sb.storage.from('product-photos').upload(fileName, fotoBlob, { contentType: 'image/png', upsert: true });
+    if (upError) {
+      if (upError.statusCode === '409' || upError.message?.includes('already exists')) {
+        await sb.storage.from('product-photos').remove([fileName]);
+        const { error: retry } = await sb.storage.from('product-photos').upload(fileName, fotoBlob, { contentType: 'image/png' });
+        if (retry) { alert('⚠️ No se pudo subir la foto: ' + retry.message + '\n\nEl producto se guardó sin foto.'); return null; }
+      } else { alert('⚠️ No se pudo subir la foto: ' + upError.message + '\n\nEl producto se guardó sin foto.'); return null; }
+    }
+    const { data } = sb.storage.from('product-photos').getPublicUrl(fileName);
+    return data.publicUrl + '?t=' + Date.now();
+  }
+
+  // ── EXPORTAR ──────────────────────────────────────────────
+  const CAT_EXPORT = { armazon_receta:'Armazon receta', armazon_sol:'Armazon sol', lentes_oftalmicos:'Lentes oftalmicos', lentes_contacto:'Lentes de contacto', lentes_cosmetica:'Lentes cosmeticas', accesorios:'Accesorios', soluciones:'Soluciones', clipon:'Clipon', otro:'Otro' };
   function fmtFechaOG(f) { if(!f) return ''; try { const d=new Date(f); if(isNaN(d)) return ''; return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`; } catch{return '';} }
   function buildDetalles(p) {
     const pts=[];
@@ -1026,47 +1396,47 @@
     setTimeout(()=>{ btn.classList.remove('copiado'); btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar todo`; }, 2500);
   }
 
-  // ── UTILIDADES ────────────────────────────────────────────
-  function cerrarModal(id) { document.getElementById(id).classList.remove('vis'); }
-  function cerrarFuera(e,id) { if(e.target===document.getElementById(id)) cerrarModal(id); }
-  function setSelect(id,val) { const s=document.getElementById(id); for(let i=0;i<s.options.length;i++) { if(s.options[i].value===val){s.selectedIndex=i;return;} } s.selectedIndex=0; }
-
-  // ── MATERIALES DESDE CONFIG ───────────────────────────────
+  // ── MATERIALES Y MARCAS ───────────────────────────────────
+  async function cargarMarcasEn(selectId, otraId) {
+    const { data } = await sb.from('configuracion').select('valor').eq('clave','marcas').maybeSingle();
+    let marcas = [];
+    if(data?.valor) { try { marcas=JSON.parse(data.valor)||[]; } catch{} }
+    marcas = [...marcas].sort((a,b)=>a.localeCompare(b,'es'));
+    const sel = document.getElementById(selectId); if(!sel) return;
+    sel.innerHTML = '<option value="">Seleccionar marca</option>';
+    marcas.forEach(m=>{ const o=document.createElement('option'); o.value=m; o.textContent=m; sel.appendChild(o); });
+    const otra=document.createElement('option'); otra.value='__otra__'; otra.textContent='✏️ Otra marca…'; sel.appendChild(otra);
+  }
   async function cargarMateriales() {
     const { data } = await sb.from('configuracion').select('valor').eq('clave','materiales').maybeSingle();
     let mats = [];
     if (data?.valor) { try { mats = JSON.parse(data.valor)||[]; } catch{} }
     mats = [...mats].sort((a,b) => a.localeCompare(b,'es'));
     const sel = document.getElementById('f-material'); if (!sel) return;
-    const valActual = sel.value;
     sel.innerHTML = '<option value="">Sin especificar</option>';
     mats.forEach(m => { const o = document.createElement('option'); o.value = m; o.textContent = m; sel.appendChild(o); });
     const otro = document.createElement('option'); otro.value = '__otro__'; otro.textContent = '✏️ Otro material…'; sel.appendChild(otro);
-    if (valActual) sel.value = valActual;
   }
-  function onMaterialChange() {
-    document.getElementById('f-material-otro').style.display =
-      document.getElementById('f-material').value === '__otro__' ? 'block' : 'none';
-  }
-
-  // ── MARCAS ────────────────────────────────────────────────
-  async function cargarMarcas() {
-    const { data } = await sb.from('configuracion').select('valor').eq('clave','marcas').maybeSingle();
-    let marcas = [];
-    if(data?.valor) { try { marcas=JSON.parse(data.valor)||[]; } catch{} }
-    marcas = [...marcas].sort((a,b)=>a.localeCompare(b,'es'));
-    const sel = document.getElementById('f-marca'); if(!sel) return;
-    const valActual = sel.value;
-    sel.innerHTML = '<option value="">Seleccionar marca</option>';
-    marcas.forEach(m=>{ const o=document.createElement('option'); o.value=m; o.textContent=m; sel.appendChild(o); });
-    const otra=document.createElement('option'); otra.value='__otra__'; otra.textContent='✏️ Otra marca…'; sel.appendChild(otra);
-    if(valActual) sel.value=valActual;
-  }
+  function onMaterialChange() { document.getElementById('f-material-otro').style.display = document.getElementById('f-material').value === '__otro__' ? 'block' : 'none'; }
   function onMarcaChange() { document.getElementById('f-marca-otra').style.display=document.getElementById('f-marca').value==='__otra__'?'block':'none'; autoNombre(); }
   function autoNombre() { const s=document.getElementById('f-marca'), o=document.getElementById('f-marca-otra'); const marca=s.value==='__otra__'?o.value.trim():s.value.trim(); const sku=document.getElementById('f-sku').value.trim(); document.getElementById('f-nombre').value=[marca,sku].filter(Boolean).join(' '); }
 
+  // ── UTILIDADES ────────────────────────────────────────────
+  function cerrarModal(id) { document.getElementById(id).classList.remove('vis'); }
+  function cerrarFuera(e,id) { if(e.target===document.getElementById(id)) cerrarModal(id); }
+  function setSelect(id,val) { const s=document.getElementById(id); for(let i=0;i<s.options.length;i++) { if(s.options[i].value===val){s.selectedIndex=i;return;} } s.selectedIndex=0; }
+
   // ── INIT ──────────────────────────────────────────────────
-  cargar(); cargarMarcas(); cargarMateriales();
+  seccionActiva = leerSeccionURL();
+  actualizarUISeccion();
+  // Nombre de usuario en sidebar
+  if (currentUser) {
+    document.getElementById('sb-nombre').textContent = currentUser.name || 'Usuario';
+    document.getElementById('sb-avatar').textContent = (currentUser.name || 'U')[0].toUpperCase();
+  }
+  cargar();
+  cargarMarcasEn('f-marca', 'f-marca-otra');
+  cargarMateriales();
 </script>
 </body>
 </html>
