@@ -453,12 +453,8 @@
     <input type="hidden" id="l-id" />
 
     <div class="campos-2">
-      <div class="campo" style="grid-column:1/-1">
-        <label>Nombre del producto *</label>
-        <input type="text" id="l-nombre" placeholder="Ej: Acuvue Oasys, FreshLook Colorblends…" />
-      </div>
       <div class="campo"><label>Marca</label>
-        <select id="l-marca" onchange="onMarcaLenteChange()" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none">
+        <select id="l-marca" onchange="onMarcaLenteChange(); autoNombreLente()" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none">
           <option value="">Seleccionar marca</option>
           <option value="Acuvue 2">Acuvue 2</option>
           <option value="Acuvue Oasys">Acuvue Oasys</option>
@@ -470,7 +466,7 @@
           <option value="Freshlook">Freshlook</option>
           <option value="__otra__">✏️ Otra marca…</option>
         </select>
-        <input type="text" id="l-marca-otra" placeholder="Escribí la marca…" style="display:none;margin-top:8px" />
+        <input type="text" id="l-marca-otra" placeholder="Escribí la marca…" oninput="autoNombreLente()" style="display:none;margin-top:8px" />
       </div>
       <div class="campo"><label>Tipo *</label>
         <select id="l-tipo" onchange="onTipoLenteChange()">
@@ -486,15 +482,15 @@
       <div class="grad-row">
         <div class="campo" style="margin-bottom:0">
           <label style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:0.4px;font-weight:700">Esfera</label>
-          <input type="text" inputmode="decimal" id="l-esfera" placeholder="Ej: -1.50" />
+          <input type="text" inputmode="decimal" id="l-esfera" placeholder="Ej: -1.50" oninput="autoNombreLente()" />
         </div>
         <div class="campo" style="margin-bottom:0">
           <label style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:0.4px;font-weight:700">Cilindro</label>
-          <input type="text" inputmode="decimal" id="l-cilindro" placeholder="Ej: -0.75" />
+          <input type="text" inputmode="decimal" id="l-cilindro" placeholder="Ej: -0.75" oninput="autoNombreLente()" />
         </div>
         <div class="campo" style="margin-bottom:0">
           <label style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:0.4px;font-weight:700">Eje</label>
-          <input type="text" inputmode="numeric" id="l-eje" placeholder="Ej: 180" />
+          <input type="text" inputmode="numeric" id="l-eje" placeholder="Ej: 180" oninput="autoNombreLente()" />
         </div>
       </div>
     </div>
@@ -502,7 +498,13 @@
     <!-- COLOR (solo cosméticas) -->
     <div class="campo" id="campo-color-lente" style="display:none">
       <label>Color <small style="font-weight:400;text-transform:none">(opcional)</small></label>
-      <input type="text" id="l-color" placeholder="Ej: Verde, Gris, Avellana, Blue Topaz…" />
+      <input type="text" id="l-color" placeholder="Ej: Verde, Gris, Avellana, Blue Topaz…" oninput="autoNombreLente()" />
+    </div>
+
+    <!-- NOMBRE GENERADO -->
+    <div class="campo">
+      <label>Nombre del producto <small style="font-weight:400;text-transform:none">(se completa automáticamente)</small></label>
+      <input type="text" id="l-nombre" placeholder="Se genera con Marca + Graduación…" />
     </div>
 
     <div class="campos-2">
@@ -531,28 +533,42 @@
     <input type="hidden" id="lq-id" />
 
     <div class="campos-2">
-      <div class="campo" style="grid-column:1/-1">
-        <label>Nombre del producto *</label>
-        <input type="text" id="lq-nombre" placeholder="Ej: Renu Fresh 360ml, Opti-Free 300ml…" />
-      </div>
       <div class="campo"><label>Marca</label>
-        <select id="lq-marca" onchange="onMarcaLiquidoChange()" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none">
+        <select id="lq-marca" onchange="onMarcaLiquidoChange(); autoNombreLiquido()" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none">
           <option value="">Seleccionar marca</option>
           <option value="Arlyt Express">Arlyt Express</option>
           <option value="Arlyt Premium">Arlyt Premium</option>
           <option value="Arlyt RGP">Arlyt RGP</option>
           <option value="Arlyt Fresh">Arlyt Fresh</option>
           <option value="Arlyt Lub">Arlyt Lub</option>
-          <option value="Bausch+Lomb">Bausch+Lomb</option>
+          <option value="Bausch+Lomb Renu Plus">Bausch+Lomb Renu Plus</option>
+          <option value="Bausch+Lomb Renu Fresh">Bausch+Lomb Renu Fresh</option>
           <option value="Natura Express">Natura Express</option>
           <option value="Sol. Sal.">Sol. Sal.</option>
           <option value="__otra__">✏️ Otra marca…</option>
         </select>
-        <input type="text" id="lq-marca-otra" placeholder="Escribí la marca…" style="display:none;margin-top:8px" />
+        <input type="text" id="lq-marca-otra" placeholder="Escribí la marca…" oninput="autoNombreLiquido()" style="display:none;margin-top:8px" />
       </div>
       <div class="campo"><label>Presentación <small style="font-weight:400;text-transform:none">(opcional)</small></label>
-        <input type="text" id="lq-presentacion" placeholder="Ej: 360ml, 500ml, Kit…" />
+        <select id="lq-presentacion" onchange="autoNombreLiquido()" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none">
+          <option value="">Sin especificar</option>
+          <option value="15ml">15ml</option>
+          <option value="60ml">60ml</option>
+          <option value="120ml">120ml</option>
+          <option value="240ml">240ml</option>
+          <option value="355ml">355ml</option>
+          <option value="360ml">360ml</option>
+          <option value="500ml">500ml</option>
+          <option value="Kit">Kit</option>
+        </select>
       </div>
+    </div>
+
+    <!-- NOMBRE GENERADO -->
+    <div class="campo">
+      <label>Nombre del producto <small style="font-weight:400;text-transform:none">(se completa automáticamente)</small></label>
+      <input type="text" id="lq-nombre" placeholder="Se genera con Marca + Presentación…" />
+    </div>
     </div>
 
     <div class="campos-2">
@@ -1201,6 +1217,31 @@
   function onTipoLenteChange() {
     const esCosmetica = document.getElementById('l-tipo').value === 'lentes_cosmetica';
     document.getElementById('campo-color-lente').style.display = esCosmetica ? 'block' : 'none';
+    autoNombreLente();
+  }
+
+  function autoNombreLente() {
+    const sel   = document.getElementById('l-marca');
+    const marca = sel.value === '__otra__' ? document.getElementById('l-marca-otra').value.trim() : sel.value;
+    const esCosmetica = document.getElementById('l-tipo').value === 'lentes_cosmetica';
+    let partes = [marca];
+    if (esCosmetica) {
+      const color = document.getElementById('l-color').value.trim();
+      if (color) partes.push(color);
+    } else {
+      const esfera = document.getElementById('l-esfera').value.trim();
+      const cil    = document.getElementById('l-cilindro').value.trim();
+      if (esfera) partes.push(esfera);
+      if (cil)    partes.push(cil);
+    }
+    document.getElementById('l-nombre').value = partes.filter(Boolean).join(' ');
+  }
+
+  function autoNombreLiquido() {
+    const sel  = document.getElementById('lq-marca');
+    const marca = sel.value === '__otra__' ? document.getElementById('lq-marca-otra').value.trim() : sel.value;
+    const pres  = document.getElementById('lq-presentacion').value;
+    document.getElementById('lq-nombre').value = [marca, pres].filter(Boolean).join(' ');
   }
 
   function onMarcaLenteChange() {
@@ -1219,6 +1260,7 @@
     document.getElementById('lq-stock-min').value = p?.stock_min ?? 0;
     document.getElementById('lq-venta').value = p?.sale_price || '';
     document.getElementById('lq-presentacion').value = p?.subcategory || '';
+    autoNombreLiquido();
     document.getElementById('lq-notas').value = p?.notes || '';
     // Marca
     const marcaSel = document.getElementById('lq-marca');
@@ -1246,7 +1288,7 @@
       sku: document.getElementById('lq-sku').value.trim() || null,
       category: 'soluciones',
       zona: null,
-      subcategory: document.getElementById('lq-presentacion').value.trim() || null,
+      subcategory: document.getElementById('lq-presentacion').value || null,
       stock_current: parseInt(document.getElementById('lq-stock').value) || 0,
       stock_min: parseInt(document.getElementById('lq-stock-min').value) || 0,
       sale_price: parseFloat(document.getElementById('lq-venta').value) || null,
