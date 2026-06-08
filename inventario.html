@@ -3,22 +3,19 @@
 <head>
   <link rel="stylesheet" href="style.css" />
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Inventario" />
+  <meta name="theme-color" content="#034295" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Olvisión Inventario — Conteo físico</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-.btn-salir { width:100%; background:rgba(255,255,255,0.1); border:none; border-radius:10px; color:rgba(255,255,255,0.7); font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; padding:9px; cursor:pointer; }
-    .btn-salir:hover { background:rgba(255,255,255,0.18); color:white; }
-    
-    
-    
-    
-    
-    
-
-    /* PANTALLA INICIO */
+    /* PANTALLAS */
     .pantalla { display:none; }
     .pantalla.activa { display:block; }
 
@@ -28,7 +25,7 @@
     .inicio-hero-titulo { font-size:22px; font-weight:900; }
     .inicio-hero-sub { font-size:13px; color:#93c5fd; margin-top:6px; }
 
-    /* SELECCIÓN ZONA */
+    /* ZONAS */
     .zonas-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
     .zona-card { background:white; border-radius:var(--radio); padding:16px; box-shadow:0 2px 6px rgba(0,0,0,0.05); cursor:pointer; border:2px solid transparent; transition:all 0.15s; text-align:center; }
     .zona-card:hover { border-color:var(--azul2); }
@@ -42,7 +39,7 @@
     .btn-iniciar { width:100%; background:var(--azul); color:white; border:none; border-radius:var(--radio); padding:16px; font-family:'Nunito',sans-serif; font-size:16px; font-weight:800; cursor:pointer; margin-top:4px; opacity:0.4; pointer-events:none; transition:opacity 0.2s; }
     .btn-iniciar.listo { opacity:1; pointer-events:all; }
 
-    /* PANTALLA CONTEO */
+    /* CONTEO */
     .progreso-wrap { background:white; border-radius:var(--radio); padding:14px 16px; margin-bottom:14px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
     .progreso-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
     .progreso-label { font-size:13px; font-weight:800; color:#1e293b; }
@@ -50,7 +47,6 @@
     .progreso-bar { height:8px; background:#f1f5f9; border-radius:20px; overflow:hidden; }
     .progreso-fill { height:100%; background:var(--azul); border-radius:20px; transition:width 0.4s; }
 
-    /* CARD PRODUCTO CONTEO */
     .prod-conteo-card { background:white; border-radius:20px; box-shadow:0 4px 16px rgba(0,0,0,0.08); padding:24px 20px; margin-bottom:14px; }
     .prod-conteo-cat { font-size:11px; font-weight:800; color:var(--gris); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:8px; }
     .prod-conteo-nombre { font-size:20px; font-weight:900; color:#1e293b; margin-bottom:4px; }
@@ -68,15 +64,15 @@
     .conteo-input:focus { border-color:var(--azul2); }
 
     .dif-badge { text-align:center; padding:8px 16px; border-radius:12px; font-size:14px; font-weight:800; margin-bottom:16px; }
-    .dif-badge.igual   { background:#f0fdf4; color:#065f46; }
-    .dif-badge.mas-dif { background:#d1fae5; color:#065f46; }
+    .dif-badge.igual     { background:#f0fdf4; color:#065f46; }
+    .dif-badge.mas-dif   { background:#d1fae5; color:#065f46; }
     .dif-badge.menos-dif { background:#fee2e2; color:#991b1b; }
 
     .conteo-btns { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    .btn-saltar { background:#f1f5f9; color:var(--gris); border:none; border-radius:14px; padding:14px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; }
+    .btn-saltar    { background:#f1f5f9; color:var(--gris); border:none; border-radius:14px; padding:14px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; }
     .btn-confirmar { background:var(--azul); color:white; border:none; border-radius:14px; padding:14px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; }
 
-    /* PANTALLA RESUMEN */
+    /* RESUMEN */
     .resumen-hero { background:var(--azul); border-radius:20px; padding:24px 20px; text-align:center; color:white; margin-bottom:16px; }
     .resumen-hero-titulo { font-size:20px; font-weight:900; }
     .resumen-hero-sub { font-size:13px; color:#93c5fd; margin-top:6px; }
@@ -86,7 +82,7 @@
     .rkpi-lab { font-size:11px; color:#93c5fd; margin-top:2px; }
 
     .dif-item { background:white; border-radius:var(--radio); padding:14px 16px; margin-bottom:8px; box-shadow:0 2px 6px rgba(0,0,0,0.05); display:flex; align-items:center; gap:12px; }
-    .dif-item.mas  { border-left:4px solid var(--verde); }
+    .dif-item.mas   { border-left:4px solid var(--verde); }
     .dif-item.menos { border-left:4px solid var(--rojo); }
     .dif-item.igual { border-left:4px solid #e2e8f0; }
     .dif-info { flex:1; min-width:0; }
@@ -94,18 +90,14 @@
     .dif-det { font-size:12px; color:var(--gris); margin-top:2px; }
     .dif-num { text-align:right; flex-shrink:0; }
     .dif-delta { font-size:18px; font-weight:900; }
-    .dif-delta.pos { color:var(--verde); }
-    .dif-delta.neg { color:var(--rojo); }
+    .dif-delta.pos  { color:var(--verde); }
+    .dif-delta.neg  { color:var(--rojo); }
     .dif-delta.cero { color:#cbd5e1; }
     .dif-stocks { font-size:11px; color:var(--gris); margin-top:2px; }
 
-    
-
     .btn-aplicar { width:100%; background:var(--verde); color:white; border:none; border-radius:var(--radio); padding:16px; font-family:'Nunito',sans-serif; font-size:16px; font-weight:800; cursor:pointer; margin-bottom:10px; }
     .btn-volver  { width:100%; background:#f1f5f9; color:var(--gris); border:none; border-radius:var(--radio); padding:14px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; cursor:pointer; }
-
-    /* TOAST */
-</style>
+  </style>
 </head>
 <body>
 <div class="app">
@@ -118,11 +110,13 @@
       <a class="sb-item activo" href="inventario.html"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><span class="sb-label">Inventario</span></a>
       <a class="sb-item" href="movimientos.html"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div><span class="sb-label">Movimientos</span></a>
       <a class="sb-item" href="proveedores.html"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="sb-label">Proveedores</span></a>
-      <div class="sb-section-label">ADMINISTRACIÓN</div>
-      <a class="sb-item" href="reportes.html"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><span class="sb-label">Reportes</span></a>
-      <a class="sb-item" href="configuracion.html"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><span class="sb-label">Configuración</span></a>
+      <div id="adminSection" style="display:none">
+        <div class="sb-section-label">ADMINISTRACIÓN</div>
+        <a class="sb-item" href="reportes.html"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><span class="sb-label">Reportes</span></a>
+        <a class="sb-item" href="configuracion.html"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><span class="sb-label">Configuración</span></a>
+      </div>
     </nav>
-    <div class="sb-footer"><div class="sb-user"><div class="sb-user-avatar" id="sb-avatar">A</div><div class="sb-user-info"><div class="sb-user-nombre" id="sb-nombre">Andrés</div><div class="sb-user-rol">Administrador</div></div><button class="sb-user-salir" onclick="salir()" title="Salir"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button></div></div>
+    <div class="sb-footer"><div class="sb-user"><div class="sb-user-avatar" id="sb-avatar">A</div><div class="sb-user-info"><div class="sb-user-nombre" id="sb-nombre">Andrés</div><div class="sb-user-rol" id="sb-rol">Administrador</div></div><button class="sb-user-salir" onclick="salir()" title="Salir"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button></div></div>
   </aside>
 
   <div class="main-wrap">
@@ -136,16 +130,14 @@
 
     <div class="content">
 
-      <!-- ══ PANTALLA 1: INICIO ══ -->
+      <!-- PANTALLA 1: INICIO -->
       <div class="pantalla activa" id="pantalla-inicio">
         <div class="inicio-hero">
           <div class="inicio-hero-icon">📋</div>
           <div class="inicio-hero-titulo">Conteo físico</div>
           <div class="inicio-hero-sub">Seleccioná una zona y contá los productos uno por uno</div>
         </div>
-
         <div style="font-size:14px;font-weight:800;color:#1e293b;margin-bottom:12px">¿Qué zona querés contar?</div>
-
         <div class="zonas-grid" id="zonas-grid">
           <div class="zona-card todas" onclick="seleccionarZona('todas')">
             <div class="zona-card-icon">🏪</div>
@@ -155,11 +147,10 @@
             </div>
           </div>
         </div>
-
         <button class="btn-iniciar" id="btn-iniciar" onclick="iniciarConteo()">🔍 Iniciar conteo</button>
       </div>
 
-      <!-- ══ PANTALLA 2: CONTEO ══ -->
+      <!-- PANTALLA 2: CONTEO -->
       <div class="pantalla" id="pantalla-conteo">
         <div class="progreso-wrap">
           <div class="progreso-header">
@@ -168,20 +159,17 @@
           </div>
           <div class="progreso-bar"><div class="progreso-fill" id="prog-fill" style="width:0%"></div></div>
         </div>
-
         <div class="prod-conteo-card" id="prod-card">
           <div class="prod-conteo-cat" id="pc-cat">—</div>
           <div class="prod-conteo-nombre" id="pc-nombre">—</div>
           <div class="prod-conteo-sku" id="pc-sku">—</div>
           <div class="prod-conteo-sistema">
-            <div>
-              <div class="pcs-label">Stock en sistema</div>
-            </div>
+            <div><div class="pcs-label">Stock en sistema</div></div>
             <div class="pcs-val" id="pc-stock-sistema">—</div>
           </div>
           <div class="conteo-controles">
             <button class="btn-cnt menos" onclick="ajustarConteo(-1)">−</button>
-            <input class="conteo-input" type="number" id="conteo-input" value="0" min="0" oninput="conteoDesdeInput(this.value)" />
+            <input class="conteo-input" type="number" id="conteo-input" value="0" min="0" inputmode="numeric" oninput="conteoDesdeInput(this.value)" />
             <button class="btn-cnt mas" onclick="ajustarConteo(1)">+</button>
           </div>
           <div class="dif-badge igual" id="dif-badge">✅ Sin diferencia</div>
@@ -192,7 +180,7 @@
         </div>
       </div>
 
-      <!-- ══ PANTALLA 3: RESUMEN ══ -->
+      <!-- PANTALLA 3: RESUMEN -->
       <div class="pantalla" id="pantalla-resumen">
         <div class="resumen-hero">
           <div class="resumen-hero-titulo">📊 Resumen del conteo</div>
@@ -203,17 +191,14 @@
             <div class="rkpi"><div class="rkpi-val" id="res-saltados" style="color:var(--amarillo)">—</div><div class="rkpi-lab">Saltados</div></div>
           </div>
         </div>
-
         <div id="res-difs-section" style="display:none">
           <div class="sec-titulo">⚠️ Diferencias encontradas</div>
           <div id="res-difs-lista"></div>
         </div>
-
         <div id="res-ok-section" style="display:none">
           <div class="sec-titulo">✅ Sin diferencias</div>
           <div id="res-ok-lista"></div>
         </div>
-
         <button class="btn-aplicar" onclick="aplicarConteo()">💾 Aplicar y actualizar stock</button>
         <button class="btn-volver" onclick="volverInicio()">↩ Volver a empezar</button>
       </div>
@@ -233,64 +218,76 @@
 <div class="toast" id="toast"></div>
 
 <script>
+  // ── AUTH (FIX: guard robusto con try/catch) ───────────────
   const userJson = localStorage.getItem('olvision_user');
-  if (!userJson) window.location.href = 'index.html';
+  if (!userJson) { window.location.replace('index.html'); throw new Error('no session'); }
   let currentUser;
-  try { currentUser = JSON.parse(userJson); } catch(e) { window.location.href = 'index.html'; }
-  function salir() { localStorage.removeItem('olvision_user'); window.location.href = 'index.html'; }
+  try { currentUser = JSON.parse(userJson); } catch(e) { window.location.replace('index.html'); throw e; }
+  function salir() { localStorage.removeItem('olvision_user'); window.location.replace('index.html'); }
 
+  // UI usuario
+  const nombre = currentUser.name || 'Usuario';
+  document.getElementById('sb-nombre').textContent = nombre;
+  document.getElementById('sb-avatar').textContent = nombre.charAt(0).toUpperCase();
+  const rolLabels = { admin:'Administrador', empleado:'Empleada', contadora:'Contadora' };
+  document.getElementById('sb-rol').textContent = rolLabels[currentUser.role] || currentUser.role;
+  if (currentUser.role === 'admin') document.getElementById('adminSection').style.display = 'block';
+
+  // ── SUPABASE ──────────────────────────────────────────────
   const { createClient } = supabase;
   const sb = createClient(
     'https://nrmjlfpbtjqyvtpdexej.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ybWpsZnBidGpxeXZ0cGRleGVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NjM0MTcsImV4cCI6MjA5MjUzOTQxN30.cg36SF1XXpFbg3hRl2Xl7Tof_OhNJRa9B1BIUcNLpoQ'
   );
 
-  const CAT_LABELS = { armazon_receta:'Armazón receta', armazon_sol:'Armazón sol', lentes_oftalmicos:'Oftálmicos', lentes_contacto:'Contacto', accesorios:'Accesorios', soluciones:'Soluciones', otro:'Otro' };
+  const CAT_LABELS  = { armazon_receta:'Armazón receta', armazon_sol:'Armazón sol', lentes_oftalmicos:'Oftálmicos', lentes_contacto:'Contacto', lentes_cosmetica:'Cosméticas', accesorios:'Accesorios', soluciones:'Soluciones', clipon:'Clipon', otro:'Otro' };
   const ZONA_LABELS = { todas:'Todo el inventario', exhibidor_1:'Exhibidor 1', exhibidor_2:'Exhibidor 2', exhibidor_3:'Exhibidor 3', vidriera_1:'Vidriera 1', vidriera_2:'Vidriera 2', vidriera_3:'Vidriera 3', vidriera_4:'Vidriera 4', cajonera_1:'Cajonera 1', cajonera_2:'Cajonera 2' };
   const ZONA_ICONOS = { todas:'🏪', exhibidor_1:'🗄', exhibidor_2:'🗄', exhibidor_3:'🗄', vidriera_1:'🪟', vidriera_2:'🪟', vidriera_3:'🪟', vidriera_4:'🪟', cajonera_1:'🗃', cajonera_2:'🗃' };
 
-  let todosProductos = [];
+  function esc(s) { const d=document.createElement('div'); d.appendChild(document.createTextNode(String(s))); return d.innerHTML; }
+
+  let todosProductos   = [];
   let zonaSeleccionada = null;
-  let productosConteo = [];
-  let indexActual = 0;
-  let resultados = []; // { producto, stockSistema, stockContado, saltado }
-  let conteoActual = 0;
+  let productosConteo  = [];
+  let indexActual      = 0;
+  let resultados       = [];
+  let conteoActual     = 0;
 
   // ── INICIO ────────────────────────────────────────────────
   async function cargar() {
-    const { data } = await sb.from('products').select('*').eq('active', true).order('zona').order('name');
-    todosProductos = data || [];
+    try {
+      const { data, error } = await sb.from('products').select('*').eq('active', true).order('zona').order('name');
+      if (error) throw error;
+      todosProductos = data || [];
 
-    // Total
-    document.getElementById('cant-todas').textContent = `${todosProductos.length} productos`;
+      document.getElementById('cant-todas').textContent = `${todosProductos.length} productos`;
 
-    // Calcular productos por zona
-    const porZona = {};
-    todosProductos.forEach(p => {
-      const z = p.zona || 'sin_zona';
-      porZona[z] = (porZona[z] || 0) + 1;
-    });
+      const porZona = {};
+      todosProductos.forEach(p => {
+        const z = p.zona || 'sin_zona';
+        porZona[z] = (porZona[z] || 0) + 1;
+      });
 
-    // Renderizar zonas con productos
-    const zonasConProds = Object.keys(porZona).filter(z => z !== 'sin_zona' && porZona[z] > 0);
-    const grid = document.getElementById('zonas-grid');
+      const grid = document.getElementById('zonas-grid');
+      const todasCard = grid.querySelector('.zona-card.todas');
+      grid.innerHTML = '';
+      grid.appendChild(todasCard);
 
-    // Mantener el botón "Todas" y agregar las zonas
-    const todasCard = grid.querySelector('.zona-card.todas');
-    grid.innerHTML = '';
-    grid.appendChild(todasCard);
-
-    zonasConProds.sort().forEach(zona => {
-      const div = document.createElement('div');
-      div.className = 'zona-card';
-      div.setAttribute('data-zona', zona);
-      div.onclick = () => seleccionarZona(zona);
-      div.innerHTML = `
-        <div class="zona-card-icon">${ZONA_ICONOS[zona] || '📦'}</div>
-        <div class="zona-card-nombre">${ZONA_LABELS[zona] || zona}</div>
-        <div class="zona-card-cant">${porZona[zona]} producto${porZona[zona] !== 1 ? 's' : ''}</div>`;
-      grid.appendChild(div);
-    });
+      Object.keys(porZona).filter(z => z !== 'sin_zona' && porZona[z] > 0).sort().forEach(zona => {
+        const div = document.createElement('div');
+        div.className = 'zona-card';
+        div.setAttribute('data-zona', zona);
+        div.onclick = () => seleccionarZona(zona);
+        div.innerHTML = `
+          <div class="zona-card-icon">${ZONA_ICONOS[zona]||'📦'}</div>
+          <div class="zona-card-nombre">${esc(ZONA_LABELS[zona]||zona)}</div>
+          <div class="zona-card-cant">${porZona[zona]} producto${porZona[zona]!==1?'s':''}</div>`;
+        grid.appendChild(div);
+      });
+    } catch(e) {
+      console.error(e);
+      toast('⚠️ Error al cargar productos');
+    }
   }
 
   function seleccionarZona(zona) {
@@ -310,7 +307,7 @@
       : todosProductos.filter(p => p.zona === zonaSeleccionada);
     if (productosConteo.length === 0) { toast('Sin productos en esta zona'); return; }
     indexActual = 0;
-    resultados = productosConteo.map(p => ({ producto: p, stockSistema: p.stock_current, stockContado: p.stock_current, saltado: false }));
+    resultados  = productosConteo.map(p => ({ producto:p, stockSistema:p.stock_current||0, stockContado:p.stock_current||0, saltado:false }));
     mostrarPantalla('pantalla-conteo');
     document.getElementById('nav-sub').textContent = ZONA_LABELS[zonaSeleccionada] || zonaSeleccionada;
     mostrarProducto();
@@ -321,15 +318,14 @@
     const r = resultados[indexActual];
     const p = r.producto;
     const total = productosConteo.length;
-    const pct = Math.round((indexActual / total) * 100);
+    const pct   = Math.round((indexActual / total) * 100);
 
-    document.getElementById('prog-label').textContent = `Producto ${indexActual + 1} de ${total}`;
-    document.getElementById('prog-num').textContent = `${indexActual + 1} / ${total}`;
-    document.getElementById('prog-fill').style.width = pct + '%';
-
-    document.getElementById('pc-cat').textContent = CAT_LABELS[p.category] || p.category || '—';
-    document.getElementById('pc-nombre').textContent = [p.brand, p.name].filter(Boolean).join(' · ');
-    document.getElementById('pc-sku').textContent = p.sku ? `Código: ${p.sku}` : 'Sin código';
+    document.getElementById('prog-label').textContent      = `Producto ${indexActual + 1} de ${total}`;
+    document.getElementById('prog-num').textContent        = `${indexActual + 1} / ${total}`;
+    document.getElementById('prog-fill').style.width       = pct + '%';
+    document.getElementById('pc-cat').textContent          = CAT_LABELS[p.category] || p.category || '—';
+    document.getElementById('pc-nombre').textContent       = [p.brand, p.name].filter(Boolean).join(' · ');
+    document.getElementById('pc-sku').textContent          = p.sku ? `Código: ${p.sku}` : 'Sin código';
     document.getElementById('pc-stock-sistema').textContent = r.stockSistema;
 
     conteoActual = r.stockContado;
@@ -353,76 +349,58 @@
   function actualizarDifBadge() {
     const sistema = resultados[indexActual].stockSistema;
     const contado = conteoActual;
-    const dif = contado - sistema;
-    const badge = document.getElementById('dif-badge');
-    if (dif === 0) { badge.className = 'dif-badge igual'; badge.textContent = '✅ Sin diferencia'; }
-    else if (dif > 0) { badge.className = 'dif-badge mas-dif'; badge.textContent = `▲ ${dif} unidades de más`; }
-    else { badge.className = 'dif-badge menos-dif'; badge.textContent = `▼ ${Math.abs(dif)} unidades de menos`; }
+    const dif     = contado - sistema;
+    const badge   = document.getElementById('dif-badge');
+    if (dif === 0) { badge.className='dif-badge igual'; badge.textContent='✅ Sin diferencia'; }
+    else if (dif > 0) { badge.className='dif-badge mas-dif'; badge.textContent=`▲ ${dif} unidades de más`; }
+    else { badge.className='dif-badge menos-dif'; badge.textContent=`▼ ${Math.abs(dif)} unidades de menos`; }
   }
 
-  function confirmar() {
-    resultados[indexActual].stockContado = conteoActual;
-    resultados[indexActual].saltado = false;
-    avanzar();
-  }
-
-  function saltar() {
-    resultados[indexActual].saltado = true;
-    avanzar();
-  }
-
-  function avanzar() {
-    indexActual++;
-    if (indexActual >= productosConteo.length) {
-      mostrarResumen();
-    } else {
-      mostrarProducto();
-    }
-  }
+  function confirmar() { resultados[indexActual].stockContado=conteoActual; resultados[indexActual].saltado=false; avanzar(); }
+  function saltar()    { resultados[indexActual].saltado=true; avanzar(); }
+  function avanzar()   { indexActual++; if (indexActual>=productosConteo.length) mostrarResumen(); else mostrarProducto(); }
 
   // ── RESUMEN ───────────────────────────────────────────────
   function mostrarResumen() {
     mostrarPantalla('pantalla-resumen');
     document.getElementById('res-zona-label').textContent = ZONA_LABELS[zonaSeleccionada] || zonaSeleccionada;
 
-    const contados  = resultados.filter(r => !r.saltado);
-    const saltados  = resultados.filter(r => r.saltado);
-    const conDif    = contados.filter(r => r.stockContado !== r.stockSistema);
-    const sinDif    = contados.filter(r => r.stockContado === r.stockSistema);
+    const contados = resultados.filter(r => !r.saltado);
+    const saltados = resultados.filter(r => r.saltado);
+    const conDif   = contados.filter(r => r.stockContado !== r.stockSistema);
+    const sinDif   = contados.filter(r => r.stockContado === r.stockSistema);
 
-    document.getElementById('res-total').textContent = contados.length;
-    document.getElementById('res-difs').textContent = conDif.length;
+    document.getElementById('res-total').textContent    = contados.length;
+    document.getElementById('res-difs').textContent     = conDif.length;
     document.getElementById('res-saltados').textContent = saltados.length;
 
-    // Diferencias
     const difSection = document.getElementById('res-difs-section');
     const difLista   = document.getElementById('res-difs-lista');
     if (conDif.length > 0) {
       difSection.style.display = 'block';
       difLista.innerHTML = conDif.map(r => {
-        const dif = r.stockContado - r.stockSistema;
+        const dif   = r.stockContado - r.stockSistema;
         const esPos = dif > 0;
         const nombre = [r.producto.brand, r.producto.name].filter(Boolean).join(' · ');
-        return `<div class="dif-item ${esPos ? 'mas' : 'menos'}">
+        return `<div class="dif-item ${esPos?'mas':'menos'}">
           <div class="dif-info">
-            <div class="dif-nombre">${nombre}</div>
-            <div class="dif-det">${CAT_LABELS[r.producto.category] || '—'}</div>
+            <div class="dif-nombre">${esc(nombre)}</div>
+            <div class="dif-det">${CAT_LABELS[r.producto.category]||'—'}</div>
           </div>
           <div class="dif-num">
-            <div class="dif-delta ${esPos ? 'pos' : 'neg'}">${esPos ? '+' : ''}${dif}</div>
+            <div class="dif-delta ${esPos?'pos':'neg'}">${esPos?'+':''}${dif}</div>
             <div class="dif-stocks">${r.stockSistema} → ${r.stockContado}</div>
           </div>
         </div>`;
       }).join('');
     } else { difSection.style.display = 'none'; }
 
-    // Sin diferencias (colapsado, solo cantidad)
     const okSection = document.getElementById('res-ok-section');
     if (sinDif.length > 0) {
       okSection.style.display = 'block';
       document.getElementById('res-ok-lista').innerHTML = `
         <div style="background:white;border-radius:var(--radio);padding:14px 16px;box-shadow:0 2px 6px rgba(0,0,0,0.05);color:var(--gris);font-size:13px;font-weight:700;text-align:center">
-          ${sinDif.length} producto${sinDif.length !== 1 ? 's' : ''} sin diferencia ✅
+          ${sinDif.length} producto${sinDif.length!==1?'s':''} sin diferencia ✅
         </div>`;
     } else { okSection.style.display = 'none'; }
   }
@@ -436,27 +414,29 @@
 
     let errores = 0;
     for (const r of conDif) {
-      const { error: errUpd } = await sb.from('products')
-        .update({ stock_current: r.stockContado, updated_at: new Date().toISOString() })
-        .eq('id', r.producto.id);
-      if (errUpd) { errores++; continue; }
+      try {
+        const { error: errUpd } = await sb.from('products')
+          .update({ stock_current: r.stockContado, updated_at: new Date().toISOString() })
+          .eq('id', r.producto.id);
+        if (errUpd) { errores++; continue; }
 
-      await sb.from('stock_movements').insert([{
-        product_id:      r.producto.id,
-        branch_id:       r.producto.branch_id || null,
-        user_id:         currentUser?.id || null,
-        type:            'ajuste_inventario',
-        quantity:        r.stockContado - r.stockSistema,
-        quantity_before: r.stockSistema,
-        quantity_after:  r.stockContado,
-        notes:           `Conteo físico · ${ZONA_LABELS[zonaSeleccionada] || zonaSeleccionada}`
-      }]);
+        await sb.from('stock_movements').insert([{
+          product_id:      r.producto.id,
+          branch_id:       r.producto.branch_id || null,
+          user_id:         currentUser?.id || null,
+          type:            'ajuste_inventario',
+          quantity:        r.stockContado - r.stockSistema,
+          quantity_before: r.stockSistema,
+          quantity_after:  r.stockContado,
+          notes:           `Conteo físico · ${ZONA_LABELS[zonaSeleccionada] || zonaSeleccionada}`
+        }]);
+      } catch(e) { errores++; }
     }
 
     btn.textContent = '💾 Aplicar y actualizar stock'; btn.disabled = false;
 
-    if (errores > 0) { toast(`⚠️ ${errores} error(es) al actualizar`); }
-    else { toast(`✅ Stock actualizado — ${conDif.length} producto${conDif.length !== 1 ? 's' : ''} ajustado${conDif.length !== 1 ? 's' : ''}`); }
+    if (errores > 0) toast(`⚠️ ${errores} error(es) al actualizar`);
+    else toast(`✅ Stock actualizado — ${conDif.length} producto${conDif.length!==1?'s':''} ajustado${conDif.length!==1?'s':''}`);
 
     setTimeout(() => volverInicio(), 1500);
   }
@@ -470,14 +450,12 @@
     cargar();
   }
 
-  // ── UTILS ─────────────────────────────────────────────────
   function mostrarPantalla(id) {
     document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
     document.getElementById(id).classList.add('activa');
-    // Back button
     const back = document.getElementById('btn-back');
-    if (id === 'pantalla-inicio') { back.href = 'dashboard.html'; back.onclick = null; }
-    else { back.href = '#'; back.onclick = (e) => { e.preventDefault(); volverInicio(); }; }
+    if (id === 'pantalla-inicio') { back.href='dashboard.html'; back.onclick=null; }
+    else { back.href='#'; back.onclick=(e)=>{ e.preventDefault(); volverInicio(); }; }
   }
 
   function toast(msg) {
@@ -487,5 +465,6 @@
   }
 
   cargar();
-</script></body>
+</script>
+</body>
 </html>
