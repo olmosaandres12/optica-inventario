@@ -525,11 +525,29 @@
       <div class="grad-row">
         <div class="campo" style="margin-bottom:0">
           <label style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:0.4px;font-weight:700">Esfera</label>
-          <input type="text" inputmode="decimal" id="l-esfera" placeholder="-1.25" pattern="[+-]?[0-9]*\.?[0-9]*" oninput="normalizarGrad(this);autoNombreLente()" />
+          <div style="display:flex;gap:6px;align-items:center">
+            <button type="button" onclick="toggleSigno('l-esfera')" id="btn-signo-esfera" style="
+              flex-shrink:0;width:38px;height:44px;border-radius:10px;border:1.5px solid var(--borde);
+              background:#f8fafc;font-size:18px;font-weight:900;cursor:pointer;
+              font-family:'Nunito',sans-serif;color:#1e293b;transition:all 0.15s;
+            ">−</button>
+            <input type="text" inputmode="numeric" id="l-esfera" placeholder="1.25"
+              style="flex:1;text-align:center"
+              oninput="normalizarGrad(this);autoNombreLente()" />
+          </div>
         </div>
         <div class="campo" style="margin-bottom:0">
           <label style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:0.4px;font-weight:700">Cilindro</label>
-          <input type="text" inputmode="decimal" id="l-cilindro" placeholder="-0.75" pattern="[+-]?[0-9]*\.?[0-9]*" oninput="normalizarGrad(this);autoNombreLente()" />
+          <div style="display:flex;gap:6px;align-items:center">
+            <button type="button" onclick="toggleSigno('l-cilindro')" id="btn-signo-cilindro" style="
+              flex-shrink:0;width:38px;height:44px;border-radius:10px;border:1.5px solid var(--borde);
+              background:#f8fafc;font-size:18px;font-weight:900;cursor:pointer;
+              font-family:'Nunito',sans-serif;color:#1e293b;transition:all 0.15s;
+            ">−</button>
+            <input type="text" inputmode="numeric" id="l-cilindro" placeholder="0.75"
+              style="flex:1;text-align:center"
+              oninput="normalizarGrad(this);autoNombreLente()" />
+          </div>
         </div>
         <div class="campo" style="margin-bottom:0">
           <label style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:0.4px;font-weight:700">Eje</label>
@@ -1352,16 +1370,17 @@
     }
     // Graduación (guardada en notas con formato "Esfera: X | Cilindro: X | Eje: X | ...")
     if (p?.notes) {
-      document.getElementById('l-esfera').value   = (p.notes.match(/Esfera: ([^|]+)/)||[])[1]?.trim() || '';
-      document.getElementById('l-cilindro').value = (p.notes.match(/Cilindro: ([^|]+)/)||[])[1]?.trim() || '';
-      document.getElementById('l-eje').value      = (p.notes.match(/Eje: ([^|]+)/)||[])[1]?.trim() || '';
-      // Notas sin graduación ni color
+      setGradValue('l-esfera',   (p.notes.match(/Esfera: ([^|]+)/)||[])[1]?.trim() || '');
+      setGradValue('l-cilindro', (p.notes.match(/Cilindro: ([^|]+)/)||[])[1]?.trim() || '');
+      document.getElementById('l-eje').value = (p.notes.match(/Eje: ([^|]+)/)||[])[1]?.trim() || '';
+      document.getElementById('l-color').value = (p.notes.match(/Color: ([^|]+)/)||[])[1]?.trim() || '';
       const notasLimpias = p.notes.replace(/Esfera: [^|]+\|?\s?/g,'').replace(/Cilindro: [^|]+\|?\s?/g,'').replace(/Eje: [^|]+\|?\s?/g,'').replace(/Color: [^|]+\|?\s?/g,'').trim().replace(/^\||\|$/g,'').trim();
       document.getElementById('l-notas').value = notasLimpias;
     } else {
-      document.getElementById('l-esfera').value = '';
-      document.getElementById('l-cilindro').value = '';
+      setGradValue('l-esfera', '');
+      setGradValue('l-cilindro', '');
       document.getElementById('l-eje').value = '';
+      document.getElementById('l-color').value = '';
     }
     document.getElementById('overlay-lente').classList.add('vis');
     document.querySelector('#overlay-lente .modal').scrollTop = 0;
@@ -1375,8 +1394,8 @@
     btn.disabled = true; btn.textContent = 'Guardando…';
 
     // Construir notas con graduación
-    const esfera   = document.getElementById('l-esfera').value.trim();
-    const cilindro = document.getElementById('l-cilindro').value.trim();
+    const esfera   = getGradValue('l-esfera');
+    const cilindro = getGradValue('l-cilindro');
     const eje      = document.getElementById('l-eje').value.trim();
     const color    = document.getElementById('l-color').value.trim();
     const notasBase = document.getElementById('l-notas').value.trim();
@@ -1421,10 +1440,43 @@
   }
 
   function normalizarGrad(input) {
-    // Reemplazar coma por punto en tiempo real
     const pos = input.selectionStart;
-    input.value = input.value.replace(',', '.');
+    input.value = input.value.replace(',', '.').replace(/[^0-9.]/g, '');
     try { input.setSelectionRange(pos, pos); } catch(e) {}
+    autoNombreLente();
+  }
+
+  function toggleSigno(inputId) {
+    const btn = document.getElementById('btn-signo-' + inputId.replace('l-',''));
+    const esNeg = btn.textContent === '−';
+    btn.textContent = esNeg ? '+' : '−';
+    btn.style.background  = esNeg ? '#f0fdf4' : '#f8fafc';
+    btn.style.color       = esNeg ? '#065f46' : '#1e293b';
+    btn.style.borderColor = esNeg ? '#86efac' : 'var(--borde)';
+    autoNombreLente();
+  }
+
+  function getGradValue(inputId) {
+    const val = document.getElementById(inputId).value.trim();
+    if (!val) return '';
+    const btnId = 'btn-signo-' + inputId.replace('l-','');
+    const btn = document.getElementById(btnId);
+    const signo = btn ? (btn.textContent === '−' ? '-' : '+') : '';
+    return signo + val;
+  }
+
+  function setGradValue(inputId, valor) {
+    if (!valor) { document.getElementById(inputId).value = ''; return; }
+    const esNeg = valor.startsWith('-');
+    const btnId = 'btn-signo-' + inputId.replace('l-','');
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      btn.textContent    = esNeg ? '−' : '+';
+      btn.style.background  = esNeg ? '#f8fafc' : '#f0fdf4';
+      btn.style.color       = esNeg ? '#1e293b' : '#065f46';
+      btn.style.borderColor = esNeg ? 'var(--borde)' : '#86efac';
+    }
+    document.getElementById(inputId).value = valor.replace(/^[+-]/, '');
   }
 
   function onTipoLenteChange() {
@@ -1442,8 +1494,8 @@
       const color = document.getElementById('l-color').value.trim();
       if (color) partes.push(color);
     } else {
-      const esfera = document.getElementById('l-esfera').value.trim();
-      const cil    = document.getElementById('l-cilindro').value.trim();
+      const esfera = getGradValue('l-esfera');
+      const cil    = getGradValue('l-cilindro');
       if (esfera) partes.push(esfera);
       if (cil)    partes.push(cil);
     }
