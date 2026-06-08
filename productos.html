@@ -297,37 +297,80 @@
       </button>
 
       <div class="toolbar">
-        <div class="search-wrap">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="buscador" placeholder="Buscar por nombre, marca o código…" oninput="aplicarFiltros()" />
+        <!-- Barra de búsqueda + botón filtros -->
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="search-wrap" style="flex:1">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="buscador" placeholder="Buscar…" oninput="aplicarFiltros()" />
+          </div>
+          <button id="btn-filtros" onclick="toggleFiltros()" style="
+            flex-shrink:0; display:flex; align-items:center; gap:6px;
+            padding:11px 14px; border-radius:var(--radio);
+            border:1.5px solid var(--borde); background:white;
+            font-family:'Nunito',sans-serif; font-size:13px; font-weight:800;
+            color:var(--gris); cursor:pointer; transition:all 0.15s; white-space:nowrap;
+          ">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+            Filtros
+            <span id="filtros-count" style="display:none;background:var(--azul);color:white;border-radius:20px;padding:1px 7px;font-size:11px">0</span>
+          </button>
         </div>
-        <!-- Filtros de categoría: solo en armazones -->
-        <div class="filtros" id="filtros-cat" style="display:none">
-          <button class="filtro-chip activo" onclick="setFiltroCategoria(this,'')">Todos</button>
-          <button class="filtro-chip" onclick="setFiltroCategoria(this,'armazon_receta')">🕶 Receta</button>
-          <button class="filtro-chip" onclick="setFiltroCategoria(this,'armazon_sol')">☀️ Sol</button>
-          <button class="filtro-chip" onclick="setFiltroCategoria(this,'lentes_oftalmicos')">🔬 Oftálmicos</button>
-          <button class="filtro-chip" onclick="setFiltroCategoria(this,'accesorios')">🎀 Accesorios</button>
-          <button class="filtro-chip" onclick="setFiltroCategoria(this,'clipon')">🔗 Clipón</button>
-          <button class="filtro-chip" onclick="setFiltroCategoria(this,'otro')">📦 Otro</button>
-        </div>
-        <!-- Filtro de tipo de lente: solo en lentes -->
-        <div class="filtros" id="filtros-lente" style="display:none">
-          <button class="filtro-chip activo" onclick="setFiltroCategoria(this,'')">Todas</button>
-          <button class="filtro-chip" onclick="setFiltroCategoria(this,'lentes_contacto')">👁 De contacto</button>
-          <button class="filtro-chip" onclick="setFiltroCategoria(this,'lentes_cosmetica')">✨ Cosméticas</button>
-        </div>
-        <div class="filtros" id="filtros-stock">
-          <button class="filtro-chip activo" onclick="setFiltroStock(this,'')">Todo stock</button>
-          <button class="filtro-chip" onclick="setFiltroStock(this,'cero')">⚠️ Sin stock</button>
-          <button class="filtro-chip" onclick="setFiltroStock(this,'bajo')">🟡 Stock bajo</button>
-          <button class="filtro-chip" onclick="setFiltroStock(this,'ok')">🟢 En stock</button>
-        </div>
-        <div class="filtros" id="filtros-zona" style="display:none">
-          <!-- se genera dinámicamente -->
-        </div>
-        <div class="filtros">
-          <button class="filtro-chip" id="chip-dup" onclick="setFiltroEspecial(this,'duplicados')">🔴 Duplicados</button>
+
+        <!-- Panel de filtros colapsable -->
+        <div id="panel-filtros" style="display:none;background:white;border-radius:var(--radio);border:1.5px solid var(--borde);padding:14px;margin-top:2px">
+
+          <!-- Categoría (solo armazones) -->
+          <div id="filtros-cat-wrap" style="display:none;margin-bottom:12px">
+            <div style="font-size:10px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:7px">Categoría</div>
+            <div class="filtros" id="filtros-cat" style="margin-bottom:0">
+              <button class="filtro-chip activo" onclick="setFiltroCategoria(this,'')">Todos</button>
+              <button class="filtro-chip" onclick="setFiltroCategoria(this,'armazon_receta')">🕶 Receta</button>
+              <button class="filtro-chip" onclick="setFiltroCategoria(this,'armazon_sol')">☀️ Sol</button>
+              <button class="filtro-chip" onclick="setFiltroCategoria(this,'lentes_oftalmicos')">🔬 Oftálmicos</button>
+              <button class="filtro-chip" onclick="setFiltroCategoria(this,'accesorios')">🎀 Accesorios</button>
+              <button class="filtro-chip" onclick="setFiltroCategoria(this,'clipon')">🔗 Clipón</button>
+              <button class="filtro-chip" onclick="setFiltroCategoria(this,'otro')">📦 Otro</button>
+            </div>
+          </div>
+
+          <!-- Tipo lente (solo lentes) -->
+          <div id="filtros-lente-wrap" style="display:none;margin-bottom:12px">
+            <div style="font-size:10px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:7px">Tipo</div>
+            <div class="filtros" id="filtros-lente" style="margin-bottom:0">
+              <button class="filtro-chip activo" onclick="setFiltroCategoria(this,'')">Todas</button>
+              <button class="filtro-chip" onclick="setFiltroCategoria(this,'lentes_contacto')">👁 De contacto</button>
+              <button class="filtro-chip" onclick="setFiltroCategoria(this,'lentes_cosmetica')">✨ Cosméticas</button>
+            </div>
+          </div>
+
+          <!-- Stock -->
+          <div style="margin-bottom:12px">
+            <div style="font-size:10px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:7px">Stock</div>
+            <div class="filtros" id="filtros-stock" style="margin-bottom:0">
+              <button class="filtro-chip activo" onclick="setFiltroStock(this,'')">Todos</button>
+              <button class="filtro-chip" onclick="setFiltroStock(this,'cero')">⚠️ Sin stock</button>
+              <button class="filtro-chip" onclick="setFiltroStock(this,'bajo')">🟡 Bajo</button>
+              <button class="filtro-chip" onclick="setFiltroStock(this,'ok')">🟢 En stock</button>
+            </div>
+          </div>
+
+          <!-- Zona (solo armazones) -->
+          <div id="filtros-zona-wrap" style="display:none;margin-bottom:12px">
+            <div style="font-size:10px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:7px">Zona</div>
+            <div class="filtros" id="filtros-zona" style="margin-bottom:0"></div>
+          </div>
+
+          <!-- Duplicados -->
+          <div style="padding-top:4px;border-top:1px solid #f1f5f9">
+            <button class="filtro-chip" id="chip-dup" onclick="setFiltroEspecial(this,'duplicados')">🔴 Duplicados</button>
+          </div>
+
+          <!-- Limpiar filtros -->
+          <button onclick="limpiarFiltros()" style="
+            margin-top:12px; width:100%; padding:9px; border-radius:10px;
+            border:1.5px solid var(--borde); background:white; color:var(--gris);
+            font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; cursor:pointer;
+          ">✖ Limpiar filtros</button>
         </div>
       </div>
 
@@ -707,25 +750,70 @@
 
   function actualizarUISeccion() {
     const cfg = SECCION_CONFIG[seccionActiva];
-    // Tabs
     document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('activo'));
     document.getElementById('tab-' + seccionActiva)?.classList.add('activo');
-    // Sidebar sub-items
     document.querySelectorAll('.sb-sub-item').forEach(i => i.classList.remove('activo'));
     document.getElementById('sb-sub-' + seccionActiva)?.classList.add('activo');
-    // Banner
     document.getElementById('seccion-banner').style.background = cfg.color;
     document.getElementById('banner-icono').textContent = cfg.icono;
     document.getElementById('banner-titulo').textContent = cfg.titulo;
     document.getElementById('banner-sub').textContent = cfg.sub;
-    // Topnav
     document.getElementById('topnav-titulo').textContent = cfg.icono + ' ' + cfg.titulo;
-    // Botón agregar
     document.getElementById('btn-agregar-principal').textContent = cfg.btnLabel;
-    // Filtros visibles
-    document.getElementById('filtros-cat').style.display   = seccionActiva === 'armazones' ? '' : 'none';
-    document.getElementById('filtros-lente').style.display = seccionActiva === 'lentes'    ? '' : 'none';
-    document.getElementById('filtros-zona').style.display  = seccionActiva === 'armazones' ? '' : 'none';
+    // Mostrar/ocultar secciones dentro del panel de filtros
+    const esArmazones = seccionActiva === 'armazones';
+    const esLentes    = seccionActiva === 'lentes';
+    document.getElementById('filtros-cat-wrap').style.display   = esArmazones ? 'block' : 'none';
+    document.getElementById('filtros-lente-wrap').style.display = esLentes    ? 'block' : 'none';
+    document.getElementById('filtros-zona-wrap').style.display  = esArmazones ? 'block' : 'none';
+  }
+
+  function toggleFiltros() {
+    const panel = document.getElementById('panel-filtros');
+    const btn   = document.getElementById('btn-filtros');
+    const abierto = panel.style.display !== 'none';
+    panel.style.display = abierto ? 'none' : 'block';
+    btn.style.background  = abierto ? 'white' : 'var(--azul-bg)';
+    btn.style.color       = abierto ? 'var(--gris)' : 'var(--azul)';
+    btn.style.borderColor = abierto ? 'var(--borde)' : 'var(--azul2)';
+  }
+
+  function actualizarContadorFiltros() {
+    let count = 0;
+    if (categoriaActiva) count++;
+    if (stockFiltro)     count++;
+    if (zonaFiltro)      count++;
+    if (especialFiltro)  count++;
+    const badge = document.getElementById('filtros-count');
+    const btn   = document.getElementById('btn-filtros');
+    if (count > 0) {
+      badge.style.display = 'inline';
+      badge.textContent = count;
+      btn.style.background  = 'var(--azul-bg)';
+      btn.style.color       = 'var(--azul)';
+      btn.style.borderColor = 'var(--azul2)';
+    } else {
+      badge.style.display = 'none';
+      // Solo resetear estilo si el panel está cerrado
+      if (document.getElementById('panel-filtros').style.display === 'none') {
+        btn.style.background  = 'white';
+        btn.style.color       = 'var(--gris)';
+        btn.style.borderColor = 'var(--borde)';
+      }
+    }
+  }
+
+  function limpiarFiltros() {
+    categoriaActiva = ''; stockFiltro = ''; zonaFiltro = ''; especialFiltro = '';
+    document.querySelectorAll('.filtro-chip').forEach(b => b.classList.remove('activo'));
+    document.querySelector('#filtros-cat .filtro-chip')?.classList.add('activo');
+    document.querySelector('#filtros-lente .filtro-chip')?.classList.add('activo');
+    document.querySelector('#filtros-stock .filtro-chip')?.classList.add('activo');
+    document.querySelector('#filtros-zona .filtro-chip')?.classList.add('activo');
+    document.getElementById('chip-dup')?.classList.remove('activo');
+    document.getElementById('buscador').value = '';
+    actualizarContadorFiltros();
+    aplicarFiltros();
   }
 
   // ── HELPERS ───────────────────────────────────────────────
@@ -783,12 +871,13 @@
     const base = lista !== undefined ? lista : productosDeSección();
     const totalUnidades = base.reduce((s, p) => s + (p.stock_current || 0), 0);
     const lab = document.getElementById('st-total-lab');
-    if (zonaFiltro && seccionActiva === 'armazones') {
-      document.getElementById('st-total').textContent = totalUnidades;
-      if (lab) lab.textContent = 'Unidades';
-    } else {
+    // Armazones con zona → unidades físicas; lentes y líquidos → siempre unidades
+    if (seccionActiva === 'armazones' && !zonaFiltro) {
       document.getElementById('st-total').textContent = base.length;
       if (lab) lab.textContent = 'Total';
+    } else {
+      document.getElementById('st-total').textContent = totalUnidades;
+      if (lab) lab.textContent = 'Unidades';
     }
     document.getElementById('st-cero').textContent = base.filter(p => p.stock_current <= 0).length;
     document.getElementById('st-bajo').textContent = base.filter(p => p.stock_current > 0 && p.stock_min > 0 && p.stock_current < p.stock_min).length;
@@ -798,22 +887,22 @@
   function setFiltroCategoria(btn, cat) {
     const row = seccionActiva === 'lentes' ? '#filtros-lente' : '#filtros-cat';
     document.querySelectorAll(row + ' .filtro-chip').forEach(b => b.classList.remove('activo'));
-    btn.classList.add('activo'); categoriaActiva = cat; aplicarFiltros();
+    btn.classList.add('activo'); categoriaActiva = cat; actualizarContadorFiltros(); aplicarFiltros();
   }
   function setFiltroStock(btn, tipo) {
     document.querySelectorAll('#filtros-stock .filtro-chip').forEach(b => b.classList.remove('activo'));
-    btn.classList.add('activo'); stockFiltro = tipo; aplicarFiltros();
+    btn.classList.add('activo'); stockFiltro = tipo; actualizarContadorFiltros(); aplicarFiltros();
   }
   function setFiltroZona(btn, zona) {
     document.querySelectorAll('#filtros-zona .filtro-chip').forEach(b => b.classList.remove('activo'));
-    btn.classList.add('activo'); zonaFiltro = zona; aplicarFiltros();
+    btn.classList.add('activo'); zonaFiltro = zona; actualizarContadorFiltros(); aplicarFiltros();
   }
   function setFiltroEspecial(btn, tipo) {
     const yaActivo = btn.classList.contains('activo');
     document.getElementById('chip-dup')?.classList.remove('activo');
     especialFiltro = yaActivo ? '' : tipo;
     if (!yaActivo) btn.classList.add('activo');
-    aplicarFiltros();
+    actualizarContadorFiltros(); aplicarFiltros();
   }
 
   function aplicarFiltros() {
