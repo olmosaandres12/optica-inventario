@@ -946,6 +946,7 @@
     document.querySelectorAll('#filtros-grad .filtro-chip').forEach(b => b.classList.remove('activo'));
     btn.classList.add('activo'); gradFiltro = tipo; actualizarContadorFiltros(); aplicarFiltros();
   }
+  function setFiltroEspecial(btn, tipo) {
     const yaActivo = btn.classList.contains('activo');
     document.getElementById('chip-dup')?.classList.remove('activo');
     especialFiltro = yaActivo ? '' : tipo;
