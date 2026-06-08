@@ -525,15 +525,15 @@
       <div class="grad-row">
         <div class="campo" style="margin-bottom:0">
           <label style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:0.4px;font-weight:700">Esfera</label>
-          <input type="text" inputmode="decimal" id="l-esfera" placeholder="Ej: -1.50" oninput="autoNombreLente()" />
+          <input type="text" inputmode="decimal" id="l-esfera" placeholder="-1.25" pattern="[+-]?[0-9]*\.?[0-9]*" oninput="normalizarGrad(this);autoNombreLente()" />
         </div>
         <div class="campo" style="margin-bottom:0">
           <label style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:0.4px;font-weight:700">Cilindro</label>
-          <input type="text" inputmode="decimal" id="l-cilindro" placeholder="Ej: -0.75" oninput="autoNombreLente()" />
+          <input type="text" inputmode="decimal" id="l-cilindro" placeholder="-0.75" pattern="[+-]?[0-9]*\.?[0-9]*" oninput="normalizarGrad(this);autoNombreLente()" />
         </div>
         <div class="campo" style="margin-bottom:0">
           <label style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:0.4px;font-weight:700">Eje</label>
-          <input type="text" inputmode="numeric" id="l-eje" placeholder="Ej: 180" oninput="autoNombreLente()" />
+          <input type="text" inputmode="numeric" id="l-eje" placeholder="180" oninput="autoNombreLente()" />
         </div>
       </div>
     </div>
@@ -1418,6 +1418,13 @@
     if (error) { alert('Error: ' + error.message); return; }
     cerrarModal('overlay-lente');
     await cargar();
+  }
+
+  function normalizarGrad(input) {
+    // Reemplazar coma por punto en tiempo real
+    const pos = input.selectionStart;
+    input.value = input.value.replace(',', '.');
+    try { input.setSelectionRange(pos, pos); } catch(e) {}
   }
 
   function onTipoLenteChange() {
