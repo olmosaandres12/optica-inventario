@@ -9,28 +9,12 @@
   <meta name="apple-mobile-web-app-title" content="Inventario" />
   <meta name="theme-color" content="#034295" />
   <link rel="manifest" href="manifest.json" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Olvisión Inventario — Configuración</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-.btn-salir { width:100%; background:rgba(255,255,255,0.1); border:none; border-radius:10px; color:rgba(255,255,255,0.7); font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; padding:9px; cursor:pointer; }
-    .btn-salir:hover { background:rgba(255,255,255,0.18); color:white; }
-    
-    
-    
-    
-    
-    
-
-    /* SECCIONES */
-    
-    
-    
-    
-
-    /* FILA DE CONFIG */
     .cfg-fila { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid #f8fafc; gap:12px; }
     .cfg-fila:last-child { border-bottom:none; }
     .cfg-label { font-size:14px; font-weight:700; color:#1e293b; }
@@ -38,7 +22,6 @@
     .cfg-val { font-size:14px; font-weight:800; color:var(--azul); cursor:pointer; padding:6px 12px; background:var(--azul-bg); border-radius:10px; white-space:nowrap; transition:background 0.15s; }
     .cfg-val:hover { background:#dbeafe; }
 
-    /* TAGS (marcas/categorías) */
     .tags-wrap { padding:14px 18px; }
     .tags-list { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; min-height:32px; }
     .tag-item { display:flex; align-items:center; gap:6px; background:var(--azul-bg); border:1.5px solid #bfdbfe; border-radius:20px; padding:5px 10px 5px 12px; font-size:13px; font-weight:700; color:var(--azul); }
@@ -49,19 +32,12 @@
     .tag-add-input:focus { border-color:var(--azul2); }
     .tag-add-btn { background:var(--azul); color:white; border:none; border-radius:12px; padding:10px 16px; font-family:'Nunito',sans-serif; font-size:13px; font-weight:800; cursor:pointer; white-space:nowrap; }
 
-    /* INFO USUARIO */
     .user-card { display:flex; align-items:center; gap:14px; padding:18px; }
     .user-avatar { width:50px; height:50px; border-radius:50%; background:var(--azul-bg); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
     .user-nombre { font-size:16px; font-weight:800; color:#1e293b; }
     .user-email { font-size:12px; color:var(--gris); margin-top:2px; }
     .user-role { display:inline-block; margin-top:6px; padding:2px 10px; border-radius:20px; font-size:11px; font-weight:800; background:#d1fae5; color:#065f46; }
-
-    /* TOAST */
-    
-    
-
-    /* MODAL */
-</style>
+  </style>
 </head>
 <body>
 <div class="app">
@@ -76,9 +52,9 @@
       <a class="sb-item" href="proveedores.html"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="sb-label">Proveedores</span></a>
       <div class="sb-section-label">ADMINISTRACIÓN</div>
       <a class="sb-item" href="reportes.html"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><span class="sb-label">Reportes</span></a>
-      <a class="sb-item activo" href="configuracion.html"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><span class="sb-label">Configuración</span></a>
+      <a class="sb-item activo" href="configuracion.html"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><span class="sb-label">Configuración</span></a>
     </nav>
-    <div class="sb-footer"><div class="sb-user"><div class="sb-user-avatar" id="sb-avatar">A</div><div class="sb-user-info"><div class="sb-user-nombre" id="sb-nombre">Andrés</div><div class="sb-user-rol">Administrador</div></div><button class="sb-user-salir" onclick="salir()" title="Salir"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button></div></div>
+    <div class="sb-footer"><div class="sb-user"><div class="sb-user-avatar" id="sb-avatar">A</div><div class="sb-user-info"><div class="sb-user-nombre" id="sb-nombre">Andrés</div><div class="sb-user-rol" id="sb-rol">Administrador</div></div><button class="sb-user-salir" onclick="salir()" title="Salir"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button></div></div>
   </aside>
 
   <div class="main-wrap">
@@ -99,7 +75,7 @@
           <div>
             <div class="user-nombre" id="user-nombre">—</div>
             <div class="user-email" id="user-email">—</div>
-            <span class="user-role">Administrador</span>
+            <span class="user-role" id="user-role-badge">Administrador</span>
           </div>
         </div>
       </div>
@@ -121,17 +97,62 @@
         </div>
       </div>
 
-      <!-- MARCAS -->
+      <!-- MARCAS ARMAZONES -->
       <div class="seccion">
         <div class="sec-header">
-          <div class="sec-titulo">🏷️ Marcas de productos</div>
-          <div class="sec-sub">Lista única de marcas para todos los productos del inventario</div>
+          <div class="sec-titulo">🕶 Marcas de armazones</div>
+          <div class="sec-sub">Disponibles al cargar armazones de receta y sol</div>
         </div>
         <div class="tags-wrap">
           <div class="tags-list" id="tags-marcas"></div>
           <div class="tag-add-wrap">
             <input type="text" class="tag-add-input" id="input-marcas" placeholder="Nueva marca…" onkeydown="if(event.key==='Enter')agregarTag('marcas')" />
             <button class="tag-add-btn" onclick="agregarTag('marcas')">+ Agregar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MARCAS LENTES DE CONTACTO -->
+      <div class="seccion">
+        <div class="sec-header">
+          <div class="sec-titulo">👁 Marcas de lentes de contacto</div>
+          <div class="sec-sub">Disponibles al cargar lentes oftálmicos, de contacto y cosméticas</div>
+        </div>
+        <div class="tags-wrap">
+          <div class="tags-list" id="tags-marcas_lentes"></div>
+          <div class="tag-add-wrap">
+            <input type="text" class="tag-add-input" id="input-marcas_lentes" placeholder="Nueva marca…" onkeydown="if(event.key==='Enter')agregarTag('marcas_lentes')" />
+            <button class="tag-add-btn" onclick="agregarTag('marcas_lentes')">+ Agregar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MARCAS LÍQUIDOS -->
+      <div class="seccion">
+        <div class="sec-header">
+          <div class="sec-titulo">💧 Marcas de líquidos</div>
+          <div class="sec-sub">Disponibles al cargar soluciones y líquidos</div>
+        </div>
+        <div class="tags-wrap">
+          <div class="tags-list" id="tags-marcas_liquidos"></div>
+          <div class="tag-add-wrap">
+            <input type="text" class="tag-add-input" id="input-marcas_liquidos" placeholder="Nueva marca…" onkeydown="if(event.key==='Enter')agregarTag('marcas_liquidos')" />
+            <button class="tag-add-btn" onclick="agregarTag('marcas_liquidos')">+ Agregar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MATERIALES -->
+      <div class="seccion">
+        <div class="sec-header">
+          <div class="sec-titulo">🔩 Materiales de armazones</div>
+          <div class="sec-sub">Disponibles al cargar armazones</div>
+        </div>
+        <div class="tags-wrap">
+          <div class="tags-list" id="tags-materiales"></div>
+          <div class="tag-add-wrap">
+            <input type="text" class="tag-add-input" id="input-materiales" placeholder="Nuevo material…" onkeydown="if(event.key==='Enter')agregarTag('materiales')" />
+            <button class="tag-add-btn" onclick="agregarTag('materiales')">+ Agregar</button>
           </div>
         </div>
       </div>
@@ -178,11 +199,13 @@
 <div class="toast" id="toast"></div>
 
 <script>
+  // ── AUTH ──────────────────────────────────────────────────
   const userJson = localStorage.getItem('olvision_user');
-  if (!userJson) window.location.href = 'index.html';
+  if (!userJson) { window.location.replace('index.html'); throw new Error('no session'); }
   let currentUser;
-  try { currentUser = JSON.parse(userJson); } catch(e) { window.location.href = 'index.html'; }
-  function salir() { localStorage.removeItem('olvision_user'); window.location.href = 'index.html'; }
+  try { currentUser = JSON.parse(userJson); } catch(e) { window.location.replace('index.html'); throw e; }
+  if (currentUser.role !== 'admin') { window.location.replace('dashboard.html'); throw new Error('no access'); }
+  function salir() { localStorage.removeItem('olvision_user'); window.location.replace('index.html'); }
 
   const { createClient } = supabase;
   const sb = createClient(
@@ -190,19 +213,29 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ybWpsZnBidGpxeXZ0cGRleGVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NjM0MTcsImV4cCI6MjA5MjUzOTQxN30.cg36SF1XXpFbg3hRl2Xl7Tof_OhNJRa9B1BIUcNLpoQ'
   );
 
-  // ── ESTADO ────────────────────────────────────────────────
+  // Valores iniciales para las claves nuevas si no existen en Supabase aún
+  const DEFAULTS = {
+    marcas_lentes:   ['Acuvue 2', 'Acuvue Oasys', 'Acuvue Vita', 'Softles 59', 'B+L Ultra', 'Vanguard', 'Lunare', 'Freshlook'],
+    marcas_liquidos: ['Arlyt Express', 'Arlyt Lubricante', 'Arlyt Fresh', 'Arlyt Premium', 'Arlyt RGP', 'Biotrue', 'Renu Fresh', 'Natura Express', 'Sol. Sal.'],
+  };
+
   let config = {};
   let editandoClave = '';
 
   // ── INIT ──────────────────────────────────────────────────
   async function cargar() {
-    // Usuario
-    if (currentUser) {
-      document.getElementById('user-nombre').textContent = currentUser.user_metadata?.nombre || currentUser.email || '—';
-      document.getElementById('user-email').textContent = currentUser.email || '';
-    }
+    // UI usuario
+    const nombre = currentUser.name || currentUser.email || '—';
+    document.getElementById('sb-nombre').textContent    = nombre;
+    document.getElementById('sb-avatar').textContent    = nombre.charAt(0).toUpperCase();
+    document.getElementById('user-nombre').textContent  = nombre;
+    document.getElementById('user-email').textContent   = currentUser.email || '';
+    const rolLabels = { admin:'Administrador', empleado:'Empleada', contadora:'Contadora' };
+    const rolLabel  = rolLabels[currentUser.role] || currentUser.role || 'Usuario';
+    document.getElementById('sb-rol').textContent         = rolLabel;
+    document.getElementById('user-role-badge').textContent = rolLabel;
 
-    // Config desde Supabase (tabla configuracion del inventario)
+    // Config desde Supabase
     const { data } = await sb.from('configuracion').select('clave, valor');
     config = {};
     (data || []).forEach(r => {
@@ -212,44 +245,53 @@
     // Stock mínimo default
     document.getElementById('val-stock-min').textContent = config['stock_min_default'] ?? 2;
 
-    // Tags
-    renderTags('marcas', config['marcas'] || []);
+    // Tags — para marcas_lentes y marcas_liquidos usa defaults si no hay nada en Supabase
+    renderTags('marcas',          config['marcas']          || []);
+    renderTags('materiales',      config['materiales']      || []);
+    renderTags('marcas_lentes',   config['marcas_lentes']   || DEFAULTS.marcas_lentes);
+    renderTags('marcas_liquidos', config['marcas_liquidos'] || DEFAULTS.marcas_liquidos);
+
+    // Si no existían en Supabase, las guardamos ahora con los defaults
+    for (const clave of ['marcas_lentes', 'marcas_liquidos']) {
+      if (!config[clave]) {
+        await guardarConfig(clave, DEFAULTS[clave]);
+      }
+    }
   }
 
   // ── TAGS ──────────────────────────────────────────────────
-  function renderTags(tipo, lista) {
-    const cont = document.getElementById('tags-' + tipo);
+  function renderTags(clave, lista) {
+    const cont = document.getElementById('tags-' + clave);
     if (!cont) return;
-    const sorted = [...lista].sort((a,b) => a.localeCompare(b, 'es'));
+    const sorted = [...lista].sort((a, b) => a.localeCompare(b, 'es'));
     cont.innerHTML = sorted.length === 0
       ? '<span style="font-size:13px;color:var(--gris);font-style:italic">Sin marcas cargadas</span>'
-      : sorted.map((t, i) => `
-        <div class="tag-item">
-          ${t}
-          <button class="tag-del" onclick="eliminarTag('${tipo}',${lista.indexOf(t)})">✕</button>
-        </div>`).join('');
+      : sorted.map(t => `
+          <div class="tag-item">
+            ${t}
+            <button class="tag-del" onclick="eliminarTag('${clave}','${t.replace(/'/g, "\\'")}')">✕</button>
+          </div>`).join('');
   }
 
   async function agregarTag(clave) {
-    const tipo = clave; // tipo === clave en lista única
-    const input = document.getElementById('input-' + tipo);
-    const val = input.value.trim();
+    const input = document.getElementById('input-' + clave);
+    const val   = input.value.trim();
     if (!val) return;
-    const lista = [...(config[clave] || [])];
-    if (lista.map(m=>m.toLowerCase()).includes(val.toLowerCase())) { toast('⚠️ Ya existe esa marca'); return; }
+    const lista = [...(config[clave] || DEFAULTS[clave] || [])];
+    if (lista.map(m => m.toLowerCase()).includes(val.toLowerCase())) {
+      toast('⚠️ Ya existe esa marca'); return;
+    }
     lista.push(val);
     await guardarConfig(clave, lista);
     input.value = '';
-    renderTags(tipo, lista);
+    renderTags(clave, lista);
     toast('✅ Marca agregada');
   }
 
-  async function eliminarTag(tipo, idx) {
-    const clave = tipo;
-    const lista = [...(config[clave] || [])];
-    lista.splice(idx, 1);
+  async function eliminarTag(clave, valor) {
+    const lista = (config[clave] || DEFAULTS[clave] || []).filter(m => m !== valor);
     await guardarConfig(clave, lista);
-    renderTags(tipo, lista);
+    renderTags(clave, lista);
     toast('🗑️ Marca eliminada');
   }
 
@@ -257,9 +299,9 @@
   function editarValor(clave, titulo, tipo) {
     editandoClave = clave;
     document.getElementById('edit-titulo').textContent = titulo;
-    document.getElementById('edit-label').textContent = titulo;
+    document.getElementById('edit-label').textContent  = titulo;
     const input = document.getElementById('edit-input');
-    input.type = tipo || 'text';
+    input.type  = tipo || 'text';
     input.value = config[clave] ?? '';
     document.getElementById('overlay-edit').classList.add('vis');
     setTimeout(() => input.focus(), 200);
@@ -278,7 +320,9 @@
   // ── GUARDAR EN SUPABASE ───────────────────────────────────
   async function guardarConfig(clave, valor) {
     config[clave] = valor;
-    const { error } = await sb.from('configuracion').upsert({ clave, valor: JSON.stringify(valor) }, { onConflict: 'clave' });
+    const { error } = await sb
+      .from('configuracion')
+      .upsert({ clave, valor: JSON.stringify(valor) }, { onConflict: 'clave' });
     if (error) console.error('Error guardando config:', error.message);
   }
 
@@ -292,5 +336,6 @@
   }
 
   cargar();
-</script></body>
+</script>
+</body>
 </html>
