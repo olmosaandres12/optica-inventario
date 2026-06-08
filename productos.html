@@ -950,19 +950,82 @@
     }
 
     if (mostrarHeaders) {
-      const grupos = {};
-      lista.forEach(p => { const cat = p.category || 'otro'; if (!grupos[cat]) grupos[cat] = []; grupos[cat].push(p); });
-      const html = CAT_ORDER.filter(cat => grupos[cat]?.length).map(cat => {
-        const items = grupos[cat];
-        const header = `
-          <div class="cat-seccion-header">
-            <div class="cat-seccion-icono" style="background:${CAT_COLORES[cat]||'#f8fafc'}">${CAT_ICONOS[cat]||'📦'}</div>
-            <div class="cat-seccion-titulo">${CAT_LABELS[cat]||cat}</div>
-            <div class="cat-seccion-count">${items.length}</div>
-          </div>`;
-        return header + items.map(renderCard).join('');
-      }).join('');
-      cont.innerHTML = html;
+      // ── ARMAZONES: agrupar por categoría (comportamiento original) ──
+      if (seccionActiva === 'armazones') {
+        const grupos = {};
+        lista.forEach(p => { const cat = p.category || 'otro'; if (!grupos[cat]) grupos[cat] = []; grupos[cat].push(p); });
+        const html = CAT_ORDER.filter(cat => grupos[cat]?.length).map(cat => {
+          const items = grupos[cat];
+          const header = `
+            <div class="cat-seccion-header">
+              <div class="cat-seccion-icono" style="background:${CAT_COLORES[cat]||'#f8fafc'}">${CAT_ICONOS[cat]||'📦'}</div>
+              <div class="cat-seccion-titulo">${CAT_LABELS[cat]||cat}</div>
+              <div class="cat-seccion-count">${items.length}</div>
+            </div>`;
+          return header + items.map(renderCard).join('');
+        }).join('');
+        cont.innerHTML = html;
+
+      // ── LENTES: agrupar por familia de marca ──
+      } else if (seccionActiva === 'lentes') {
+        const LENTE_GRUPOS = [
+          { key: 'acuvue',   label: 'Acuvue',          icono: '👁',  color: '#eff6ff', marcas: ['Acuvue 2','Acuvue Oasys','Acuvue Vita'] },
+          { key: 'softlens', label: 'Softlens / Ultra', icono: '🔵', color: '#f0f9ff', marcas: ['Softles 59','B+L Ultra'] },
+          { key: 'vanguard', label: 'Vanguard',         icono: '👁',  color: '#f0fdf4', marcas: ['Vanguard'] },
+          { key: 'cosmetica',label: 'Cosméticas',       icono: '✨', color: '#fdf4ff', marcas: ['Lunare','Freshlook'] },
+          { key: 'otro',     label: 'Otras marcas',     icono: '📦', color: '#f8fafc', marcas: [] },
+        ];
+        // Asignar cada producto a su grupo
+        const grupos = {};
+        LENTE_GRUPOS.forEach(g => grupos[g.key] = []);
+        lista.forEach(p => {
+          const brand = p.brand || '';
+          const grupo = LENTE_GRUPOS.find(g => g.marcas.includes(brand));
+          if (grupo) grupos[grupo.key].push(p);
+          else grupos['otro'].push(p);
+        });
+        const html = LENTE_GRUPOS.filter(g => grupos[g.key]?.length).map(g => {
+          const header = `
+            <div class="cat-seccion-header">
+              <div class="cat-seccion-icono" style="background:${g.color}">${g.icono}</div>
+              <div class="cat-seccion-titulo">${g.label}</div>
+              <div class="cat-seccion-count">${grupos[g.key].length}</div>
+            </div>`;
+          return header + grupos[g.key].map(renderCard).join('');
+        }).join('');
+        cont.innerHTML = html;
+
+      // ── LÍQUIDOS: agrupar por familia de marca ──
+      } else if (seccionActiva === 'liquidos') {
+        const LIQUIDO_GRUPOS = [
+          { key: 'arlyt_exp',  label: 'Arlyt Express',  icono: '💧', color: '#eff6ff', marcas: ['Arlyt Express'] },
+          { key: 'arlyt_pre',  label: 'Arlyt Premium',  icono: '💧', color: '#f0f9ff', marcas: ['Arlyt Premium'] },
+          { key: 'arlyt_rgp',  label: 'Arlyt RGP',      icono: '💧', color: '#fefce8', marcas: ['Arlyt RGP'] },
+          { key: 'gotas',      label: 'Gotas',           icono: '💦', color: '#ecfeff', marcas: ['Arlyt Fresh','Arlyt Lub'] },
+          { key: 'bausch',     label: 'Bausch+Lomb',     icono: '🔬', color: '#f0fdf4', marcas: ['Bausch+Lomb Renu Plus','Bausch+Lomb Renu Fresh'] },
+          { key: 'natura',     label: 'Natura Express',  icono: '🌿', color: '#f0fdf4', marcas: ['Natura Express'] },
+          { key: 'solsal',     label: 'Sol. Salina',     icono: '🧴', color: '#f8fafc', marcas: ['Sol. Sal.'] },
+          { key: 'otro',       label: 'Otras marcas',    icono: '📦', color: '#f8fafc', marcas: [] },
+        ];
+        const grupos = {};
+        LIQUIDO_GRUPOS.forEach(g => grupos[g.key] = []);
+        lista.forEach(p => {
+          const brand = p.brand || '';
+          const grupo = LIQUIDO_GRUPOS.find(g => g.marcas.includes(brand));
+          if (grupo) grupos[grupo.key].push(p);
+          else grupos['otro'].push(p);
+        });
+        const html = LIQUIDO_GRUPOS.filter(g => grupos[g.key]?.length).map(g => {
+          const header = `
+            <div class="cat-seccion-header">
+              <div class="cat-seccion-icono" style="background:${g.color}">${g.icono}</div>
+              <div class="cat-seccion-titulo">${g.label}</div>
+              <div class="cat-seccion-count">${grupos[g.key].length}</div>
+            </div>`;
+          return header + grupos[g.key].map(renderCard).join('');
+        }).join('');
+        cont.innerHTML = html;
+      }
     } else {
       cont.innerHTML = lista.map(renderCard).join('');
     }
