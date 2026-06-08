@@ -528,7 +528,7 @@
           background:#f8fafc;font-size:18px;font-weight:900;cursor:pointer;
           font-family:'Nunito',sans-serif;color:#1e293b;transition:all 0.15s;
         ">−</button>
-        <input type="text" inputmode="numeric" id="l-esfera" placeholder="1.25"
+        <input type="text" inputmode="decimal" id="l-esfera" placeholder="1.25"
           style="flex:1;text-align:center"
           oninput="normalizarGrad(this);autoNombreLente()" />
       </div>
@@ -1409,9 +1409,12 @@
 
   function normalizarGrad(input) {
     const pos = input.selectionStart;
+    // Convertir coma a punto, eliminar todo lo que no sea dígito o punto
     input.value = input.value.replace(',', '.').replace(/[^0-9.]/g, '');
+    // Evitar múltiples puntos
+    const partes = input.value.split('.');
+    if (partes.length > 2) input.value = partes[0] + '.' + partes.slice(1).join('');
     try { input.setSelectionRange(pos, pos); } catch(e) {}
-    autoNombreLente();
   }
 
   function toggleSigno(inputId) {
