@@ -522,37 +522,15 @@
     <!-- GRADUACIÓN -->
     <div class="campo">
       <label>Graduación <small style="font-weight:400;text-transform:none">(opcional)</small></label>
-      <div class="grad-row">
-        <div class="campo" style="margin-bottom:0">
-          <label style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:0.4px;font-weight:700">Esfera</label>
-          <div style="display:flex;gap:6px;align-items:center">
-            <button type="button" onclick="toggleSigno('l-esfera')" id="btn-signo-esfera" style="
-              flex-shrink:0;width:38px;height:44px;border-radius:10px;border:1.5px solid var(--borde);
-              background:#f8fafc;font-size:18px;font-weight:900;cursor:pointer;
-              font-family:'Nunito',sans-serif;color:#1e293b;transition:all 0.15s;
-            ">−</button>
-            <input type="text" inputmode="numeric" id="l-esfera" placeholder="1.25"
-              style="flex:1;text-align:center"
-              oninput="normalizarGrad(this);autoNombreLente()" />
-          </div>
-        </div>
-        <div class="campo" style="margin-bottom:0">
-          <label style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:0.4px;font-weight:700">Cilindro</label>
-          <div style="display:flex;gap:6px;align-items:center">
-            <button type="button" onclick="toggleSigno('l-cilindro')" id="btn-signo-cilindro" style="
-              flex-shrink:0;width:38px;height:44px;border-radius:10px;border:1.5px solid var(--borde);
-              background:#f8fafc;font-size:18px;font-weight:900;cursor:pointer;
-              font-family:'Nunito',sans-serif;color:#1e293b;transition:all 0.15s;
-            ">−</button>
-            <input type="text" inputmode="numeric" id="l-cilindro" placeholder="0.75"
-              style="flex:1;text-align:center"
-              oninput="normalizarGrad(this);autoNombreLente()" />
-          </div>
-        </div>
-        <div class="campo" style="margin-bottom:0">
-          <label style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:0.4px;font-weight:700">Eje</label>
-          <input type="text" inputmode="numeric" id="l-eje" placeholder="180" oninput="autoNombreLente()" />
-        </div>
+      <div style="display:flex;gap:6px;align-items:center;max-width:180px">
+        <button type="button" onclick="toggleSigno('l-esfera')" id="btn-signo-esfera" style="
+          flex-shrink:0;width:38px;height:44px;border-radius:10px;border:1.5px solid var(--borde);
+          background:#f8fafc;font-size:18px;font-weight:900;cursor:pointer;
+          font-family:'Nunito',sans-serif;color:#1e293b;transition:all 0.15s;
+        ">−</button>
+        <input type="text" inputmode="numeric" id="l-esfera" placeholder="1.25"
+          style="flex:1;text-align:center"
+          oninput="normalizarGrad(this);autoNombreLente()" />
       </div>
     </div>
 
@@ -1027,11 +1005,9 @@
       // Línea de info según sección
       let subInfo = '';
       if (seccionActiva === 'lentes') {
-        const esfera   = p.notes ? (p.notes.match(/Esfera: ([^|]+)/)||[])[1]?.trim() : '';
-        const cilindro = p.notes ? (p.notes.match(/Cilindro: ([^|]+)/)||[])[1]?.trim() : '';
-        const color    = p.notes ? (p.notes.match(/Color: ([^|]+)/)||[])[1]?.trim() : '';
-        const grad = [esfera, cilindro].filter(Boolean).join(' / ');
-        subInfo = [color, grad, p.sku ? `#${p.sku}` : ''].filter(Boolean).join(' · ');
+        const esfera = p.notes ? (p.notes.match(/Esfera: ([^|]+)/)||[])[1]?.trim() : '';
+        const color  = p.notes ? (p.notes.match(/Color: ([^|]+)/)||[])[1]?.trim() : '';
+        subInfo = [color, esfera, p.sku ? `#${p.sku}` : ''].filter(Boolean).join(' · ');
       } else if (seccionActiva === 'liquidos') {
         subInfo = [p.subcategory, p.sku ? `#${p.sku}` : ''].filter(Boolean).join(' · ');
       } else {
@@ -1370,16 +1346,12 @@
     }
     // Graduación (guardada en notas con formato "Esfera: X | Cilindro: X | Eje: X | ...")
     if (p?.notes) {
-      setGradValue('l-esfera',   (p.notes.match(/Esfera: ([^|]+)/)||[])[1]?.trim() || '');
-      setGradValue('l-cilindro', (p.notes.match(/Cilindro: ([^|]+)/)||[])[1]?.trim() || '');
-      document.getElementById('l-eje').value = (p.notes.match(/Eje: ([^|]+)/)||[])[1]?.trim() || '';
+      setGradValue('l-esfera', (p.notes.match(/Esfera: ([^|]+)/)||[])[1]?.trim() || '');
       document.getElementById('l-color').value = (p.notes.match(/Color: ([^|]+)/)||[])[1]?.trim() || '';
-      const notasLimpias = p.notes.replace(/Esfera: [^|]+\|?\s?/g,'').replace(/Cilindro: [^|]+\|?\s?/g,'').replace(/Eje: [^|]+\|?\s?/g,'').replace(/Color: [^|]+\|?\s?/g,'').trim().replace(/^\||\|$/g,'').trim();
+      const notasLimpias = p.notes.replace(/Esfera: [^|]+\|?\s?/g,'').replace(/Color: [^|]+\|?\s?/g,'').trim().replace(/^\||\|$/g,'').trim();
       document.getElementById('l-notas').value = notasLimpias;
     } else {
       setGradValue('l-esfera', '');
-      setGradValue('l-cilindro', '');
-      document.getElementById('l-eje').value = '';
       document.getElementById('l-color').value = '';
     }
     document.getElementById('overlay-lente').classList.add('vis');
@@ -1395,15 +1367,11 @@
 
     // Construir notas con graduación
     const esfera   = getGradValue('l-esfera');
-    const cilindro = getGradValue('l-cilindro');
-    const eje      = document.getElementById('l-eje').value.trim();
     const color    = document.getElementById('l-color').value.trim();
     const notasBase = document.getElementById('l-notas').value.trim();
     const partesGrad = [];
-    if (esfera)   partesGrad.push(`Esfera: ${esfera}`);
-    if (cilindro) partesGrad.push(`Cilindro: ${cilindro}`);
-    if (eje)      partesGrad.push(`Eje: ${eje}`);
-    if (color)    partesGrad.push(`Color: ${color}`);
+    if (esfera) partesGrad.push(`Esfera: ${esfera}`);
+    if (color)  partesGrad.push(`Color: ${color}`);
     const notasFinal = [...partesGrad, notasBase].filter(Boolean).join(' | ');
 
     const marcaSel = document.getElementById('l-marca');
@@ -1495,9 +1463,7 @@
       if (color) partes.push(color);
     } else {
       const esfera = getGradValue('l-esfera');
-      const cil    = getGradValue('l-cilindro');
       if (esfera) partes.push(esfera);
-      if (cil)    partes.push(cil);
     }
     document.getElementById('l-nombre').value = partes.filter(Boolean).join(' ');
   }
