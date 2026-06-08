@@ -336,10 +336,16 @@
           <!-- Tipo lente (solo lentes) -->
           <div id="filtros-lente-wrap" style="display:none;margin-bottom:12px">
             <div style="font-size:10px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:7px">Tipo</div>
-            <div class="filtros" id="filtros-lente" style="margin-bottom:0">
+            <div class="filtros" id="filtros-lente" style="margin-bottom:8px">
               <button class="filtro-chip activo" onclick="setFiltroCategoria(this,'')">Todas</button>
               <button class="filtro-chip" onclick="setFiltroCategoria(this,'lentes_contacto')">👁 De contacto</button>
               <button class="filtro-chip" onclick="setFiltroCategoria(this,'lentes_cosmetica')">✨ Cosméticas</button>
+            </div>
+            <div style="font-size:10px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:7px">Graduación</div>
+            <div class="filtros" id="filtros-grad" style="margin-bottom:0">
+              <button class="filtro-chip activo" onclick="setFiltroGrad(this,'')">Todas</button>
+              <button class="filtro-chip" onclick="setFiltroGrad(this,'positiva')">➕ Positivas</button>
+              <button class="filtro-chip" onclick="setFiltroGrad(this,'negativa')">➖ Negativas</button>
             </div>
           </div>
 
@@ -733,7 +739,7 @@
   };
 
   let seccionActiva = 'armazones';
-  let productos = [], categoriaActiva = '', stockFiltro = '', zonaFiltro = '', especialFiltro = '', prodAbierto = null;
+  let productos = [], categoriaActiva = '', stockFiltro = '', zonaFiltro = '', especialFiltro = '', gradFiltro = '', prodAbierto = null;
   let fotoBlob = null;
   let idsDuplicados = new Set();
 
@@ -754,7 +760,7 @@
     // Actualizar UI
     actualizarUISeccion();
     // Resetear filtros de categoría
-    categoriaActiva = '';
+    categoriaActiva = ''; gradFiltro = '';
     document.querySelectorAll('#filtros-cat .filtro-chip, #filtros-lente .filtro-chip').forEach(b => b.classList.remove('activo'));
     const primerChip = document.querySelector('#filtros-cat .filtro-chip, #filtros-lente .filtro-chip');
     if (primerChip) primerChip.classList.add('activo');
@@ -797,6 +803,7 @@
     if (stockFiltro)     count++;
     if (zonaFiltro)      count++;
     if (especialFiltro)  count++;
+    if (gradFiltro)      count++;
     const badge = document.getElementById('filtros-count');
     const btn   = document.getElementById('btn-filtros');
     if (count > 0) {
@@ -817,10 +824,11 @@
   }
 
   function limpiarFiltros() {
-    categoriaActiva = ''; stockFiltro = ''; zonaFiltro = ''; especialFiltro = '';
+    categoriaActiva = ''; stockFiltro = ''; zonaFiltro = ''; especialFiltro = ''; gradFiltro = '';
     document.querySelectorAll('.filtro-chip').forEach(b => b.classList.remove('activo'));
     document.querySelector('#filtros-cat .filtro-chip')?.classList.add('activo');
     document.querySelector('#filtros-lente .filtro-chip')?.classList.add('activo');
+    document.querySelector('#filtros-grad .filtro-chip')?.classList.add('activo');
     document.querySelector('#filtros-stock .filtro-chip')?.classList.add('activo');
     document.querySelector('#filtros-zona .filtro-chip')?.classList.add('activo');
     document.getElementById('chip-dup')?.classList.remove('activo');
@@ -875,9 +883,33 @@
     document.getElementById('nav-sub').textContent = `${total} productos activos`;
   }
 
+  function gradToNum(notes) {
+    if (!notes) return null;
+    const match = notes.match(/Esfera: ([+-]?[\d.]+)/);
+    if (!match) return null;
+    return parseFloat(match[1]);
+  }
+
   function productosDeSección() {
     const cats = SECCION_CATS[seccionActiva];
-    return productos.filter(p => cats.includes(p.category));
+    let lista = productos.filter(p => cats.includes(p.category));
+    if (seccionActiva === 'lentes') {
+      lista = [...lista].sort((a, b) => {
+        const ga = gradToNum(a.notes);
+        const gb = gradToNum(b.notes);
+        // Sin graduación al final
+        if (ga === null && gb === null) return 0;
+        if (ga === null) return 1;
+        if (gb === null) return -1;
+        // Positivas antes que negativas
+        const aPos = ga >= 0, bPos = gb >= 0;
+        if (aPos && !bPos) return -1;
+        if (!aPos && bPos) return 1;
+        // Dentro del mismo grupo: de menor a mayor valor absoluto
+        return Math.abs(ga) - Math.abs(gb);
+      });
+    }
+    return lista;
   }
 
   function actualizarStats(lista) {
@@ -910,7 +942,10 @@
     document.querySelectorAll('#filtros-zona .filtro-chip').forEach(b => b.classList.remove('activo'));
     btn.classList.add('activo'); zonaFiltro = zona; actualizarContadorFiltros(); aplicarFiltros();
   }
-  function setFiltroEspecial(btn, tipo) {
+  function setFiltroGrad(btn, tipo) {
+    document.querySelectorAll('#filtros-grad .filtro-chip').forEach(b => b.classList.remove('activo'));
+    btn.classList.add('activo'); gradFiltro = tipo; actualizarContadorFiltros(); aplicarFiltros();
+  }
     const yaActivo = btn.classList.contains('activo');
     document.getElementById('chip-dup')?.classList.remove('activo');
     especialFiltro = yaActivo ? '' : tipo;
@@ -928,6 +963,8 @@
     if (stockFiltro === 'bajo') lista = lista.filter(p => p.stock_current > 0 && p.stock_min > 0 && p.stock_current < p.stock_min);
     if (stockFiltro === 'ok')   lista = lista.filter(p => p.stock_current > 0 && (!p.stock_min || p.stock_current >= p.stock_min));
     if (especialFiltro === 'duplicados') lista = lista.filter(p => idsDuplicados.has(p.id));
+    if (gradFiltro === 'positiva') lista = lista.filter(p => { const g = gradToNum(p.notes); return g !== null && g >= 0; });
+    if (gradFiltro === 'negativa') lista = lista.filter(p => { const g = gradToNum(p.notes); return g !== null && g < 0; });
     if (q) lista = lista.filter(p => (p.name||'').toLowerCase().includes(q) || (p.brand||'').toLowerCase().includes(q) || (p.sku||'').toLowerCase().includes(q));
     const resDiv = document.getElementById('resultado-txt');
     if (q || categoriaActiva || stockFiltro || zonaFiltro || especialFiltro) {
@@ -1130,7 +1167,6 @@
           { key: 'cosmetica',label: 'Cosméticas',       icono: '✨', color: '#fdf4ff', marcas: ['Lunare','Freshlook'] },
           { key: 'otro',     label: 'Otras marcas',     icono: '📦', color: '#f8fafc', marcas: [] },
         ];
-        // Asignar cada producto a su grupo
         const grupos = {};
         LENTE_GRUPOS.forEach(g => grupos[g.key] = []);
         lista.forEach(p => {
@@ -1139,16 +1175,38 @@
           if (grupo) grupos[grupo.key].push(p);
           else grupos['otro'].push(p);
         });
-        const html = LENTE_GRUPOS.filter(g => grupos[g.key]?.length).map(g => {
+
+        function renderGrupoLente(items, label, icono, color) {
+          if (!items.length) return '';
+          const esCosmetica = label === 'Cosméticas';
           const header = `
             <div class="cat-seccion-header">
-              <div class="cat-seccion-icono" style="background:${g.color}">${g.icono}</div>
-              <div class="cat-seccion-titulo">${g.label}</div>
-              <div class="cat-seccion-count">${grupos[g.key].length}</div>
+              <div class="cat-seccion-icono" style="background:${color}">${icono}</div>
+              <div class="cat-seccion-titulo">${label}</div>
+              <div class="cat-seccion-count">${items.length}</div>
             </div>`;
-          return header + grupos[g.key].map(renderCard).join('');
-        }).join('');
-        cont.innerHTML = html;
+          if (esCosmetica) return header + items.map(renderCard).join('');
+          // Separar positivas (≥0) y negativas (<0); sin grad van al final
+          const positivas = items.filter(p => { const g = gradToNum(p.notes); return g !== null && g >= 0; });
+          const negativas  = items.filter(p => { const g = gradToNum(p.notes); return g !== null && g < 0; });
+          const sinGrad    = items.filter(p => gradToNum(p.notes) === null);
+          let html = header;
+          if (positivas.length) {
+            html += `<div style="padding:4px 4px 6px"><span style="font-size:10px;font-weight:800;color:#16a34a;background:#f0fdf4;border-radius:20px;padding:2px 10px">➕ POSITIVAS</span></div>`;
+            html += positivas.map(renderCard).join('');
+          }
+          if (negativas.length) {
+            html += `<div style="padding:${positivas.length?'10px':'4px'} 4px 6px"><span style="font-size:10px;font-weight:800;color:#2563eb;background:#eff6ff;border-radius:20px;padding:2px 10px">➖ NEGATIVAS</span></div>`;
+            html += negativas.map(renderCard).join('');
+          }
+          if (sinGrad.length) html += sinGrad.map(renderCard).join('');
+          return html;
+        }
+
+        cont.innerHTML = LENTE_GRUPOS
+          .filter(g => grupos[g.key]?.length)
+          .map(g => renderGrupoLente(grupos[g.key], g.label, g.icono, g.color))
+          .join('');
 
       // ── LÍQUIDOS: agrupar por familia de marca ──
       } else if (seccionActiva === 'liquidos') {
