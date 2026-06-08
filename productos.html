@@ -519,6 +519,23 @@
       </div>
     </div>
 
+    <!-- PAR / MEDIO PAR (solo contacto) -->
+    <div class="campo" id="campo-par-lente">
+      <label>Presentación</label>
+      <div style="display:flex;gap:8px">
+        <button type="button" id="btn-par" onclick="setParLente('par')" style="
+          flex:1;padding:11px;border-radius:12px;border:1.5px solid var(--azul2);
+          background:var(--azul);color:white;font-family:'Nunito',sans-serif;
+          font-size:13px;font-weight:800;cursor:pointer;transition:all 0.15s
+        ">Par (x2)</button>
+        <button type="button" id="btn-medio-par" onclick="setParLente('medio')" style="
+          flex:1;padding:11px;border-radius:12px;border:1.5px solid var(--borde);
+          background:white;color:var(--gris);font-family:'Nunito',sans-serif;
+          font-size:13px;font-weight:800;cursor:pointer;transition:all 0.15s
+        ">Medio par (x1)</button>
+      </div>
+    </div>
+
     <!-- GRADUACIÓN -->
     <div class="campo">
       <label>Graduación <small style="font-weight:400;text-transform:none">(opcional)</small></label>
@@ -1322,8 +1339,9 @@
     document.getElementById('l-id').value = p?.id || '';
     document.getElementById('l-nombre').value = p?.name || '';
     document.getElementById('l-sku').value = p?.sku || '';
-    document.getElementById('l-stock').value = p?.stock_current ?? 0;
-    document.getElementById('l-stock-min').value = p?.stock_min ?? 0;
+    parLenteActual = p?.subcategory === 'medio' ? 'medio' : 'par';
+    setParLente(parLenteActual);
+    document.getElementById('l-stock-min').value = p?.stock_min ?? 3;
     document.getElementById('l-venta').value = p?.sale_price || '';
     document.getElementById('l-notas').value = '';
     // Marca
@@ -1383,6 +1401,7 @@
       sku: document.getElementById('l-sku').value.trim() || null,
       category: document.getElementById('l-tipo').value,
       zona: null,
+      subcategory: document.getElementById('l-tipo').value === 'lentes_cosmetica' ? null : parLenteActual,
       stock_current: parseInt(document.getElementById('l-stock').value) || 0,
       stock_min: parseInt(document.getElementById('l-stock-min').value) || 0,
       sale_price: parseFloat(document.getElementById('l-venta').value) || null,
@@ -1450,9 +1469,61 @@
     document.getElementById(inputId).value = valor.replace(/^[+-]/, '');
   }
 
+  // ── PRECIOS POR DEFECTO ───────────────────────────────────
+  // Lentes: { par, medio }
+  const PRECIOS_LENTES = {
+    'Acuvue Oasys':  { par: 30000, medio: 15000 },
+    'Acuvue Vita':   { par: 30000, medio: 15000 },
+    'Acuvue 2':      { par: 30000, medio: 15000 },
+    'Softles 59':    { par: 30000, medio: 15000 },
+    'B+L Ultra':     { par: 30000, medio: 15000 },
+    'Vanguard':      { par: 24000, medio: 12000 },
+  };
+
+  // Líquidos: { presentacion: precio } o { '*': precio } para precio único
+  const PRECIOS_LIQUIDOS = {
+    'Arlyt Express':         { '60ml':6000, '120ml':8900, '240ml':11500, '360ml':13500, '500ml':16600 },
+    'Arlyt Premium':         { '60ml':6500, '120ml':9700, '240ml':14000, '360ml':15800 },
+    'Arlyt RGP':             { '120ml':13600 },
+    'Arlyt Fresh':           { '15ml':9700 },
+    'Arlyt Lub':             { '15ml':11000 },
+    'Bausch+Lomb Renu Plus': { '15ml':9900 },
+    'Bausch+Lomb Renu Fresh':{ '60ml':6500, '120ml':10000, '355ml':15200, '500ml':18500 },
+    'Natura Express':        { '120ml':9300, '355ml':14000, '500ml':18000 },
+    'Sol. Sal.':             { '500ml':12000 },
+  };
+
+  function setParLente(tipo) {
+    parLenteActual = tipo;
+    const btnPar   = document.getElementById('btn-par');
+    const btnMedio = document.getElementById('btn-medio-par');
+    if (tipo === 'par') {
+      btnPar.style.background = 'var(--azul)'; btnPar.style.color = 'white'; btnPar.style.borderColor = 'var(--azul2)';
+      btnMedio.style.background = 'white'; btnMedio.style.color = 'var(--gris)'; btnMedio.style.borderColor = 'var(--borde)';
+    } else {
+      btnMedio.style.background = 'var(--azul)'; btnMedio.style.color = 'white'; btnMedio.style.borderColor = 'var(--azul2)';
+      btnPar.style.background = 'white'; btnPar.style.color = 'var(--gris)'; btnPar.style.borderColor = 'var(--borde)';
+    }
+    autoPrecioLente();
+  }
+
+  function autoPrecioLente() {
+    const marca = document.getElementById('l-marca').value;
+    const precios = PRECIOS_LENTES[marca];
+    if (!precios) return;
+    document.getElementById('l-venta').value = precios[parLenteActual] || '';
+  }
+
+  function onMarcaLenteChange() {
+    document.getElementById('l-marca-otra').style.display = document.getElementById('l-marca').value === '__otra__' ? 'block' : 'none';
+    autoPrecioLente();
+    autoNombreLente();
+  }
+
   function onTipoLenteChange() {
     const esCosmetica = document.getElementById('l-tipo').value === 'lentes_cosmetica';
     document.getElementById('campo-color-lente').style.display = esCosmetica ? 'block' : 'none';
+    document.getElementById('campo-par-lente').style.display   = esCosmetica ? 'none' : 'block';
     autoNombreLente();
   }
 
@@ -1476,10 +1547,7 @@
     const marca = sel.value === '__otra__' ? document.getElementById('lq-marca-otra').value.trim() : sel.value;
     const pres  = document.getElementById('lq-presentacion').value;
     document.getElementById('lq-nombre').value = [marca, pres].filter(Boolean).join(' ');
-  }
-
-  function onMarcaLenteChange() {
-    document.getElementById('l-marca-otra').style.display = document.getElementById('l-marca').value === '__otra__' ? 'block' : 'none';
+    autoPrecioLiquido();
   }
 
   // ── MODAL LÍQUIDOS ────────────────────────────────────────
@@ -1547,6 +1615,14 @@
 
   function onMarcaLiquidoChange() {
     document.getElementById('lq-marca-otra').style.display = document.getElementById('lq-marca').value === '__otra__' ? 'block' : 'none';
+    autoPrecioLiquido();
+  }
+
+  function autoPrecioLiquido() {
+    const marca = document.getElementById('lq-marca').value;
+    const pres  = document.getElementById('lq-presentacion').value;
+    const precio = PRECIOS_LIQUIDOS[marca]?.[pres] || PRECIOS_LIQUIDOS[marca]?.['*'] || null;
+    if (precio) document.getElementById('lq-venta').value = precio;
   }
 
   // ── ELIMINAR ──────────────────────────────────────────────
