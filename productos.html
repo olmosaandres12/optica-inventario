@@ -868,13 +868,63 @@
       const abierto = prodAbierto === p.id;
       const dupBadge = esDup ? `<span class="dup-badge">⚠️ DUPLICADO</span>` : '';
 
+      // Imagen de fallback por marca
+      const BASE_IMG = 'https://nrmjlfpbtjqyvtpdexej.supabase.co/storage/v1/object/public/product-photos/';
+      const BRAND_IMG = {
+        'Arlyt Express':           BASE_IMG + '1.png',
+        'Bausch+Lomb Renu Fresh':  BASE_IMG + '2.png',
+        'Natura Express':          BASE_IMG + '3.png',
+        'Sol. Sal.':               BASE_IMG + '4.png',
+        'Arlyt Lub':               BASE_IMG + '5.png',
+        'Arlyt Fresh':             BASE_IMG + '6.png',
+        'Arlyt Premium':           BASE_IMG + '7.png',
+        'Arlyt RGP':               BASE_IMG + '8.png',
+        'Bausch+Lomb Renu Plus':   BASE_IMG + '9.png',
+        'Acuvue 2':                BASE_IMG + '10.png',
+        'Acuvue Oasys':            BASE_IMG + '11.png',
+        'Acuvue Vita':             BASE_IMG + '12.png',
+        'Freshlook':               BASE_IMG + '13.png',
+        'Lunare':                  BASE_IMG + '15.png',
+        'B+L Ultra':               BASE_IMG + '14.png',
+        'Softles 59':              BASE_IMG + '13 2.png',
+        'Vanguard':                BASE_IMG + '16.png',
+      };
+      const imgUrl = p.photo_url || BRAND_IMG[p.brand] || null;
+
+      // Nombre a mostrar: para lentes/liquidos solo el nombre (ya incluye marca)
+      const nombreDisplay = (seccionActiva === 'lentes' || seccionActiva === 'liquidos')
+        ? (p.name || '(sin nombre)')
+        : ([p.brand, p.name].filter(Boolean).join(' · ') || '(sin nombre)');
+
+      // Badge compacto para lentes/liquidos: "A.Express 120ml" style
+      const badgeTexto = (() => {
+        if (seccionActiva === 'liquidos' && p.brand && p.subcategory) {
+          // Abreviar marca: primera palabra máx 8 chars
+          const palabras = p.brand.split(' ');
+          const abrev = palabras.length > 1
+            ? palabras[0].substring(0,1) + '.' + palabras.slice(1).join(' ')
+            : palabras[0];
+          return `${abrev} ${p.subcategory}`;
+        }
+        if (seccionActiva === 'lentes') {
+          const esfera = p.notes ? (p.notes.match(/Esfera: ([^|]+)/)||[])[1]?.trim() : '';
+          const color  = p.notes ? (p.notes.match(/Color: ([^|]+)/)||[])[1]?.trim() : '';
+          if (color) return color;
+          if (esfera) return esfera;
+        }
+        return p.stock_current <= 0 ? '⚠️ Sin stock' : `${p.stock_current} u.`;
+      })();
+
       // Línea de info según sección
       let subInfo = '';
       if (seccionActiva === 'lentes') {
-        const grad = [p.notes_grad_esfera, p.notes_grad_cilindro, p.notes_grad_eje].filter(Boolean).join(' / ');
-        subInfo = [CAT_LABELS[p.category], grad, p.sku ? `#${p.sku}` : ''].filter(Boolean).join(' · ');
+        const esfera   = p.notes ? (p.notes.match(/Esfera: ([^|]+)/)||[])[1]?.trim() : '';
+        const cilindro = p.notes ? (p.notes.match(/Cilindro: ([^|]+)/)||[])[1]?.trim() : '';
+        const color    = p.notes ? (p.notes.match(/Color: ([^|]+)/)||[])[1]?.trim() : '';
+        const grad = [esfera, cilindro].filter(Boolean).join(' / ');
+        subInfo = [color, grad, p.sku ? `#${p.sku}` : ''].filter(Boolean).join(' · ');
       } else if (seccionActiva === 'liquidos') {
-        subInfo = [p.brand, p.subcategory, p.sku ? `#${p.sku}` : ''].filter(Boolean).join(' · ');
+        subInfo = [p.subcategory, p.sku ? `#${p.sku}` : ''].filter(Boolean).join(' · ');
       } else {
         subInfo = [CAT_LABELS[p.category], p.material, p.subcategory].filter(Boolean).join(' · ');
         if (p.sku) subInfo += (subInfo ? ' · ' : '') + `<span style="font-family:monospace;font-weight:800">${p.sku}</span>`;
@@ -882,19 +932,22 @@
       }
 
       const stockLabel = p.stock_current <= 0 ? '⚠️ Sin stock' : `${p.stock_current} u.`;
-      const nombreCompleto = [p.brand, p.name].filter(Boolean).join(' · ');
 
-      const iconoHtml = p.photo_url
-        ? `<div class="prod-icono" style="background:white;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.08)"><img src="${p.photo_url}" alt="${p.name}" /></div>`
+      const iconoHtml = imgUrl
+        ? `<div class="prod-icono" style="background:white;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.08)"><img src="${imgUrl}" alt="${p.name}" /></div>`
         : `<div class="prod-icono" style="background:${iconoBg}">${icono}</div>`;
+
+      const fotoZonaHtml = imgUrl
+        ? `<img src="${imgUrl}" alt="${p.name}" />`
+        : `<span class="prod-foto-emoji">${icono}</span>`;
 
       const catHeader = `
         <div class="prod-foto-zona">
-          ${p.photo_url ? `<img src="${p.photo_url}" alt="${p.name}" />` : `<span class="prod-foto-emoji">${icono}</span>`}
+          ${fotoZonaHtml}
         </div>
         <div class="prod-info-cat">
-          <div class="prod-nombre-cat">${nombreCompleto||'(sin nombre)'}${dupBadge}</div>
-          <div class="prod-sub-cat">${[p.material, p.sku ? `#${p.sku}` : ''].filter(Boolean).join(' · ')}</div>
+          <div class="prod-nombre-cat">${nombreDisplay}${dupBadge}</div>
+          <div class="prod-sub-cat">${subInfo || '—'}</div>
           <div class="prod-stock-cat"><span class="stock-badge ${sc}" style="font-size:11px;padding:3px 9px">${stockLabel}</span></div>
         </div>
         <div class="prod-right-cat">
@@ -921,7 +974,7 @@
             ${catHeader}
             ${iconoHtml}
             <div class="prod-info">
-              <div class="prod-nombre">${nombreCompleto || '(sin nombre)'}${dupBadge}</div>
+              <div class="prod-nombre">${nombreDisplay}${dupBadge}</div>
               <div class="prod-sub">${subInfo || '—'}</div>
             </div>
             <div class="prod-right">
