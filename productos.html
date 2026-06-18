@@ -227,6 +227,101 @@
       font-weight: 700; padding: 9px; cursor: pointer; transition: all 0.15s;
     }
     .btn-salir:hover { background: rgba(255,255,255,0.18); color: white; }
+
+    /* ── VARIANTE DE COLOR ── */
+    #toggle-variante-btn {
+      width: 100%; margin-bottom: 14px; padding: 13px 16px;
+      border: 2px dashed #cbd5e1; border-radius: var(--radio);
+      background: white; font-family: 'Nunito', sans-serif;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; gap: 12px; text-align: left;
+    }
+    #toggle-variante-btn .v-icono { font-size: 22px; flex-shrink: 0; }
+    #toggle-variante-btn.activo {
+      background: #eff6ff; border-color: var(--azul2);
+      border-style: solid;
+    }
+    .variante-toggle-lbl {
+      font-size: 13px; font-weight: 800; color: #475569;
+      transition: color 0.2s;
+    }
+    #toggle-variante-btn.activo .variante-toggle-lbl { color: var(--azul); }
+    .variante-toggle-sub {
+      font-size: 11px; color: #94a3b8; font-weight: 600;
+      margin-top: 2px; line-height: 1.3; transition: color 0.2s;
+    }
+    #toggle-variante-btn.activo .variante-toggle-sub { color: #93c5fd; }
+
+    #panel-variante { display: none; margin-bottom: 6px; }
+    #panel-variante.vis { display: block; }
+
+    .variante-busqueda-wrap { position: relative; margin-bottom: 8px; }
+    .variante-busqueda-wrap input {
+      width: 100%; padding: 12px 16px 12px 42px;
+      border: 1.5px solid var(--borde); border-radius: var(--radio);
+      font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600;
+      color: #1e293b; background: white; outline: none;
+      transition: border-color 0.15s; box-sizing: border-box;
+    }
+    .variante-busqueda-wrap input:focus { border-color: var(--azul2); }
+    .variante-busqueda-icon {
+      position: absolute; left: 14px; top: 50%;
+      transform: translateY(-50%); font-size: 16px; pointer-events: none;
+    }
+
+    #variante-resultados {
+      border: 1.5px solid var(--borde); border-radius: var(--radio);
+      background: white; max-height: 210px; overflow-y: auto;
+      margin-bottom: 10px; display: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .variante-res-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; cursor: pointer;
+      border-bottom: 1px solid #f1f5f9; transition: background 0.1s;
+    }
+    .variante-res-item:last-child { border-bottom: none; }
+    .variante-res-item:hover { background: #f8fafc; }
+    .variante-res-item:active { background: #eff6ff; }
+    .variante-res-thumb {
+      width: 38px; height: 38px; border-radius: 9px; overflow: hidden;
+      flex-shrink: 0; background: #f1f5f9;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid #e2e8f0; font-size: 16px;
+    }
+    .variante-res-thumb img { width: 100%; height: 100%; object-fit: contain; padding: 3px; box-sizing: border-box; }
+    .variante-res-info { flex: 1; min-width: 0; }
+    .variante-res-nombre { font-size: 13px; font-weight: 800; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .variante-res-sub { font-size: 11px; color: var(--gris); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    #card-base-variante {
+      background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 14px;
+      padding: 12px 14px; margin-bottom: 14px; display: none;
+      align-items: center; gap: 10px;
+    }
+    #card-base-variante.vis { display: flex; }
+    .card-base-thumb {
+      width: 44px; height: 44px; border-radius: 10px; overflow: hidden;
+      flex-shrink: 0; background: white; border: 1px solid #d1fae5;
+      display: flex; align-items: center; justify-content: center; font-size: 20px;
+    }
+    .card-base-thumb img { width: 100%; height: 100%; object-fit: contain; padding: 3px; box-sizing: border-box; }
+    .card-base-info { flex: 1; min-width: 0; }
+    .card-base-nombre { font-size: 13px; font-weight: 800; color: #065f46; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-base-sub { font-size: 11px; color: #16a34a; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-base-clear {
+      background: none; border: none; font-size: 18px; cursor: pointer;
+      color: #9ca3af; flex-shrink: 0; padding: 4px; line-height: 1;
+      border-radius: 6px; transition: all 0.15s;
+    }
+    .card-base-clear:hover { color: var(--rojo); background: #fee2e2; }
+
+    .variante-nombre-preview {
+      background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 10px;
+      padding: 10px 14px; font-size: 13px; font-weight: 800; color: var(--azul);
+      margin-bottom: 14px; text-align: center; min-height: 40px;
+      display: flex; align-items: center; justify-content: center;
+    }
   </style>
 </head>
 <body>
@@ -239,7 +334,6 @@
       <div class="sb-section-label">PRINCIPAL</div>
       <a class="sb-item" href="dashboard.html"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><span class="sb-label">Inicio</span></a>
 
-      <!-- PRODUCTOS con sub-items -->
       <a class="sb-item activo" href="productos.html?s=armazones"><div class="sb-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div><span class="sb-label">Productos</span></a>
       <div class="sb-sub-nav">
         <a class="sb-sub-item" id="sb-sub-armazones" href="productos.html?s=armazones"><span class="sb-sub-dot"></span>🕶 Armazones</a>
@@ -297,7 +391,6 @@
       </button>
 
       <div class="toolbar">
-        <!-- Barra de búsqueda + botón filtros -->
         <div style="display:flex;gap:8px;align-items:center">
           <div class="search-wrap" style="flex:1">
             <span class="search-icon">🔍</span>
@@ -316,10 +409,8 @@
           </button>
         </div>
 
-        <!-- Panel de filtros colapsable -->
         <div id="panel-filtros" style="display:none;background:white;border-radius:var(--radio);border:1.5px solid var(--borde);padding:14px;margin-top:2px">
 
-          <!-- Categoría (solo armazones) -->
           <div id="filtros-cat-wrap" style="display:none;margin-bottom:12px">
             <div style="font-size:10px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:7px">Categoría</div>
             <div class="filtros" id="filtros-cat" style="margin-bottom:0">
@@ -333,7 +424,6 @@
             </div>
           </div>
 
-          <!-- Tipo lente (solo lentes) -->
           <div id="filtros-lente-wrap" style="display:none;margin-bottom:12px">
             <div style="font-size:10px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:7px">Tipo</div>
             <div class="filtros" id="filtros-lente" style="margin-bottom:8px">
@@ -349,7 +439,6 @@
             </div>
           </div>
 
-          <!-- Stock -->
           <div style="margin-bottom:12px">
             <div style="font-size:10px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:7px">Stock</div>
             <div class="filtros" id="filtros-stock" style="margin-bottom:0">
@@ -360,18 +449,15 @@
             </div>
           </div>
 
-          <!-- Zona (solo armazones) -->
           <div id="filtros-zona-wrap" style="display:none;margin-bottom:12px">
             <div style="font-size:10px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:7px">Zona</div>
             <div class="filtros" id="filtros-zona" style="margin-bottom:0"></div>
           </div>
 
-          <!-- Duplicados -->
           <div style="padding-top:4px;border-top:1px solid #f1f5f9">
             <button class="filtro-chip" id="chip-dup" onclick="setFiltroEspecial(this,'duplicados')">🔴 Duplicados</button>
           </div>
 
-          <!-- Limpiar filtros -->
           <button onclick="limpiarFiltros()" style="
             margin-top:12px; width:100%; padding:9px; border-radius:10px;
             border:1.5px solid var(--borde); background:white; color:var(--gris);
@@ -394,78 +480,141 @@
   </div>
 </div>
 
-<!-- ══ MODAL ARMAZONES (formulario completo original) ══ -->
+<!-- ══ MODAL ARMAZONES ══ -->
 <div class="overlay" id="overlay-form" onclick="cerrarFuera(event,'overlay-form')">
   <div class="modal">
     <div class="modal-titulo" id="modal-titulo">Nuevo armazón</div>
     <input type="hidden" id="f-id" />
     <input type="hidden" id="f-photo-url" />
 
-    <div class="campos-2">
-      <div class="campo" style="grid-column:1/-1">
-        <label>Nombre (se completa automáticamente)</label>
-        <input type="text" id="f-nombre" placeholder="Se genera con Marca + Código, o escribí directamente…" />
+    <!-- ── TOGGLE VARIANTE DE COLOR (solo en nuevo) ── -->
+    <div id="toggle-variante-wrap">
+      <button type="button" id="toggle-variante-btn" onclick="toggleModoVariante()">
+        <span class="v-icono">🎨</span>
+        <div>
+          <div class="variante-toggle-lbl">¿Es variante de color?</div>
+          <div class="variante-toggle-sub">Copia todos los datos de otro armazón — solo cambiás zona, color y foto</div>
+        </div>
+      </button>
+    </div>
+
+    <!-- ── PANEL VARIANTE ── -->
+    <div id="panel-variante">
+      <div style="font-size:10px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">🔍 Buscar armazón base</div>
+
+      <div class="variante-busqueda-wrap">
+        <span class="variante-busqueda-icon">🔍</span>
+        <input type="text" id="v-busqueda" placeholder="Nombre, marca o código del armazón original…" oninput="buscarBaseVariante(this.value)" autocomplete="off" />
       </div>
-      <div class="campo"><label>Marca</label>
-        <select id="f-marca" onchange="onMarcaChange()" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none">
-          <option value="">Seleccionar marca</option>
+
+      <div id="variante-resultados"></div>
+
+      <div id="card-base-variante">
+        <div class="card-base-thumb" id="card-base-thumb">🕶</div>
+        <div class="card-base-info">
+          <div class="card-base-nombre" id="card-base-nombre">—</div>
+          <div class="card-base-sub" id="card-base-sub">—</div>
+        </div>
+        <button class="card-base-clear" onclick="limpiarBase()" title="Quitar selección">✕</button>
+      </div>
+
+      <div id="campos-variante-simples" style="display:none">
+        <div class="campos-2">
+          <div class="campo"><label>Zona *</label>
+            <select id="v-zona" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none">
+              <option value="">Sin zona</option>
+              <option value="exhibidor_1">🗄 Exhibidor 1</option>
+              <option value="exhibidor_2">🗄 Exhibidor 2</option>
+              <option value="exhibidor_3">🗄 Exhibidor 3</option>
+              <option value="vidriera_1">🪟 Vidriera 1</option>
+              <option value="vidriera_2">🪟 Vidriera 2</option>
+              <option value="vidriera_3">🪟 Vidriera 3</option>
+              <option value="vidriera_4">🪟 Vidriera 4</option>
+              <option value="cajonera_1">🗃 Cajonera 1</option>
+              <option value="cajonera_2">🗃 Cajonera 2</option>
+            </select>
+          </div>
+          <div class="campo"><label>Stock inicial</label>
+            <input type="number" id="v-stock" placeholder="0" min="0" value="0" />
+          </div>
+        </div>
+        <div class="campo">
+          <label>Color *</label>
+          <input type="text" id="v-color" placeholder="Ej: Negro, Carey, Azul, Habano…" oninput="actualizarNombreVariante()" />
+        </div>
+        <div class="variante-nombre-preview" id="v-nombre-preview">—</div>
+      </div>
+    </div>
+
+    <!-- ── CAMPOS NORMALES (se ocultan en modo variante) ── -->
+    <div id="campos-normales">
+      <div class="campos-2">
+        <div class="campo" style="grid-column:1/-1">
+          <label>Nombre (se completa automáticamente)</label>
+          <input type="text" id="f-nombre" placeholder="Se genera con Marca + Código, o escribí directamente…" />
+        </div>
+        <div class="campo"><label>Marca</label>
+          <select id="f-marca" onchange="onMarcaChange()" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none">
+            <option value="">Seleccionar marca</option>
+          </select>
+          <input type="text" id="f-marca-otra" placeholder="Escribí la marca…" oninput="autoNombre()" style="display:none;margin-top:8px" />
+        </div>
+        <div class="campo"><label>SKU / Código</label><input type="text" id="f-sku" placeholder="Ej: RB2140" oninput="autoNombre()" /></div>
+      </div>
+
+      <div class="campos-2">
+        <div class="campo"><label>Categoría *</label>
+          <select id="f-categoria">
+            <option value="">Seleccionar</option>
+            <option value="armazon_receta">🕶 Armazón receta</option>
+            <option value="armazon_sol">☀️ Armazón sol</option>
+            <option value="lentes_oftalmicos">🔬 Lentes oftálmicos</option>
+            <option value="accesorios">🎀 Accesorios</option>
+            <option value="clipon">🔗 Clipón</option>
+            <option value="otro">📦 Otro</option>
+          </select>
+        </div>
+        <div class="campo"><label>Zona *</label>
+          <select id="f-zona" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none">
+            <option value="">Sin zona</option>
+            <option value="exhibidor_1">🗄 Exhibidor 1</option>
+            <option value="exhibidor_2">🗄 Exhibidor 2</option>
+            <option value="exhibidor_3">🗄 Exhibidor 3</option>
+            <option value="vidriera_1">🪟 Vidriera 1</option>
+            <option value="vidriera_2">🪟 Vidriera 2</option>
+            <option value="vidriera_3">🪟 Vidriera 3</option>
+            <option value="vidriera_4">🪟 Vidriera 4</option>
+            <option value="cajonera_1">🗃 Cajonera 1</option>
+            <option value="cajonera_2">🗃 Cajonera 2</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label>Material <small style="font-weight:400;text-transform:none">(opcional)</small></label>
+        <select id="f-material" onchange="onMaterialChange()" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none">
+          <option value="">Sin especificar</option>
         </select>
-        <input type="text" id="f-marca-otra" placeholder="Escribí la marca…" oninput="autoNombre()" style="display:none;margin-top:8px" />
+        <input type="text" id="f-material-otro" placeholder="Escribí el material…" style="display:none;margin-top:8px" />
       </div>
-      <div class="campo"><label>SKU / Código</label><input type="text" id="f-sku" placeholder="Ej: RB2140" oninput="autoNombre()" /></div>
-    </div>
 
-    <div class="campos-2">
-      <div class="campo"><label>Categoría *</label>
-        <select id="f-categoria">
-          <option value="">Seleccionar</option>
-          <option value="armazon_receta">🕶 Armazón receta</option>
-          <option value="armazon_sol">☀️ Armazón sol</option>
-          <option value="lentes_oftalmicos">🔬 Lentes oftálmicos</option>
-          <option value="accesorios">🎀 Accesorios</option>
-          <option value="clipon">🔗 Clipón</option>
-          <option value="otro">📦 Otro</option>
-        </select>
+      <div class="campos-2">
+        <div class="campo"><label>Stock actual *</label><input type="number" id="f-stock" placeholder="0" min="0" /></div>
+        <div class="campo"><label>Stock mínimo</label><input type="number" id="f-stock-min" placeholder="0" min="0" /></div>
       </div>
-      <div class="campo"><label>Zona *</label>
-        <select id="f-zona">
-          <option value="">Sin zona</option>
-          <option value="exhibidor_1">🗄 Exhibidor 1</option>
-          <option value="exhibidor_2">🗄 Exhibidor 2</option>
-          <option value="exhibidor_3">🗄 Exhibidor 3</option>
-          <option value="vidriera_1">🪟 Vidriera 1</option>
-          <option value="vidriera_2">🪟 Vidriera 2</option>
-          <option value="vidriera_3">🪟 Vidriera 3</option>
-          <option value="vidriera_4">🪟 Vidriera 4</option>
-          <option value="cajonera_1">🗃 Cajonera 1</option>
-          <option value="cajonera_2">🗃 Cajonera 2</option>
-        </select>
+      <div class="campos-2">
+        <div class="campo"><label>Precio costo $</label><input type="number" id="f-costo" placeholder="0" min="0" /></div>
+        <div class="campo"><label>Precio venta $</label><input type="number" id="f-venta" placeholder="0" min="0" /></div>
+      </div>
+      <div class="campo"><label>Subcategoría <small style="font-weight:400;text-transform:none">(opcional)</small></label>
+        <input type="text" id="f-subcat" placeholder="Ej: Redondos, Progresivos…" />
+      </div>
+      <div class="campo"><label>Notas <small style="font-weight:400;text-transform:none">(opcional)</small></label>
+        <textarea id="f-notas" rows="2" placeholder="Descripción adicional…"></textarea>
       </div>
     </div>
 
-    <div class="campo">
-      <label>Material <small style="font-weight:400;text-transform:none">(opcional)</small></label>
-      <select id="f-material" onchange="onMaterialChange()" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none">
-        <option value="">Sin especificar</option>
-      </select>
-      <input type="text" id="f-material-otro" placeholder="Escribí el material…" style="display:none;margin-top:8px" />
-    </div>
-
-    <div class="campos-2">
-      <div class="campo"><label>Stock actual *</label><input type="number" id="f-stock" placeholder="0" min="0" /></div>
-      <div class="campo"><label>Stock mínimo</label><input type="number" id="f-stock-min" placeholder="0" min="0" /></div>
-    </div>
-    <div class="campos-2">
-      <div class="campo"><label>Precio costo $</label><input type="number" id="f-costo" placeholder="0" min="0" /></div>
-      <div class="campo"><label>Precio venta $</label><input type="number" id="f-venta" placeholder="0" min="0" /></div>
-    </div>
-    <div class="campo"><label>Subcategoría <small style="font-weight:400;text-transform:none">(opcional)</small></label>
-      <input type="text" id="f-subcat" placeholder="Ej: Redondos, Progresivos…" />
-    </div>
-    <div class="campo"><label>Notas <small style="font-weight:400;text-transform:none">(opcional)</small></label>
-      <textarea id="f-notas" rows="2" placeholder="Descripción adicional…"></textarea>
-    </div>
-
+    <!-- FOTO (siempre visible, en ambos modos) -->
     <div class="campo">
       <label>Foto del producto <small style="font-weight:400;text-transform:none">(opcional)</small></label>
       <div class="foto-zona" id="foto-sin">
@@ -495,7 +644,7 @@
   </div>
 </div>
 
-<!-- ══ MODAL LENTES (contacto / cosméticas) ══ -->
+<!-- ══ MODAL LENTES ══ -->
 <div class="overlay" id="overlay-lente" onclick="cerrarFuera(event,'overlay-lente')">
   <div class="modal">
     <div class="modal-titulo" id="modal-lente-titulo">Nueva lente</div>
@@ -525,45 +674,27 @@
       </div>
     </div>
 
-    <!-- PAR / MEDIO PAR (solo contacto) -->
     <div class="campo" id="campo-par-lente">
       <label>Presentación</label>
       <div style="display:flex;gap:8px">
-        <button type="button" id="btn-par" onclick="setParLente('par')" style="
-          flex:1;padding:11px;border-radius:12px;border:1.5px solid var(--azul2);
-          background:var(--azul);color:white;font-family:'Nunito',sans-serif;
-          font-size:13px;font-weight:800;cursor:pointer;transition:all 0.15s
-        ">Par (x2)</button>
-        <button type="button" id="btn-medio-par" onclick="setParLente('medio')" style="
-          flex:1;padding:11px;border-radius:12px;border:1.5px solid var(--borde);
-          background:white;color:var(--gris);font-family:'Nunito',sans-serif;
-          font-size:13px;font-weight:800;cursor:pointer;transition:all 0.15s
-        ">Medio par (x1)</button>
+        <button type="button" id="btn-par" onclick="setParLente('par')" style="flex:1;padding:11px;border-radius:12px;border:1.5px solid var(--azul2);background:var(--azul);color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all 0.15s">Par (x2)</button>
+        <button type="button" id="btn-medio-par" onclick="setParLente('medio')" style="flex:1;padding:11px;border-radius:12px;border:1.5px solid var(--borde);background:white;color:var(--gris);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all 0.15s">Medio par (x1)</button>
       </div>
     </div>
 
-    <!-- GRADUACIÓN -->
     <div class="campo">
       <label>Graduación <small style="font-weight:400;text-transform:none">(opcional)</small></label>
       <div style="display:flex;gap:6px;align-items:center;max-width:180px">
-        <button type="button" onclick="toggleSigno('l-esfera')" id="btn-signo-esfera" style="
-          flex-shrink:0;width:38px;height:44px;border-radius:10px;border:1.5px solid var(--borde);
-          background:#f8fafc;font-size:18px;font-weight:900;cursor:pointer;
-          font-family:'Nunito',sans-serif;color:#1e293b;transition:all 0.15s;
-        ">−</button>
-        <input type="text" inputmode="decimal" id="l-esfera" placeholder="1.25"
-          style="flex:1;text-align:center"
-          oninput="normalizarGrad(this);autoNombreLente()" />
+        <button type="button" onclick="toggleSigno('l-esfera')" id="btn-signo-esfera" style="flex-shrink:0;width:38px;height:44px;border-radius:10px;border:1.5px solid var(--borde);background:#f8fafc;font-size:18px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;color:#1e293b;transition:all 0.15s;">−</button>
+        <input type="text" inputmode="decimal" id="l-esfera" placeholder="1.25" style="flex:1;text-align:center" oninput="normalizarGrad(this);autoNombreLente()" />
       </div>
     </div>
 
-    <!-- COLOR (solo cosméticas) -->
     <div class="campo" id="campo-color-lente" style="display:none">
       <label>Color <small style="font-weight:400;text-transform:none">(opcional)</small></label>
       <input type="text" id="l-color" placeholder="Ej: Verde, Gris, Avellana, Blue Topaz…" oninput="autoNombreLente()" />
     </div>
 
-    <!-- NOMBRE GENERADO -->
     <div class="campo">
       <label>Nombre del producto <small style="font-weight:400;text-transform:none">(se completa automáticamente)</small></label>
       <input type="text" id="l-nombre" placeholder="Se genera con Marca + Graduación…" />
@@ -588,7 +719,7 @@
   </div>
 </div>
 
-<!-- ══ MODAL LÍQUIDOS (soluciones) ══ -->
+<!-- ══ MODAL LÍQUIDOS ══ -->
 <div class="overlay" id="overlay-liquido" onclick="cerrarFuera(event,'overlay-liquido')">
   <div class="modal">
     <div class="modal-titulo" id="modal-liquido-titulo">Nuevo líquido</div>
@@ -627,7 +758,6 @@
       </div>
     </div>
 
-    <!-- NOMBRE GENERADO -->
     <div class="campo">
       <label>Nombre del producto <small style="font-weight:400;text-transform:none">(se completa automáticamente)</small></label>
       <input type="text" id="lq-nombre" placeholder="Se genera con Marca + Presentación…" />
@@ -652,7 +782,7 @@
   </div>
 </div>
 
-<!-- ══ MODAL AJUSTE DE STOCK ══ -->
+<!-- ══ MODAL AJUSTE STOCK ══ -->
 <div class="overlay" id="overlay-stock" onclick="cerrarFuera(event,'overlay-stock')">
   <div class="modal">
     <div class="modal-titulo">📦 Ajustar stock</div>
@@ -725,8 +855,6 @@
   );
 
   // ── SECCIÓN ACTIVA ────────────────────────────────────────
-  // Secciones: 'armazones' | 'lentes' | 'liquidos'
-  // Categorías de cada sección:
   const SECCION_CATS = {
     armazones: ['armazon_receta','armazon_sol','lentes_oftalmicos','accesorios','clipon','otro'],
     lentes:    ['lentes_contacto','lentes_cosmetica'],
@@ -743,6 +871,160 @@
   let fotoBlob = null;
   let idsDuplicados = new Set();
 
+  // ── VARIANTE DE COLOR ─────────────────────────────────────
+  let modoVariante = false;
+  let productoBaseId = null;
+  let parLenteActual = 'par';
+
+  // Mapa global de imágenes por marca
+  const BASE_IMG_URL = 'https://nrmjlfpbtjqyvtpdexej.supabase.co/storage/v1/object/public/product-photos/';
+  const BRAND_IMG = {
+    'Arlyt Express':           BASE_IMG_URL + '1.png',
+    'Bausch+Lomb Renu Fresh':  BASE_IMG_URL + '2.png',
+    'Natura Express':          BASE_IMG_URL + '3.png',
+    'Sol. Sal.':               BASE_IMG_URL + '4.png',
+    'Arlyt Lub':               BASE_IMG_URL + '5.png',
+    'Arlyt Fresh':             BASE_IMG_URL + '6.png',
+    'Arlyt Premium':           BASE_IMG_URL + '7.png',
+    'Arlyt RGP':               BASE_IMG_URL + '8.png',
+    'Bausch+Lomb Renu Plus':   BASE_IMG_URL + '9.png',
+    'Biotrue':                 BASE_IMG_URL + '9.png',
+    'Acuvue 2':                BASE_IMG_URL + '10.png',
+    'Acuvue Oasys':            BASE_IMG_URL + '11.png',
+    'Acuvue Vita':             BASE_IMG_URL + '12.png',
+    'Freshlook':               BASE_IMG_URL + '13.png',
+    'Lunare':                  BASE_IMG_URL + '15.png',
+    'B+L Ultra':               BASE_IMG_URL + '14.png',
+    'Softles 59':              BASE_IMG_URL + '13 2.png',
+    'Vanguard':                BASE_IMG_URL + '16.png',
+  };
+
+  function toggleModoVariante() {
+    modoVariante = !modoVariante;
+    aplicarUIVariante();
+    if (!modoVariante) resetVariante();
+  }
+
+  function aplicarUIVariante() {
+    const btn       = document.getElementById('toggle-variante-btn');
+    const panel     = document.getElementById('panel-variante');
+    const normales  = document.getElementById('campos-normales');
+    const btnGuard  = document.getElementById('btn-guardar-prod');
+    btn.classList.toggle('activo', modoVariante);
+    panel.classList.toggle('vis', modoVariante);
+    normales.style.display = modoVariante ? 'none' : '';
+    btnGuard.textContent   = modoVariante ? '🎨 Guardar variante' : '✅ Guardar producto';
+  }
+
+  function resetVariante() {
+    productoBaseId = null;
+    const vBus = document.getElementById('v-busqueda');
+    if (vBus) vBus.value = '';
+    const vColor = document.getElementById('v-color');
+    if (vColor) vColor.value = '';
+    const vStock = document.getElementById('v-stock');
+    if (vStock) vStock.value = '0';
+    const res = document.getElementById('variante-resultados');
+    if (res) { res.innerHTML = ''; res.style.display = 'none'; }
+    const card = document.getElementById('card-base-variante');
+    if (card) card.classList.remove('vis');
+    const simples = document.getElementById('campos-variante-simples');
+    if (simples) simples.style.display = 'none';
+    const preview = document.getElementById('v-nombre-preview');
+    if (preview) preview.textContent = '—';
+  }
+
+  function buscarBaseVariante(q) {
+    const lista = document.getElementById('variante-resultados');
+    q = q.trim();
+    if (q.length < 1) { lista.style.display = 'none'; lista.innerHTML = ''; return; }
+
+    const resultados = productos.filter(p =>
+      SECCION_CATS.armazones.includes(p.category) &&
+      ((p.name  ||'').toLowerCase().includes(q.toLowerCase()) ||
+       (p.sku   ||'').toLowerCase().includes(q.toLowerCase()) ||
+       (p.brand ||'').toLowerCase().includes(q.toLowerCase()))
+    ).slice(0, 8);
+
+    if (!resultados.length) {
+      lista.innerHTML = '<div style="padding:14px;text-align:center;color:var(--gris);font-size:13px;font-weight:600">Sin resultados</div>';
+      lista.style.display = 'block';
+      return;
+    }
+
+    lista.innerHTML = resultados.map(p => {
+      const imgUrl = p.photo_url || BRAND_IMG[p.brand] || null;
+      const thumbHtml = imgUrl
+        ? `<img src="${imgUrl}" />`
+        : (CAT_ICONOS[p.category] || '🕶');
+      const zona = ZONA_LABELS[p.zona] || (p.zona ? p.zona : 'Sin zona');
+      const sc   = getStockClase(p);
+      const subInfo = [CAT_LABELS[p.category], p.material, zona, p.sku ? '#'+p.sku : ''].filter(Boolean).join(' · ');
+      return `
+        <div class="variante-res-item" onclick="seleccionarBase('${p.id}')">
+          <div class="variante-res-thumb">${thumbHtml}</div>
+          <div class="variante-res-info">
+            <div class="variante-res-nombre">${[p.brand, p.name].filter(Boolean).join(' · ') || '(sin nombre)'}</div>
+            <div class="variante-res-sub">${subInfo}</div>
+          </div>
+          <span class="stock-badge ${sc}" style="font-size:10px;padding:2px 8px;flex-shrink:0">${p.stock_current} u.</span>
+        </div>`;
+    }).join('');
+    lista.style.display = 'block';
+  }
+
+  function seleccionarBase(id) {
+    const p = productos.find(x => x.id === id);
+    if (!p) return;
+    productoBaseId = id;
+
+    // Ocultar resultados + limpiar búsqueda
+    document.getElementById('variante-resultados').style.display = 'none';
+    document.getElementById('v-busqueda').value = '';
+
+    // Tarjeta resumen
+    const imgUrl = p.photo_url || BRAND_IMG[p.brand] || null;
+    const thumb  = document.getElementById('card-base-thumb');
+    thumb.innerHTML = imgUrl
+      ? `<img src="${imgUrl}" />`
+      : (CAT_ICONOS[p.category] || '🕶');
+
+    document.getElementById('card-base-nombre').textContent =
+      [p.brand, p.name].filter(Boolean).join(' · ') || '(sin nombre)';
+    document.getElementById('card-base-sub').textContent =
+      [CAT_LABELS[p.category], p.material, ZONA_LABELS[p.zona]||p.zona].filter(Boolean).join(' · ');
+    document.getElementById('card-base-variante').classList.add('vis');
+
+    // Mostrar campos simples
+    document.getElementById('campos-variante-simples').style.display = 'block';
+
+    // Pre-seleccionar zona del base como sugerencia
+    if (p.zona) setSelect('v-zona', p.zona);
+
+    actualizarNombreVariante();
+    setTimeout(() => document.getElementById('v-color').focus(), 80);
+  }
+
+  function limpiarBase() {
+    resetVariante();
+  }
+
+  function actualizarNombreVariante() {
+    const base  = productos.find(x => x.id === productoBaseId);
+    const color = (document.getElementById('v-color')?.value || '').trim();
+    if (!base) { document.getElementById('v-nombre-preview').textContent = '—'; return; }
+
+    let nombre;
+    if (base.brand && base.sku) {
+      nombre = [base.brand, base.sku, color].filter(Boolean).join(' ');
+    } else if (base.brand && base.name) {
+      nombre = [base.brand, base.name, color].filter(Boolean).join(' ');
+    } else {
+      nombre = [(base.name || ''), color].filter(Boolean).join(' ');
+    }
+    document.getElementById('v-nombre-preview').textContent = nombre || '—';
+  }
+
   // ── LEER SECCIÓN DESDE URL ────────────────────────────────
   function leerSeccionURL() {
     const params = new URLSearchParams(window.location.search);
@@ -753,13 +1035,10 @@
 
   function cambiarSeccion(sec) {
     seccionActiva = sec;
-    // Actualizar URL sin recargar
     const url = new URL(window.location);
     url.searchParams.set('s', sec);
     window.history.replaceState({}, '', url);
-    // Actualizar UI
     actualizarUISeccion();
-    // Resetear filtros de categoría
     categoriaActiva = ''; gradFiltro = '';
     document.querySelectorAll('#filtros-cat .filtro-chip, #filtros-lente .filtro-chip').forEach(b => b.classList.remove('activo'));
     const primerChip = document.querySelector('#filtros-cat .filtro-chip, #filtros-lente .filtro-chip');
@@ -779,7 +1058,6 @@
     document.getElementById('banner-sub').textContent = cfg.sub;
     document.getElementById('topnav-titulo').textContent = cfg.icono + ' ' + cfg.titulo;
     document.getElementById('btn-agregar-principal').textContent = cfg.btnLabel;
-    // Mostrar/ocultar secciones dentro del panel de filtros
     const esArmazones = seccionActiva === 'armazones';
     const esLentes    = seccionActiva === 'lentes';
     document.getElementById('filtros-cat-wrap').style.display   = esArmazones ? 'block' : 'none';
@@ -814,7 +1092,6 @@
       btn.style.borderColor = 'var(--azul2)';
     } else {
       badge.style.display = 'none';
-      // Solo resetear estilo si el panel está cerrado
       if (document.getElementById('panel-filtros').style.display === 'none') {
         btn.style.background  = 'white';
         btn.style.color       = 'var(--gris)';
@@ -879,8 +1156,7 @@
     renderFiltrosZona();
     actualizarStats();
     aplicarFiltros();
-    const total = productos.length;
-    document.getElementById('nav-sub').textContent = `${total} productos activos`;
+    document.getElementById('nav-sub').textContent = `${productos.length} productos activos`;
   }
 
   function gradToNum(notes) {
@@ -897,15 +1173,12 @@
       lista = [...lista].sort((a, b) => {
         const ga = gradToNum(a.notes);
         const gb = gradToNum(b.notes);
-        // Sin graduación al final
         if (ga === null && gb === null) return 0;
         if (ga === null) return 1;
         if (gb === null) return -1;
-        // Positivas antes que negativas
         const aPos = ga >= 0, bPos = gb >= 0;
         if (aPos && !bPos) return -1;
         if (!aPos && bPos) return 1;
-        // Dentro del mismo grupo: de menor a mayor valor absoluto
         return Math.abs(ga) - Math.abs(gb);
       });
     }
@@ -916,7 +1189,6 @@
     const base = lista !== undefined ? lista : productosDeSección();
     const totalUnidades = base.reduce((s, p) => s + (p.stock_current || 0), 0);
     const lab = document.getElementById('st-total-lab');
-    // Armazones con zona → unidades físicas; lentes y líquidos → siempre unidades
     if (seccionActiva === 'armazones' && !zonaFiltro) {
       document.getElementById('st-total').textContent = base.length;
       if (lab) lab.textContent = 'Total';
@@ -956,7 +1228,6 @@
 
   function aplicarFiltros() {
     const q = document.getElementById('buscador').value.trim().toLowerCase();
-    // Partir de los productos de la sección activa
     let lista = productosDeSección();
     if (categoriaActiva)        lista = lista.filter(p => p.category === categoriaActiva);
     if (zonaFiltro && seccionActiva === 'armazones') lista = lista.filter(p => p.zona === zonaFiltro);
@@ -979,7 +1250,6 @@
       resDiv.classList.remove('vis');
       actualizarStats();
     }
-    // Vista catálogo solo en armazones con zona seleccionada
     document.getElementById('lista').classList.toggle('catalogo', !!zonaFiltro && seccionActiva === 'armazones');
     renderLista(lista);
   }
@@ -1009,39 +1279,14 @@
       const abierto = prodAbierto === p.id;
       const dupBadge = esDup ? `<span class="dup-badge">⚠️ DUPLICADO</span>` : '';
 
-      // Imagen de fallback por marca
-      const BASE_IMG = 'https://nrmjlfpbtjqyvtpdexej.supabase.co/storage/v1/object/public/product-photos/';
-      const BRAND_IMG = {
-        'Arlyt Express':           BASE_IMG + '1.png',
-        'Bausch+Lomb Renu Fresh':  BASE_IMG + '2.png',
-        'Natura Express':          BASE_IMG + '3.png',
-        'Sol. Sal.':               BASE_IMG + '4.png',
-        'Arlyt Lub':               BASE_IMG + '5.png',
-        'Arlyt Fresh':             BASE_IMG + '6.png',
-        'Arlyt Premium':           BASE_IMG + '7.png',
-        'Arlyt RGP':               BASE_IMG + '8.png',
-        'Bausch+Lomb Renu Plus':   BASE_IMG + '9.png',
-        'Biotrue':                 BASE_IMG + '9.png',
-        'Acuvue 2':                BASE_IMG + '10.png',
-        'Acuvue Oasys':            BASE_IMG + '11.png',
-        'Acuvue Vita':             BASE_IMG + '12.png',
-        'Freshlook':               BASE_IMG + '13.png',
-        'Lunare':                  BASE_IMG + '15.png',
-        'B+L Ultra':               BASE_IMG + '14.png',
-        'Softles 59':              BASE_IMG + '13 2.png',
-        'Vanguard':                BASE_IMG + '16.png',
-      };
       const imgUrl = p.photo_url || BRAND_IMG[p.brand] || null;
 
-      // Nombre a mostrar: para lentes/liquidos solo el nombre (ya incluye marca)
       const nombreDisplay = (seccionActiva === 'lentes' || seccionActiva === 'liquidos')
         ? (p.name || '(sin nombre)')
         : ([p.brand, p.name].filter(Boolean).join(' · ') || '(sin nombre)');
 
-      // Badge compacto para lentes/liquidos: "A.Express 120ml" style
       const badgeTexto = (() => {
         if (seccionActiva === 'liquidos' && p.brand && p.subcategory) {
-          // Abreviar marca: primera palabra máx 8 chars
           const palabras = p.brand.split(' ');
           const abrev = palabras.length > 1
             ? palabras[0].substring(0,1) + '.' + palabras.slice(1).join(' ')
@@ -1057,7 +1302,6 @@
         return p.stock_current <= 0 ? '⚠️ Sin stock' : `${p.stock_current} u.`;
       })();
 
-      // Línea de info según sección
       let subInfo = '';
       if (seccionActiva === 'lentes') {
         const esfera = p.notes ? (p.notes.match(/Esfera: ([^|]+)/)||[])[1]?.trim() : '';
@@ -1082,9 +1326,7 @@
         : `<span class="prod-foto-emoji">${icono}</span>`;
 
       const catHeader = `
-        <div class="prod-foto-zona">
-          ${fotoZonaHtml}
-        </div>
+        <div class="prod-foto-zona">${fotoZonaHtml}</div>
         <div class="prod-info-cat">
           <div class="prod-nombre-cat">${nombreDisplay}${dupBadge}</div>
           <div class="prod-sub-cat">${subInfo || '—'}</div>
@@ -1094,7 +1336,6 @@
           <span style="font-size:13px;color:var(--gris);transform:rotate(${abierto?'180':'0'}deg);display:inline-block;transition:transform 0.2s">▾</span>
         </div>`;
 
-      // Detalle según sección
       let detExtra = '';
       if (seccionActiva === 'lentes') {
         const esfera   = p.notes ? (p.notes.match(/Esfera: ([^\|]+)/)||[])[1]?.trim() : '';
@@ -1143,7 +1384,6 @@
     }
 
     if (mostrarHeaders) {
-      // ── ARMAZONES: agrupar por categoría (comportamiento original) ──
       if (seccionActiva === 'armazones') {
         const grupos = {};
         lista.forEach(p => { const cat = p.category || 'otro'; if (!grupos[cat]) grupos[cat] = []; grupos[cat].push(p); });
@@ -1159,7 +1399,6 @@
         }).join('');
         cont.innerHTML = html;
 
-      // ── LENTES: agrupar por familia de marca ──
       } else if (seccionActiva === 'lentes') {
         const LENTE_GRUPOS = [
           { key: 'acuvue',   label: 'Acuvue',          icono: '👁',  color: '#eff6ff', marcas: ['Acuvue 2','Acuvue Oasys','Acuvue Vita'] },
@@ -1187,7 +1426,6 @@
               <div class="cat-seccion-count">${items.length}</div>
             </div>`;
           if (esCosmetica) return header + items.map(renderCard).join('');
-          // Separar positivas (≥0) y negativas (<0); sin grad van al final
           const positivas = items.filter(p => { const g = gradToNum(p.notes); return g !== null && g >= 0; });
           const negativas  = items.filter(p => { const g = gradToNum(p.notes); return g !== null && g < 0; });
           const sinGrad    = items.filter(p => gradToNum(p.notes) === null);
@@ -1209,7 +1447,6 @@
           .map(g => renderGrupoLente(grupos[g.key], g.label, g.icono, g.color))
           .join('');
 
-      // ── LÍQUIDOS: agrupar por familia de marca ──
       } else if (seccionActiva === 'liquidos') {
         const LIQUIDO_GRUPOS = [
           { key: 'arlyt_exp',  label: 'Arlyt Express',  icono: '💧', color: '#eff6ff', marcas: ['Arlyt Express'] },
@@ -1258,7 +1495,6 @@
     }
   }
 
-  // ── DETECTAR SECCIÓN SEGÚN CATEGORÍA ─────────────────────
   function seccionDeCategoria(cat) {
     if (SECCION_CATS.lentes.includes(cat)) return 'lentes';
     if (SECCION_CATS.liquidos.includes(cat)) return 'liquidos';
@@ -1271,7 +1507,6 @@
     const sec = seccionDeCategoria(p.category);
     if (sec === 'lentes') { abrirModalLente(id); return; }
     if (sec === 'liquidos') { abrirModalLiquido(id); return; }
-    // Armazones (modal original)
     document.getElementById('f-id').value = p.id;
     document.getElementById('f-nombre').value = p.name || '';
     const marcaSel = document.getElementById('f-marca');
@@ -1309,8 +1544,17 @@
 
   // ── MODAL ARMAZONES ───────────────────────────────────────
   function abrirModal(idEdit) {
+    // Siempre resetear modo variante al abrir
+    modoVariante = false;
+    aplicarUIVariante();
+    resetVariante();
+
+    // Mostrar toggle solo al crear nuevo (ocultar al editar)
+    document.getElementById('toggle-variante-wrap').style.display = idEdit ? 'none' : 'block';
+
     document.getElementById('modal-titulo').textContent = idEdit ? 'Editar armazón' : 'Nuevo armazón';
     document.getElementById('btn-guardar-prod').textContent = idEdit ? '💾 Guardar cambios' : '✅ Guardar producto';
+
     if (!idEdit) {
       ['f-id','f-nombre','f-sku','f-stock','f-stock-min','f-costo','f-venta','f-subcat','f-notas','f-photo-url'].forEach(id => {
         const el = document.getElementById(id);
@@ -1331,6 +1575,81 @@
   }
 
   async function guardar() {
+    // ── RAMA VARIANTE DE COLOR ────────────────────────────
+    if (modoVariante) {
+      if (!productoBaseId) { alert('Buscá y seleccioná el armazón base primero'); return; }
+      const color = document.getElementById('v-color').value.trim();
+      if (!color) { alert('Ingresá el color de la variante'); return; }
+      const zona = document.getElementById('v-zona').value;
+      if (!zona) { alert('Seleccioná una zona'); return; }
+
+      const base = productos.find(x => x.id === productoBaseId);
+      if (!base) { alert('No se encontró el producto base'); return; }
+
+      const btn = document.getElementById('btn-guardar-prod');
+      btn.disabled = true; btn.textContent = 'Guardando…';
+
+      // Nombre generado
+      let nombreVariante;
+      if (base.brand && base.sku) {
+        nombreVariante = [base.brand, base.sku, color].filter(Boolean).join(' ');
+      } else if (base.brand && base.name) {
+        nombreVariante = [base.brand, base.name, color].filter(Boolean).join(' ');
+      } else {
+        nombreVariante = [(base.name||''), color].filter(Boolean).join(' ');
+      }
+
+      // SKU derivado
+      const skuVariante = base.sku
+        ? `${base.sku}-${color.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}`
+        : null;
+
+      // Notas: agregar color, conservar notas base (sin color previo)
+      const notasBase = (base.notes || '').replace(/Color: [^|]+\|?\s*/g,'').trim().replace(/^\||\|$/g,'').trim();
+      const notasVariante = [`Color: ${color}`, notasBase].filter(Boolean).join(' | ');
+
+      const payload = {
+        name:          nombreVariante,
+        brand:         base.brand         || null,
+        sku:           skuVariante,
+        category:      base.category,
+        zona:          zona,
+        material:      base.material      || null,
+        stock_current: parseInt(document.getElementById('v-stock').value) || 0,
+        stock_min:     base.stock_min     || 0,
+        cost_price:    base.cost_price    || null,
+        sale_price:    base.sale_price    || null,
+        subcategory:   base.subcategory   || null,
+        notes:         notasVariante      || null,
+        photo_url:     null,
+        active:        true,
+        updated_at:    new Date().toISOString(),
+      };
+
+      const { data: profile } = await sb.from('profiles').select('branch_id').eq('id', currentUser.id).maybeSingle();
+      if (profile?.branch_id) payload.branch_id = profile.branch_id;
+
+      const { data: nuevo, error } = await sb.from('products').insert([payload]).select().single();
+      if (error) {
+        alert('Error: ' + error.message);
+        btn.disabled = false; btn.textContent = '🎨 Guardar variante';
+        return;
+      }
+
+      if (fotoBlob && nuevo) {
+        btn.textContent = '📷 Subiendo foto…';
+        const urlFoto = await subirFotoStorage(nuevo.id);
+        if (urlFoto) await sb.from('products').update({ photo_url: urlFoto }).eq('id', nuevo.id);
+      }
+
+      btn.textContent = '🎨 Guardar variante'; btn.disabled = false;
+      fotoBlob = null;
+      cerrarModal('overlay-form');
+      await cargar();
+      return; // ← no continuar con lógica normal
+    }
+
+    // ── RAMA NORMAL ───────────────────────────────────────
     const id     = document.getElementById('f-id').value;
     const nombre = document.getElementById('f-nombre').value.trim();
     const cat    = document.getElementById('f-categoria').value;
@@ -1403,7 +1722,6 @@
     document.getElementById('l-stock-min').value = p?.stock_min ?? 3;
     document.getElementById('l-venta').value = p?.sale_price || '';
     document.getElementById('l-notas').value = '';
-    // Marca
     const marcaSel = document.getElementById('l-marca');
     const marcaOtra = document.getElementById('l-marca-otra');
     if (p?.brand) {
@@ -1411,17 +1729,14 @@
       if (opts.includes(p.brand)) { marcaSel.value = p.brand; marcaOtra.style.display = 'none'; }
       else { marcaSel.value = '__otra__'; marcaOtra.value = p.brand; marcaOtra.style.display = 'block'; }
     } else { marcaSel.selectedIndex = 0; marcaOtra.style.display = 'none'; }
-    // Tipo + color
     setSelect('l-tipo', p?.category || 'lentes_contacto');
     const esCosmetica = (p?.category === 'lentes_cosmetica');
     document.getElementById('campo-color-lente').style.display = esCosmetica ? 'block' : 'none';
-    // Color (guardado en notas como "Color: X | ...")
     if (p?.notes) {
       document.getElementById('l-color').value = (p.notes.match(/Color: ([^|]+)/)||[])[1]?.trim() || '';
     } else {
       document.getElementById('l-color').value = '';
     }
-    // Graduación (guardada en notas con formato "Esfera: X | Cilindro: X | Eje: X | ...")
     if (p?.notes) {
       setGradValue('l-esfera', (p.notes.match(/Esfera: ([^|]+)/)||[])[1]?.trim() || '');
       document.getElementById('l-color').value = (p.notes.match(/Color: ([^|]+)/)||[])[1]?.trim() || '';
@@ -1431,6 +1746,8 @@
       setGradValue('l-esfera', '');
       document.getElementById('l-color').value = '';
     }
+    // l-stock: si editando, usar stock actual; si nuevo, 0
+    document.getElementById('l-stock').value = p?.stock_current ?? 0;
     document.getElementById('overlay-lente').classList.add('vis');
     document.querySelector('#overlay-lente .modal').scrollTop = 0;
   }
@@ -1441,8 +1758,6 @@
     if (!nombre) { alert('El nombre es obligatorio'); return; }
     const btn = document.getElementById('btn-guardar-lente');
     btn.disabled = true; btn.textContent = 'Guardando…';
-
-    // Construir notas con graduación
     const esfera   = getGradValue('l-esfera');
     const color    = document.getElementById('l-color').value.trim();
     const notasBase = document.getElementById('l-notas').value.trim();
@@ -1450,10 +1765,8 @@
     if (esfera) partesGrad.push(`Esfera: ${esfera}`);
     if (color)  partesGrad.push(`Color: ${color}`);
     const notasFinal = [...partesGrad, notasBase].filter(Boolean).join(' | ');
-
     const marcaSel = document.getElementById('l-marca');
     const brand = marcaSel.value === '__otra__' ? document.getElementById('l-marca-otra').value.trim()||null : marcaSel.value||null;
-
     const payload = {
       name: nombre,
       brand,
@@ -1468,7 +1781,6 @@
       active: true,
       updated_at: new Date().toISOString(),
     };
-
     let error;
     if (id) {
       ({ error } = await sb.from('products').update(payload).eq('id', id));
@@ -1477,7 +1789,6 @@
       if (profile?.branch_id) payload.branch_id = profile.branch_id;
       ({ error } = await sb.from('products').insert([payload]));
     }
-
     btn.textContent = id ? '💾 Guardar cambios' : '✅ Guardar lente';
     btn.disabled = false;
     if (error) { alert('Error: ' + error.message); return; }
@@ -1487,9 +1798,7 @@
 
   function normalizarGrad(input) {
     const pos = input.selectionStart;
-    // Convertir coma a punto, eliminar todo lo que no sea dígito o punto
     input.value = input.value.replace(',', '.').replace(/[^0-9.]/g, '');
-    // Evitar múltiples puntos
     const partes = input.value.split('.');
     if (partes.length > 2) input.value = partes[0] + '.' + partes.slice(1).join('');
     try { input.setSelectionRange(pos, pos); } catch(e) {}
@@ -1528,8 +1837,7 @@
     document.getElementById(inputId).value = valor.replace(/^[+-]/, '');
   }
 
-  // ── PRECIOS POR DEFECTO ───────────────────────────────────
-  // Lentes: { par, medio }
+  // ── PRECIOS ───────────────────────────────────────────────
   const PRECIOS_LENTES = {
     'Acuvue Oasys':  { par: 30000, medio: 15000 },
     'Acuvue Vita':   { par: 30000, medio: 15000 },
@@ -1538,8 +1846,6 @@
     'B+L Ultra':     { par: 30000, medio: 15000 },
     'Vanguard':      { par: 24000, medio: 12000 },
   };
-
-  // Líquidos: { presentacion: precio } o { '*': precio } para precio único
   const PRECIOS_LIQUIDOS = {
     'Arlyt Express':         { '60ml':6000, '120ml':8900, '240ml':11500, '360ml':13500, '500ml':16600 },
     'Arlyt Premium':         { '60ml':6500, '120ml':9700, '240ml':14000, '360ml':15800 },
@@ -1623,7 +1929,6 @@
     document.getElementById('lq-presentacion').value = p?.subcategory || '';
     autoNombreLiquido();
     document.getElementById('lq-notas').value = p?.notes || '';
-    // Marca
     const marcaSel = document.getElementById('lq-marca');
     const marcaOtra = document.getElementById('lq-marca-otra');
     if (p?.brand) {
@@ -1807,7 +2112,7 @@
     setTimeout(()=>{ btn.classList.remove('copiado'); btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar todo`; }, 2500);
   }
 
-  // ── MATERIALES Y MARCAS ───────────────────────────────────
+  // ── MARCAS Y MATERIALES ───────────────────────────────────
   async function cargarMarcasEn(selectId, otraId) {
     const { data } = await sb.from('configuracion').select('valor').eq('clave','marcas').maybeSingle();
     let marcas = [];
@@ -1840,7 +2145,6 @@
   // ── INIT ──────────────────────────────────────────────────
   seccionActiva = leerSeccionURL();
   actualizarUISeccion();
-  // Nombre de usuario en sidebar
   if (currentUser) {
     document.getElementById('sb-nombre').textContent = currentUser.name || 'Usuario';
     document.getElementById('sb-avatar').textContent = (currentUser.name || 'U')[0].toUpperCase();
