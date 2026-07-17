@@ -815,7 +815,10 @@
           .trim();
 
         const fila = {};
-        fila[headers[0]]  = p.name || '';
+        const nombreLimpio = esfera
+          ? (p.name || '').replace(esfera, '').replace(/\s+/g, ' ').trim()
+          : (p.name || '').trim();
+        fila[headers[0]]  = nombreLimpio || p.brand || p.name || '';
         fila[headers[1]]  = p.sku || '';
         fila[headers[2]]  = p.brand || '';
         fila[headers[3]]  = '';                          // Material: no aplica a lentes
