@@ -121,6 +121,27 @@
     .btn-export-sub { font-size:11px; color:var(--gris); font-weight:600; margin-top:1px; }
     #exportar-excel-status { font-size:12px; font-weight:700; text-align:center; margin:2px 0 12px; display:none; }
 
+    .export-armazones-box {
+      border:1.5px solid var(--borde); border-radius:14px; padding:14px 16px;
+      background:white;
+    }
+    .export-tipo-chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+    .export-chip {
+      padding:8px 14px; border-radius:20px; border:1.5px solid var(--borde);
+      background:white; color:var(--gris); font-family:'Nunito',sans-serif;
+      font-size:12.5px; font-weight:800; cursor:pointer; transition:all .15s;
+    }
+    .export-chip.activo {
+      background:linear-gradient(135deg,#034295,#2563eb); color:white; border-color:transparent;
+    }
+    .btn-generar-excel {
+      width:100%; background:var(--azul); color:white; border:none;
+      border-radius:12px; padding:12px; font-family:'Nunito',sans-serif;
+      font-size:14px; font-weight:800; cursor:pointer; transition:opacity .15s;
+    }
+    .btn-generar-excel:hover { opacity:.9; }
+    .btn-generar-excel:disabled { opacity:.6; cursor:not-allowed; }
+
     @media(max-width:767px) {
       .btn-hamburger { display:flex; }
 
@@ -387,13 +408,21 @@
     <p style="font-size:13px;color:var(--gris);font-weight:600;margin:0 0 16px">Elegí qué sección querés exportar al formato de tu sistema.</p>
 
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:6px">
-      <button class="btn-export-opcion" id="btn-exp-armazones" onclick="exportarArmazonesExcel(this)">
-        <span class="btn-export-icono">🕶</span>
-        <div>
-          <div class="btn-export-titulo">Armazones</div>
-          <div class="btn-export-sub">Genera el .xlsx listo para importar</div>
+      <div class="export-armazones-box">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <span class="btn-export-icono">🕶</span>
+          <div>
+            <div class="btn-export-titulo">Armazones</div>
+            <div class="btn-export-sub">Elegí qué tipo incluir</div>
+          </div>
         </div>
-      </button>
+        <div class="export-tipo-chips">
+          <button type="button" class="export-chip activo" id="chip-exp-todos" onclick="setTipoExport(this,'')">Todos</button>
+          <button type="button" class="export-chip" id="chip-exp-receta" onclick="setTipoExport(this,'armazon_receta')">🕶 Recetados</button>
+          <button type="button" class="export-chip" id="chip-exp-sol" onclick="setTipoExport(this,'armazon_sol')">☀️ Sol</button>
+        </div>
+        <button class="btn-generar-excel" id="btn-exp-armazones" onclick="exportarArmazonesExcel(this)">📥 Generar Excel</button>
+      </div>
       <button class="btn-export-opcion" disabled>
         <span class="btn-export-icono">👁</span>
         <div>
@@ -621,11 +650,22 @@
   // ── EXPORTAR A EXCEL (OptiGest) ────────────────────────────
   // Mismas categorías de "armazones" que usa productos.html
   const CAT_ARMAZONES_EXPORT = ['armazon_receta','armazon_sol','lentes_oftalmicos','accesorios','clipon','otro'];
+  let tipoExportActivo = ''; // '' = todos, 'armazon_receta', 'armazon_sol'
+
+  function setTipoExport(btn, tipo) {
+    document.querySelectorAll('.export-chip').forEach(b => b.classList.remove('activo'));
+    btn.classList.add('activo');
+    tipoExportActivo = tipo;
+  }
 
   function abrirExportarModal() {
     const st = document.getElementById('exportar-excel-status');
     st.style.display = 'none';
     st.textContent = '';
+    // reset a "Todos" cada vez que se abre
+    tipoExportActivo = '';
+    document.querySelectorAll('.export-chip').forEach(b => b.classList.remove('activo'));
+    document.getElementById('chip-exp-todos').classList.add('activo');
     document.getElementById('overlay-exportar-excel').classList.add('vis');
   }
 
@@ -638,16 +678,20 @@
     st.textContent = 'Generando archivo…';
 
     try {
-      const { data, error } = await sb
-        .from('products')
-        .select('*')
-        .eq('active', true)
-        .in('category', CAT_ARMAZONES_EXPORT);
+      let query = sb.from('products').select('*').eq('active', true);
+      query = tipoExportActivo
+        ? query.eq('category', tipoExportActivo)
+        : query.in('category', CAT_ARMAZONES_EXPORT);
+      const { data, error } = await query;
       if (error) throw error;
+
+      const tipoLabel = tipoExportActivo === 'armazon_receta' ? 'recetados'
+                       : tipoExportActivo === 'armazon_sol'    ? 'de sol'
+                       : '';
 
       if (!data || !data.length) {
         st.style.color = '#92400e';
-        st.textContent = '⚠️ No hay armazones cargados para exportar.';
+        st.textContent = `⚠️ No hay armazones ${tipoLabel} cargados para exportar.`;
         btn.disabled = false;
         return;
       }
@@ -695,10 +739,13 @@
       XLSX.utils.book_append_sheet(wb, ws, 'Armazones y Lentes de Sol Tabla');
 
       const fecha = new Date().toISOString().slice(0,10);
-      XLSX.writeFile(wb, `armazones-optigest-${fecha}.xlsx`);
+      const sufijo = tipoExportActivo === 'armazon_receta' ? '-recetados'
+                   : tipoExportActivo === 'armazon_sol'    ? '-sol'
+                   : '';
+      XLSX.writeFile(wb, `armazones${sufijo}-optigest-${fecha}.xlsx`);
 
       st.style.color = '#065f46';
-      st.textContent = `✅ ${data.length} armazón${data.length!==1?'es':''} exportado${data.length!==1?'s':''} correctamente.`;
+      st.textContent = `✅ ${data.length} armazón${data.length!==1?'es':''} ${tipoLabel} exportado${data.length!==1?'s':''} correctamente.`;
       setTimeout(() => cerrarModal('overlay-exportar-excel'), 1400);
     } catch(e) {
       st.style.color = '#991b1b';
