@@ -423,20 +423,27 @@
         </div>
         <button class="btn-generar-excel" id="btn-exp-armazones" onclick="exportarArmazonesExcel(this)">📥 Generar Excel</button>
       </div>
-      <button class="btn-export-opcion" disabled>
-        <span class="btn-export-icono">👁</span>
-        <div>
-          <div class="btn-export-titulo" style="color:#94a3b8">Lentes de contacto</div>
-          <div class="btn-export-sub" style="color:#cbd5e1">Próximamente</div>
+      <div class="export-armazones-box">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <span class="btn-export-icono">👁</span>
+          <div>
+            <div class="btn-export-titulo">Lentes de contacto</div>
+            <div class="btn-export-sub">Formato OptiGest (12 columnas)</div>
+          </div>
         </div>
-      </button>
-      <button class="btn-export-opcion" disabled>
-        <span class="btn-export-icono">💧</span>
-        <div>
-          <div class="btn-export-titulo" style="color:#94a3b8">Líquidos</div>
-          <div class="btn-export-sub" style="color:#cbd5e1">Próximamente</div>
+        <button class="btn-generar-excel" id="btn-exp-lentes" onclick="exportarLentesExcel(this)">📥 Generar Excel</button>
+      </div>
+
+      <div class="export-armazones-box">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <span class="btn-export-icono">💧</span>
+          <div>
+            <div class="btn-export-titulo">Líquidos</div>
+            <div class="btn-export-sub">Formato OptiGest (8 columnas)</div>
+          </div>
         </div>
-      </button>
+        <button class="btn-generar-excel" id="btn-exp-liquidos" onclick="exportarLiquidosExcel(this)">📥 Generar Excel</button>
+      </div>
     </div>
 
     <div id="exportar-excel-status"></div>
@@ -747,6 +754,152 @@
       st.style.color = '#065f46';
       st.textContent = `✅ ${data.length} armazón${data.length!==1?'es':''} ${tipoLabel} exportado${data.length!==1?'s':''} correctamente.`;
       setTimeout(() => cerrarModal('overlay-exportar-excel'), 1400);
+    } catch(e) {
+      st.style.color = '#991b1b';
+      st.textContent = '❌ Error al exportar: ' + e.message;
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = originalHTML;
+    }
+  }
+
+  // ── helper: formatea fecha a DD/MM/YYYY (Vencimiento) ──────
+  function fmtFechaExport(f) {
+    if (!f) return '';
+    try {
+      const d = new Date(f);
+      if (isNaN(d)) return '';
+      return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+    } catch(e) { return ''; }
+  }
+
+  // ── LENTES DE CONTACTO ──────────────────────────────────────
+  const CAT_LENTES_EXPORT = ['lentes_contacto'];
+
+  async function exportarLentesExcel(btn) {
+    const st = document.getElementById('exportar-excel-status');
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    st.style.display = 'block';
+    st.style.color = 'var(--gris)';
+    st.textContent = 'Generando archivo…';
+
+    try {
+      const { data, error } = await sb
+        .from('products')
+        .select('*')
+        .eq('active', true)
+        .in('category', CAT_LENTES_EXPORT);
+      if (error) throw error;
+
+      if (!data || !data.length) {
+        st.style.color = '#92400e';
+        st.textContent = '⚠️ No hay lentes de contacto cargadas para exportar.';
+        btn.disabled = false;
+        return;
+      }
+
+      const headers = ['Nombre','SKU','Marca','Material','Esfera','Curva Base','Diámetro','Precio','Stock','Vencimiento','Color','Notas'];
+
+      const filas = data.map(p => {
+        const notes = p.notes || '';
+        const esferaMatch = notes.match(/Esfera:\s*([^|]+)/i);
+        const colorMatch  = notes.match(/Color:\s*([^|]+)/i);
+        const esfera = esferaMatch ? esferaMatch[1].trim() : '';
+        const color  = colorMatch  ? colorMatch[1].trim()  : '';
+        const notasLimpias = notes
+          .replace(/Esfera:\s*[^|]+\|?\s*/i, '')
+          .replace(/Color:\s*[^|]+\|?\s*/i, '')
+          .trim()
+          .replace(/^\||\|$/g, '')
+          .trim();
+
+        const fila = {};
+        fila[headers[0]]  = p.name || '';
+        fila[headers[1]]  = p.sku || '';
+        fila[headers[2]]  = p.brand || '';
+        fila[headers[3]]  = '';                          // Material: no aplica a lentes
+        fila[headers[4]]  = esfera;
+        fila[headers[5]]  = '';                          // Curva Base: no se guarda
+        fila[headers[6]]  = '';                          // Diámetro: no se guarda
+        fila[headers[7]]  = p.sale_price ? Math.round(p.sale_price) : '';
+        fila[headers[8]]  = p.stock_current ?? 0;
+        fila[headers[9]]  = fmtFechaExport(p.expiry_date); // Vencimiento (obligatorio en OptiGest, puede quedar vacío)
+        fila[headers[10]] = color;
+        fila[headers[11]] = notasLimpias;
+        return fila;
+      });
+
+      const ws = XLSX.utils.json_to_sheet(filas, { header: headers });
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Lentes de Contacto');
+
+      const fecha = new Date().toISOString().slice(0,10);
+      XLSX.writeFile(wb, `lentes-contacto-optigest-${fecha}.xlsx`);
+
+      st.style.color = '#065f46';
+      st.textContent = `✅ ${data.length} lente${data.length!==1?'s':''} exportada${data.length!==1?'s':''} correctamente. Revisá "Vencimiento" antes de importar.`;
+      setTimeout(() => cerrarModal('overlay-exportar-excel'), 1800);
+    } catch(e) {
+      st.style.color = '#991b1b';
+      st.textContent = '❌ Error al exportar: ' + e.message;
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = originalHTML;
+    }
+  }
+
+  // ── LÍQUIDOS ────────────────────────────────────────────────
+  const CAT_LIQUIDOS_EXPORT = ['soluciones'];
+
+  async function exportarLiquidosExcel(btn) {
+    const st = document.getElementById('exportar-excel-status');
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    st.style.display = 'block';
+    st.style.color = 'var(--gris)';
+    st.textContent = 'Generando archivo…';
+
+    try {
+      const { data, error } = await sb
+        .from('products')
+        .select('*')
+        .eq('active', true)
+        .in('category', CAT_LIQUIDOS_EXPORT);
+      if (error) throw error;
+
+      if (!data || !data.length) {
+        st.style.color = '#92400e';
+        st.textContent = '⚠️ No hay líquidos cargados para exportar.';
+        btn.disabled = false;
+        return;
+      }
+
+      const headers = ['Nombre','SKU','Marca','Volumen','Vencimiento','Precio','Stock','Notas'];
+
+      const filas = data.map(p => {
+        const fila = {};
+        fila[headers[0]] = p.name || '';
+        fila[headers[1]] = p.sku || '';
+        fila[headers[2]] = p.brand || '';
+        fila[headers[3]] = p.subcategory || '';           // Volumen → presentación (ej: 360ml)
+        fila[headers[4]] = fmtFechaExport(p.expiry_date); // Vencimiento (obligatorio en OptiGest, puede quedar vacío)
+        fila[headers[5]] = p.sale_price ? Math.round(p.sale_price) : '';
+        fila[headers[6]] = p.stock_current ?? 0;
+        fila[headers[7]] = p.notes || '';
+        return fila;
+      });
+
+      const ws = XLSX.utils.json_to_sheet(filas, { header: headers });
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Líquidos');
+
+      const fecha = new Date().toISOString().slice(0,10);
+      XLSX.writeFile(wb, `liquidos-optigest-${fecha}.xlsx`);
+
+      st.style.color = '#065f46';
+      st.textContent = `✅ ${data.length} líquido${data.length!==1?'s':''} exportado${data.length!==1?'s':''} correctamente. Revisá "Vencimiento" antes de importar.`;
+      setTimeout(() => cerrarModal('overlay-exportar-excel'), 1800);
     } catch(e) {
       st.style.color = '#991b1b';
       st.textContent = '❌ Error al exportar: ' + e.message;
