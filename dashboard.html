@@ -14,6 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     /* ── CARDS KPI ── */
     .cards-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:20px; }
@@ -104,6 +105,21 @@
     /* SIDEBAR OVERLAY mobile */
     .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:99; opacity:0; transition:opacity .3s; pointer-events:none; }
     .sidebar-overlay.show { opacity:1; pointer-events:all; }
+
+    /* ── EXPORTAR ── */
+    .export-panel-desc { padding:0 18px 14px; font-size:12.5px; color:var(--gris); font-weight:600; line-height:1.5; }
+    .btn-export-opcion {
+      display:flex; align-items:center; gap:12px; width:100%;
+      padding:14px 16px; border-radius:14px; border:1.5px solid var(--borde);
+      background:white; cursor:pointer; transition:all .15s; font-family:'Nunito',sans-serif;
+      text-align:left;
+    }
+    .btn-export-opcion:hover:not(:disabled) { border-color:var(--azul2); background:#eff6ff; }
+    .btn-export-opcion:disabled { cursor:not-allowed; opacity:.55; }
+    .btn-export-icono { font-size:20px; flex-shrink:0; }
+    .btn-export-titulo { font-weight:800; font-size:14px; color:#1e293b; }
+    .btn-export-sub { font-size:11px; color:var(--gris); font-weight:600; margin-top:1px; }
+    #exportar-excel-status { font-size:12px; font-weight:700; text-align:center; margin:2px 0 12px; display:none; }
 
     @media(max-width:767px) {
       .btn-hamburger { display:flex; }
@@ -319,6 +335,25 @@
         </div>
       </div>
 
+      <!-- EXPORTAR A SISTEMA (OPTIGEST) -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Exportar productos
+          </div>
+        </div>
+        <div class="export-panel-desc">
+          Generá un archivo Excel listo para importar en tu otro sistema.
+        </div>
+        <div style="padding:0 18px 18px">
+          <button class="btn-action" style="width:100%;flex-direction:row;justify-content:center;padding:13px" onclick="abrirExportarModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            &nbsp;📤 Exportar a Excel
+          </button>
+        </div>
+      </div>
+
       <!-- ACTIVIDAD RECIENTE -->
       <div class="panel">
         <div class="panel-header">
@@ -342,6 +377,41 @@
       <a class="bnav-item" href="movimientos.html"><span class="bnav-icon">↕️</span>Movimientos</a>
       <a class="bnav-item" href="proveedores.html"><span class="bnav-icon">🏢</span>Proveedores</a>
     </nav>
+  </div>
+</div>
+
+<!-- ══ MODAL EXPORTAR A EXCEL ══ -->
+<div class="overlay" id="overlay-exportar-excel" onclick="cerrarFuera(event,'overlay-exportar-excel')">
+  <div class="modal">
+    <div class="modal-titulo">📤 Exportar a Excel</div>
+    <p style="font-size:13px;color:var(--gris);font-weight:600;margin:0 0 16px">Elegí qué sección querés exportar al formato de tu sistema.</p>
+
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:6px">
+      <button class="btn-export-opcion" id="btn-exp-armazones" onclick="exportarArmazonesExcel(this)">
+        <span class="btn-export-icono">🕶</span>
+        <div>
+          <div class="btn-export-titulo">Armazones</div>
+          <div class="btn-export-sub">Genera el .xlsx listo para importar</div>
+        </div>
+      </button>
+      <button class="btn-export-opcion" disabled>
+        <span class="btn-export-icono">👁</span>
+        <div>
+          <div class="btn-export-titulo" style="color:#94a3b8">Lentes de contacto</div>
+          <div class="btn-export-sub" style="color:#cbd5e1">Próximamente</div>
+        </div>
+      </button>
+      <button class="btn-export-opcion" disabled>
+        <span class="btn-export-icono">💧</span>
+        <div>
+          <div class="btn-export-titulo" style="color:#94a3b8">Líquidos</div>
+          <div class="btn-export-sub" style="color:#cbd5e1">Próximamente</div>
+        </div>
+      </button>
+    </div>
+
+    <div id="exportar-excel-status"></div>
+    <button class="btn-cancelar" onclick="cerrarModal('overlay-exportar-excel')">Cerrar</button>
   </div>
 </div>
 
@@ -542,6 +612,101 @@
   }
   function logout() {
     if (confirm('¿Cerrar sesión?')) { localStorage.removeItem('olvision_user'); window.location.replace('index.html'); }
+  }
+
+  // ── MODALES (genérico) ────────────────────────────────────
+  function cerrarModal(id) { document.getElementById(id).classList.remove('vis'); }
+  function cerrarFuera(e,id) { if (e.target === document.getElementById(id)) cerrarModal(id); }
+
+  // ── EXPORTAR A EXCEL (OptiGest) ────────────────────────────
+  // Mismas categorías de "armazones" que usa productos.html
+  const CAT_ARMAZONES_EXPORT = ['armazon_receta','armazon_sol','lentes_oftalmicos','accesorios','clipon','otro'];
+
+  function abrirExportarModal() {
+    const st = document.getElementById('exportar-excel-status');
+    st.style.display = 'none';
+    st.textContent = '';
+    document.getElementById('overlay-exportar-excel').classList.add('vis');
+  }
+
+  async function exportarArmazonesExcel(btn) {
+    const st = document.getElementById('exportar-excel-status');
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    st.style.display = 'block';
+    st.style.color = 'var(--gris)';
+    st.textContent = 'Generando archivo…';
+
+    try {
+      const { data, error } = await sb
+        .from('products')
+        .select('*')
+        .eq('active', true)
+        .in('category', CAT_ARMAZONES_EXPORT);
+      if (error) throw error;
+
+      if (!data || !data.length) {
+        st.style.color = '#92400e';
+        st.textContent = '⚠️ No hay armazones cargados para exportar.';
+        btn.disabled = false;
+        return;
+      }
+
+      // Columnas EXACTAS de la plantilla (respetando el doble espacio original)
+      const headers = [
+        'Nombre del Producto (Obligatorio)',
+        'Código SKU',
+        'Marca',
+        'Modelo',
+        'Precio (Obligatorio)',
+        'Stock Disponible  (Obligatorio)',
+        'Material',
+        'Medidas',
+        'Color',
+        'Notas'
+      ];
+
+      const filas = data.map(p => {
+        const notes = p.notes || '';
+        const colorMatch = notes.match(/Color:\s*([^|]+)/i);
+        const color = colorMatch ? colorMatch[1].trim() : '';
+        const notasLimpias = notes
+          .replace(/Color:\s*[^|]+\|?\s*/i, '')
+          .trim()
+          .replace(/^\||\|$/g, '')
+          .trim();
+
+        const fila = {};
+        fila[headers[0]] = p.name || '';
+        fila[headers[1]] = p.sku || '';
+        fila[headers[2]] = p.brand || '';
+        fila[headers[3]] = p.sku || '';                                  // Modelo → código (no hay campo "modelo" propio)
+        fila[headers[4]] = p.sale_price ? Math.round(p.sale_price) : '';
+        fila[headers[5]] = p.stock_current ?? 0;
+        fila[headers[6]] = p.material || '';
+        fila[headers[7]] = '';                                            // Medidas: no se guarda hoy
+        fila[headers[8]] = color;
+        fila[headers[9]] = notasLimpias;
+        return fila;
+      });
+
+      const ws = XLSX.utils.json_to_sheet(filas, { header: headers });
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Armazones y Lentes de Sol Tabla');
+
+      const fecha = new Date().toISOString().slice(0,10);
+      XLSX.writeFile(wb, `armazones-optigest-${fecha}.xlsx`);
+
+      st.style.color = '#065f46';
+      st.textContent = `✅ ${data.length} armazón${data.length!==1?'es':''} exportado${data.length!==1?'s':''} correctamente.`;
+      setTimeout(() => cerrarModal('overlay-exportar-excel'), 1400);
+    } catch(e) {
+      st.style.color = '#991b1b';
+      st.textContent = '❌ Error al exportar: ' + e.message;
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = originalHTML;
+    }
   }
 
   // ── INIT ──────────────────────────────────────────────────
